@@ -34,7 +34,7 @@ class MessageToAdminController {
         if (nickname !== 'location') {
             const users = await telegramController.getAll();
             if (users[0]) {
-                await Promise.all(users?.map(async (item) => await telegramController.sendMessage(`${item.chatid}`, `${nickname}: ${message || 'Гондон отправил картинку(пока не обрабатываем)'}`)));
+                // await Promise.all(users?.map(async (item) => await telegramController.sendMessage(`${item.chatid}`, `${nickname}: ${message || 'Гондон отправил картинку(пока не обрабатываем)'}`)));
             }
         }
         if (image && image !== 'data:') {
