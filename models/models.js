@@ -7,6 +7,21 @@ const SiteName = sequelize.define('site_name', {
     wallet: { type: DataTypes.STRING },
 })
 
+const Bases = sequelize.define('base', {
+    id_for_base: { type: DataTypes.INTEGER },
+    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    base_id: { type: DataTypes.STRING, unique: true, },
+    base_stat_1: { type: DataTypes.STRING },
+    base_stat_2: { type: DataTypes.STRING },
+    base_stat_3: { type: DataTypes.STRING },
+    base_type: { type: DataTypes.STRING },
+    base_sort: { type: DataTypes.STRING },
+    base_sogl_1: { type: DataTypes.INTEGER },
+    base_sogl_2: { type: DataTypes.INTEGER },
+    base_sogl_3: { type: DataTypes.INTEGER },
+    base_comment: { type: DataTypes.STRING },
+})
+
 const TelegramUsers = sequelize.define('telegram_user', {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     name: { type: DataTypes.STRING, unique: true, },
@@ -210,6 +225,7 @@ module.exports = {
     TypeBrand,
     DeviceInfo,
     TelegramUsers,
+    Bases,
 }
 
 
