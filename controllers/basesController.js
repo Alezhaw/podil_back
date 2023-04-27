@@ -32,7 +32,7 @@ class BasesController {
                 base_sogl_3: Number(item.base_sogl_3) || null,
                 base_comment: item.base_comment || null
             })
-            console.log(2, base)
+            console.log(2, base.dataValues)
             if (!base) {
                 return error = [...error, {
                     base_id: item.base_id,
