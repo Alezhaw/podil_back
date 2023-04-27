@@ -9,9 +9,8 @@ class BasesController {
         let notIdForBase = ''
         let error = []
         let bases = []
-        const obj = JSON.parse(JSON.stringify(data));
-        console.log(123, obj, 321, typeof obj)
-        data.map(async (item, index) => {
+        const forPostman = { ...req.body }
+        forPostman.map(async (item, index) => {
             const checkUnique = await Bases.findOne({ where: { base_id: item.base_id } })
             if (checkUnique) {
                 return dublicate = `${dublicate}/${item.base_id}`
