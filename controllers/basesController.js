@@ -7,7 +7,7 @@ class BasesController {
         const { data } = req.body
         const forPostman = [{ ...req.body }]
         console.log(1, forPostman)
-        const allResult = forPostman.map(async (item, index) => {
+        const allResult = Promise.all(forPostman.map(async (item, index) => {
             const checkUnique = await Bases.findOne({ where: { base_id: item.base_id } })
             let dublicate = ''
             let notIdForBase = ''
@@ -46,10 +46,13 @@ class BasesController {
                 error,
                 base
             }
-        })
+        }))
         console.log(2, allResult)
         const result = allResult.reduce((acc, item) => ({
-            dublicate: item.dublicate ? `${acc.dublicate}/${item.dublicate}` : acc.dublicate
+            dublicate: item.dublicate ? `${acc.dublicate}/${item.dublicate}` : acc.dublicate,
+            notIdForBase: item.notIdForBase ? `${acc.notIdForBase}/${item.notIdForBase}` : acc.notIdForBase,
+            error: item.error ? `${acc.error}/${item.error}` : acc.error,
+            base: item.base ? [...acc.base, item.base] : acc.base,
         }), {})
         return res.json(result)
     }
