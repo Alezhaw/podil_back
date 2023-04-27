@@ -36,11 +36,13 @@ class BasesController {
                 base_comment: item.base_comment || null
             })
             if (!base) {
+                console.log(4, base, base.dataValues)
                 return error = error.push({
                     base_id: item.base_id,
                     base: base,
                 })
             }
+            console.log(5, base, base.dataValues)
             bases.push(base.dataValues)
         }))
         console.log(3, result, dublicate, notIdForBase, error, bases)
