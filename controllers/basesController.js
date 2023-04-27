@@ -21,17 +21,18 @@ class BasesController {
             }
             const base = await Bases.create({
                 id_for_base: Number(item.id_for_base) || null,
-                base_id: String(item.base_id) || null,
-                base_stat_1: String(item.base_stat_1) || null,
-                base_stat_2: String(item.base_stat_2) || null,
-                base_stat_3: String(item.base_stat_3) || null,
-                base_type: String(item.base_type) || null,
-                base_sort: String(item.base_sort) || null,
+                base_id: item.base_id || null,
+                base_stat_1: item.base_stat_1 || null,
+                base_stat_2: item.base_stat_2 || null,
+                base_stat_3: item.base_stat_3 || null,
+                base_type: item.base_type || null,
+                base_sort: item.base_sort || null,
                 base_sogl_1: Number(item.base_sogl_1) || null,
-                base_sogl_2: Number(item.base_sogl_2) | null,
+                base_sogl_2: Number(item.base_sogl_2) || null,
                 base_sogl_3: Number(item.base_sogl_3) || null,
-                base_comment: String(item.base_comment) || null
+                base_comment: item.base_comment || null
             })
+            console.log(2, base)
             if (!base) {
                 return error = [...error, {
                     base_id: item.base_id,
@@ -59,7 +60,7 @@ class BasesController {
         if (!id && !base_id) {
             return next(ApiError.badRequest('Укажите id или base_id'))
         }
-        const base = await Bases.findOne({ where: { id: Number(id) } }) || await Bases.findOne({ where: { base_id: String(base_id) } })
+        const base = await Bases.findOne({ where: { id: Number(id) } }) || await Bases.findOne({ where: { base_id: base_id } })
         if (!base) {
             return next(ApiError.internal('База не найдена'))
         }
@@ -85,22 +86,22 @@ class BasesController {
         if (!id && !base_id) {
             return next(ApiError.badRequest('Укажите id или base_id'))
         }
-        const base = await Bases.findOne({ where: { id: Number(id) } }) || await Bases.findOne({ where: { base_id: String(base_id) } })
+        const base = await Bases.findOne({ where: { id: Number(id) } }) || await Bases.findOne({ where: { base_id: base_id } })
         if (!base) {
             return next(ApiError.internal('База не найдена'))
         }
         const updatedBase = await Bases.update({
             id_for_base: Number(id_for_base) || null,
-            base_id: String(base_id) || null,
-            base_stat_1: String(base_stat_1) || null,
-            base_stat_2: String(base_stat_2) || null,
-            base_stat_3: String(base_stat_3) || null,
-            base_type: String(base_type) || null,
-            base_sort: String(base_sort) || null,
+            base_id: base_id || null,
+            base_stat_1: base_stat_1 || null,
+            base_stat_2: base_stat_2 || null,
+            base_stat_3: base_stat_3 || null,
+            base_type: base_type || null,
+            base_sort: base_sort || null,
             base_sogl_1: Number(base_sogl_1) || null,
             base_sogl_2: Number(base_sogl_2) || null,
             base_sogl_3: Number(base_sogl_3) || null,
-            base_comment: String(base_comment) || null,
+            base_comment: base_comment || null,
         }, { where: { id: base.id } })
 
         return res.json(updatedBase)
@@ -111,7 +112,7 @@ class BasesController {
         if (!id && !base_id) {
             return next(ApiError.badRequest('Укажите id или base_id'))
         }
-        const base = await Bases.findOne({ where: { id: Number(id) } }) || await Bases.findOne({ where: { base_id: String(base_id) } })
+        const base = await Bases.findOne({ where: { id: Number(id) } }) || await Bases.findOne({ where: { base_id: base_id } })
         if (!base) {
             return next(ApiError.internal('База не найдена'))
         }
