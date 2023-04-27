@@ -15,6 +15,7 @@ class BasesController {
             const checkUnique = await Bases.findOne({ where: { base_id: item.base_id } })
             if (checkUnique) {
                 dublicate = `${dublicate}/${item.base_id}`
+                console.log(2, dublicate, notIdForBase, error, bases)
                 return;
             }
             if (!item.id_for_base) {
@@ -34,7 +35,6 @@ class BasesController {
                 base_sogl_3: Number(item.base_sogl_3) || null,
                 base_comment: item.base_comment || null
             })
-            console.log(2, dublicate, notIdForBase, error, bases)
             if (!base) {
                 return error = error.push({
                     base_id: item.base_id,
@@ -43,6 +43,7 @@ class BasesController {
             }
             bases.push(base.dataValues)
         })
+        console.log(3, dublicate, notIdForBase, error, bases)
         return res.json({
             bases: bases,
             dublicate: dublicate,
