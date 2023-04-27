@@ -39,7 +39,7 @@ class BasesController {
                     base: base,
                 }]
             }
-            bases = [...bases, base]
+            bases = [...bases, base.dataValues]
         })
         return res.json({
             bases: bases,
