@@ -10,7 +10,6 @@ class BasesController {
         let error = []
         let bases = []
         const forPostman = [{ ...req.body }]
-        console.log(1, forPostman)
         const result = await Promise.all(forPostman.map(async (item, index) => {
             const checkUnique = await Bases.findOne({ where: { base_id: item.base_id } })
             if (checkUnique) {
@@ -22,7 +21,6 @@ class BasesController {
                 notIdForBase = `${notIdForBase}/${item.base_id}`
                 return;
             }
-            console.log(6)
             const base = await Bases.create({
                 id_for_base: Number(item.id_for_base) || null,
                 base_id: item.base_id || null,
@@ -36,18 +34,14 @@ class BasesController {
                 base_sogl_3: Number(item.base_sogl_3) || null,
                 base_comment: item.base_comment || null
             })
-            console.log(7)
             if (!base) {
-                console.log(4, base, base.dataValues)
                 return error = error.push({
                     base_id: item.base_id,
                     base: base,
                 })
             }
-            console.log(5, base, base.dataValues)
             bases.push(base.dataValues)
         }))
-        console.log(3, result, dublicate, notIdForBase, error, bases)
         return res.json({
             bases: bases,
             dublicate: dublicate,
