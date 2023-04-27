@@ -34,12 +34,12 @@ class BasesController {
             })
             console.log(2, base.dataValues)
             if (!base) {
-                return error = [...error, {
+                return error = error.push({
                     base_id: item.base_id,
                     base: base,
-                }]
+                })
             }
-            bases = [...bases, base.dataValues]
+            bases.push(base.dataValues)
         })
         return res.json({
             bases: bases,
