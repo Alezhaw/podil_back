@@ -14,10 +14,12 @@ class BasesController {
         forPostman.map(async (item, index) => {
             const checkUnique = await Bases.findOne({ where: { base_id: item.base_id } })
             if (checkUnique) {
-                return dublicate = `${dublicate}/${item.base_id}`
+                dublicate = `${dublicate}/${item.base_id}`
+                return;
             }
             if (!item.id_for_base) {
-                return notIdForBase = `${notIdForBase}/${item.base_id}`
+                notIdForBase = `${notIdForBase}/${item.base_id}`
+                return;
             }
             const base = await Bases.create({
                 id_for_base: Number(item.id_for_base) || null,
