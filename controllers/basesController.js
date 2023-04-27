@@ -5,22 +5,24 @@ const bcrypt = require('bcrypt')
 class BasesController {
     async create(req, res, next) {
         const { data } = req.body
-        let dublicate = ''
-        let notIdForBase = ''
-        let error = []
-        let bases = []
         const forPostman = [{ ...req.body }]
         console.log(1, forPostman)
-        forPostman.map(async (item, index) => {
+        const allResult = forPostman.map(async (item, index) => {
             const checkUnique = await Bases.findOne({ where: { base_id: item.base_id } })
+            let dublicate = ''
+            let notIdForBase = ''
+            let error = ''
             if (checkUnique) {
-                dublicate = `${dublicate}/${item.base_id}`
-                console.log(2, dublicate, notIdForBase, error, bases)
-                return;
+                dublicate = item.base_id
             }
             if (!item.id_for_base) {
-                notIdForBase = `${notIdForBase}/${item.base_id}`
-                return;
+                notIdForBase = item.base_id
+            }
+            if (dublicate || notIdForBase) {
+                return {
+                    dublicate: dublicate,
+                    notIdForBase: notIdForBase,
+                }
             }
             const base = await Bases.create({
                 id_for_base: Number(item.id_for_base) || null,
@@ -36,20 +38,20 @@ class BasesController {
                 base_comment: item.base_comment || null
             })
             if (!base) {
-                return error = error.push({
-                    base_id: item.base_id,
-                    base: base,
-                })
+                error = item.base_id
             }
-            bases.push(base.dataValues)
+            return {
+                dublicate,
+                notIdForBase,
+                error,
+                base
+            }
         })
-        console.log(3, dublicate, notIdForBase, error, bases)
-        return res.json({
-            bases: bases,
-            dublicate: dublicate,
-            notIdForBase: notIdForBase,
-            error: error,
-        })
+        console.log(2, allResult)
+        const result = allResult.reduce((acc, item) => ({
+            dublicate: item.dublicate ? `${acc.dublicate}/${item.dublicate}` : acc.dublicate
+        }), {})
+        return res.json(result)
     }
 
     async getAll(req, res) {
