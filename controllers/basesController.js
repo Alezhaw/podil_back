@@ -22,6 +22,7 @@ class BasesController {
                 notIdForBase = `${notIdForBase}/${item.base_id}`
                 return;
             }
+            console.log(6)
             const base = await Bases.create({
                 id_for_base: Number(item.id_for_base) || null,
                 base_id: item.base_id || null,
@@ -35,6 +36,7 @@ class BasesController {
                 base_sogl_3: Number(item.base_sogl_3) || null,
                 base_comment: item.base_comment || null
             })
+            console.log(7)
             if (!base) {
                 console.log(4, base, base.dataValues)
                 return error = error.push({
