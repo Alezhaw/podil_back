@@ -1,5 +1,5 @@
 const ApiError = require('../error/ApiError');
-const { User, Deal, Bases } = require('../models/models')
+const { Bases } = require('../models/models')
 const bcrypt = require('bcrypt')
 
 class BasesController {
