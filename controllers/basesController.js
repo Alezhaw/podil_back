@@ -9,7 +9,7 @@ class BasesController {
         let notIdForBase = ''
         let error = []
         let bases = []
-        const forPostman = { ...req.body }
+        const forPostman = [{ ...req.body }]
         forPostman.map(async (item, index) => {
             const checkUnique = await Bases.findOne({ where: { base_id: item.base_id } })
             if (checkUnique) {
