@@ -9,7 +9,7 @@ class BasesController {
         let notIdForBase = ''
         let error = []
         let bases = []
-        console.log(123, req.body, 321, data)
+        console.log(123, req.body, 321, data, typeof req.body, typeof data)
         data.map(async (item, index) => {
             const checkUnique = await Bases.findOne({ where: { base_id: item.base_id } })
             if (checkUnique) {
