@@ -72,10 +72,8 @@ class CitiesController {
                     zamkniete: !!item.zamkniete ?? null,
                     base_stat_6: item.base_stat_6 || null,
                 })
-                console.log(3, city)
                 cities.push(city.dataValues)
             } catch (e) {
-                console.log(1, e, e.message)
                 return error.push({
                     miasto: item.miasto_lokal,
                     id_for_base: item.id_for_base,
@@ -102,7 +100,7 @@ class CitiesController {
         if (!id && !id_for_base) {
             return next(ApiError.badRequest('Укажите id или id_for_base'))
         }
-        const city = await Cities.findOne({ where: { id: Number(id) } }) || await Cities.findOne({ where: { id_for_base: Number(id_for_base) } })
+        const city = await Cities.findOne({ where: { id: Number(id) } }) || await Cities.findAll({ where: { id_for_base: Number(id_for_base) } })
         if (!city) {
             return next(ApiError.internal('Город не найден'))
         }
@@ -164,10 +162,10 @@ class CitiesController {
             base_stat_6,
         } = req.body
 
-        if (!id && !id_for_base) {
-            return next(ApiError.badRequest('Укажите id или id_for_base'))
+        if (!id) {
+            return next(ApiError.badRequest('Укажите id'))
         }
-        const city = await Cities.findOne({ where: { id: Number(id) } }) || await Cities.findOne({ where: { id_for_base: Number(id_for_base) } })
+        const city = await Cities.findOne({ where: { id: Number(id) } })
         if (!city) {
             return next(ApiError.internal('Город не найден'))
         }
@@ -228,16 +226,16 @@ class CitiesController {
     }
 
     async deleteCity(req, res, next) {
-        const { id, id_for_base } = req.body
-        if (!id && !id_for_base) {
-            return next(ApiError.badRequest('Укажите id или id_for_base'))
+        const { id_for_base } = req.body
+        if (!id_for_base) {
+            return next(ApiError.badRequest('id_for_base'))
         }
-        const city = await Cities.findOne({ where: { id: Number(id) } }) || await Cities.findOne({ where: { id_for_base: Number(id_for_base) } })
+        const city = await Cities.findOne({ where: { id_for_base: Number(id_for_base) } })
         if (!city) {
             return next(ApiError.internal('Город не найден'))
         }
         await Cities.destroy({
-            where: { id: city.id }
+            where: { id_for_base: city.id_for_base }
         })
         return res.json({ ...city.dataValues })
     }

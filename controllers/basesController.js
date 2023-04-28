@@ -20,7 +20,6 @@ class BasesController {
                 return;
             }
             try {
-                console.log(2)
                 const base = await Bases.create({
                     id_for_base: Number(item.id_for_base),
                     base_id: item.base_id || null,
@@ -34,10 +33,8 @@ class BasesController {
                     base_sogl_3: Number(item.base_sogl_3) || null,
                     base_comment: item.base_comment || null
                 })
-                console.log(3, base)
                 bases.push(base.dataValues)
             } catch (e) {
-                console.log(1, e, e.message)
                 return error.push({
                     base_id: item.base_id,
                     error: e.message,
