@@ -20,7 +20,6 @@ class CitiesController {
                 return;
             }
             try {
-                console.log(2, city)
                 const city = await Cities.create({
                     l_p: Number(item.l_p) || null,
                     godzina: item.godzina || null,
