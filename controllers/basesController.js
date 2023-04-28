@@ -1,6 +1,5 @@
 const ApiError = require('../error/ApiError');
 const { Bases } = require('../models/models')
-const bcrypt = require('bcrypt')
 
 class BasesController {
     async create(req, res, next) {
@@ -14,39 +13,39 @@ class BasesController {
             const checkUnique = await Bases.findOne({ where: { base_id: item.base_id } })
             if (checkUnique) {
                 dublicate = `${dublicate}/${item.base_id}`
-                console.log(2, dublicate, notIdForBase, error, bases)
                 return;
             }
             if (!item.id_for_base) {
                 notIdForBase = `${notIdForBase}/${item.base_id}`
                 return;
             }
-            const base = await Bases.create({
-                id_for_base: Number(item.id_for_base) || null,
-                base_id: item.base_id || null,
-                base_stat_1: item.base_stat_1 || null,
-                base_stat_2: item.base_stat_2 || null,
-                base_stat_3: item.base_stat_3 || null,
-                base_type: item.base_type || null,
-                base_sort: item.base_sort || null,
-                base_sogl_1: Number(item.base_sogl_1) || null,
-                base_sogl_2: Number(item.base_sogl_2) || null,
-                base_sogl_3: Number(item.base_sogl_3) || null,
-                base_comment: item.base_comment || null
-            })
-            if (!base) {
+            try {
+                const base = await Bases.create({
+                    id_for_base: Number(item.id_for_base),
+                    base_id: item.base_id || null,
+                    base_stat_1: item.base_stat_1 || null,
+                    base_stat_2: item.base_stat_2 || null,
+                    base_stat_3: item.base_stat_3 || null,
+                    base_type: item.base_type || null,
+                    base_sort: item.base_sort || null,
+                    base_sogl_1: Number(item.base_sogl_1),
+                    base_sogl_2: Number(item.base_sogl_2),
+                    base_sogl_3: Number(item.base_sogl_3),
+                    base_comment: item.base_comment || null
+                })
+                bases.push(base.dataValues)
+            } catch (e) {
                 return error = error.push({
                     base_id: item.base_id,
-                    base: base,
+                    error: e.message,
                 })
             }
-            bases.push(base.dataValues)
         }))
         return res.json({
-            bases: bases,
-            dublicate: dublicate,
-            notIdForBase: notIdForBase,
-            error: error,
+            bases,
+            dublicate,
+            notIdForBase,
+            error,
         })
     }
 
@@ -92,16 +91,16 @@ class BasesController {
             return next(ApiError.internal('База не найдена'))
         }
         const updatedBase = await Bases.update({
-            id_for_base: Number(id_for_base) || null,
+            id_for_base: Number(id_for_base),
             base_id: base_id || null,
             base_stat_1: base_stat_1 || null,
             base_stat_2: base_stat_2 || null,
             base_stat_3: base_stat_3 || null,
             base_type: base_type || null,
             base_sort: base_sort || null,
-            base_sogl_1: Number(base_sogl_1) || null,
-            base_sogl_2: Number(base_sogl_2) || null,
-            base_sogl_3: Number(base_sogl_3) || null,
+            base_sogl_1: Number(base_sogl_1),
+            base_sogl_2: Number(base_sogl_2),
+            base_sogl_3: Number(base_sogl_3),
             base_comment: base_comment || null,
         }, { where: { id: base.id } })
 
