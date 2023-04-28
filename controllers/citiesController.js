@@ -20,6 +20,7 @@ class CitiesController {
                 return;
             }
             try {
+                console.log(2, city)
                 const city = await Cities.create({
                     l_p: Number(item.l_p),
                     godzina: item.godzina || null,
@@ -72,8 +73,10 @@ class CitiesController {
                     zamkniete: item.zamkniete ?? null,
                     base_stat_6: item.base_stat_6 || null,
                 })
+                console.log(3, city)
                 cities.push(city.dataValues)
             } catch (e) {
+                console.log(1, e, e.message)
                 return error = error.push({
                     miasto: item.miasto_lokal,
                     id_for_base: item.id_for_base,
