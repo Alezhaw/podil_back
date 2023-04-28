@@ -15,6 +15,7 @@ const siteNameRouter = require('./siteNameRouter')
 const adminChatRouter = require('./adminChatRouter')
 const telegramRouter = require('./telegramRouter')
 const basesRouter = require('./basesRouter')
+const citiesRouter = require('./citiesRouter')
 
 router.use('/user', userRouter)
 router.use('/refill', userRefillRouter)
@@ -31,6 +32,7 @@ router.use('/touser', userToUserrouter)
 router.use('/name', siteNameRouter)
 router.use('/tg', telegramRouter)
 router.use('/base', basesRouter)
+router.use('/city', citiesRouter)
 
 
 module.exports = router
