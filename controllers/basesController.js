@@ -29,9 +29,9 @@ class BasesController {
                     base_stat_3: item.base_stat_3 || null,
                     base_type: item.base_type || null,
                     base_sort: item.base_sort || null,
-                    base_sogl_1: Number(item.base_sogl_1) ?? null,
-                    base_sogl_2: Number(item.base_sogl_2) ?? null,
-                    base_sogl_3: Number(item.base_sogl_3) ?? null,
+                    base_sogl_1: Number(item.base_sogl_1) || null,
+                    base_sogl_2: Number(item.base_sogl_2) || null,
+                    base_sogl_3: Number(item.base_sogl_3) || null,
                     base_comment: item.base_comment || null
                 })
                 console.log(3, base)
@@ -101,9 +101,9 @@ class BasesController {
             base_stat_3: base_stat_3 || null,
             base_type: base_type || null,
             base_sort: base_sort || null,
-            base_sogl_1: Number(base_sogl_1) ?? null,
-            base_sogl_2: Number(base_sogl_2) ?? null,
-            base_sogl_3: Number(base_sogl_3) ?? null,
+            base_sogl_1: Number(base_sogl_1) || null,
+            base_sogl_2: Number(base_sogl_2) || null,
+            base_sogl_3: Number(base_sogl_3) || null,
             base_comment: base_comment || null,
         }, { where: { id: base.id } })
 
