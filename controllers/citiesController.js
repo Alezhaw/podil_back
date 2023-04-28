@@ -77,7 +77,7 @@ class CitiesController {
                 cities.push(city.dataValues)
             } catch (e) {
                 console.log(1, e, e.message)
-                return error = error.push({
+                return error.push({
                     miasto: item.miasto_lokal,
                     id_for_base: item.id_for_base,
                     error: e.message,

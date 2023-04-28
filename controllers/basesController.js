@@ -38,7 +38,7 @@ class BasesController {
                 bases.push(base.dataValues)
             } catch (e) {
                 console.log(1, e, e.message)
-                return error = error.push({
+                return error.push({
                     base_id: item.base_id,
                     error: e.message,
                 })
