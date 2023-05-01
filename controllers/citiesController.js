@@ -9,7 +9,7 @@ class CitiesController {
         let error = []
         let cities = []
         const forPostman = [{ ...req.body }]
-        console.log(1, data, req.body)
+        console.log(1, data, req.body, req)
         const result = await Promise.all(data.map(async (item, index) => {
             if (!item.id_for_base) {
                 not_id_for_base = `${not_id_for_base}/${item.miasto_lokal}`
