@@ -1,5 +1,5 @@
 const ApiError = require('../error/ApiError');
-const { Bases, Cities } = require('../models/models')
+const { Cities } = require('../models/models')
 
 class CitiesController {
     async create(req, res, next) {
@@ -30,7 +30,7 @@ class CitiesController {
                     miasto_lokal: item.miasto_lokal || null,
                     timezone: Number(item.timezone) || null,
                     limit: Number(item.limit) || null,
-                    dodawanie_rekordów: item.dodawanie_rekordów || null,
+                    dodawanie_rekordow: item.dodawanie_rekordow || null,
                     scenariusze: item.scenariusze || null,
                     weryfikacja_dkj: item.weryfikacja_dkj || null,
                     podpinanie_scenariuszy: item.podpinanie_scenariuszy || null,
@@ -119,7 +119,7 @@ class CitiesController {
             miasto_lokal,
             timezone,
             limit,
-            dodawanie_rekordów,
+            dodawanie_rekordow,
             scenariusze,
             weryfikacja_dkj,
             podpinanie_scenariuszy,
@@ -179,7 +179,7 @@ class CitiesController {
             miasto_lokal: miasto_lokal || null,
             timezone: Number(timezone) || null,
             limit: Number(limit) || null,
-            dodawanie_rekordów: dodawanie_rekordów || null,
+            dodawanie_rekordow: dodawanie_rekordow || null,
             scenariusze: scenariusze || null,
             weryfikacja_dkj: weryfikacja_dkj || null,
             podpinanie_scenariuszy: podpinanie_scenariuszy || null,
