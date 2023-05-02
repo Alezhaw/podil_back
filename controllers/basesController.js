@@ -9,7 +9,8 @@ class BasesController {
         let error = []
         let bases = []
         const forPostman = [{ ...req.body }]
-        const result = await Promise.all(forPostman.map(async (item, index) => {
+        console.log(1, data, req.body)
+        const result = await Promise.all(data.map(async (item, index) => {
             const checkUnique = await Bases.findOne({ where: { base_id: item.base_id } })
             if (checkUnique) {
                 dublicate = `${dublicate}/${item.base_id}`
