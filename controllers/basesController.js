@@ -4,7 +4,7 @@ const { Bases } = require('../models/models')
 class BasesController {
     async create(req, res, next) {
         const { data } = req.body
-        let dublicate = ''
+        let update = ''
         let notIdForBase = ''
         let error = []
         let bases = []
@@ -13,8 +13,28 @@ class BasesController {
         const result = await Promise.all(data.map(async (item, index) => {
             const checkUnique = await Bases.findOne({ where: { base_id: item.base_id } })
             if (checkUnique) {
-                dublicate = `${dublicate}/${item.base_id}`
-                return;
+                try {
+                    await Bases.update({
+                        id_for_base: Number(item.id_for_base),
+                        base_id: item.base_id || null,
+                        base_stat_1: item.base_stat_1 || null,
+                        base_stat_2: item.base_stat_2 || null,
+                        base_stat_3: item.base_stat_3 || null,
+                        base_type: item.base_type || null,
+                        base_sort: item.base_sort || null,
+                        base_sogl_1: Number(item.base_sogl_1) || null,
+                        base_sogl_2: Number(item.base_sogl_2) || null,
+                        base_sogl_3: Number(item.base_sogl_3) || null,
+                        base_comment: item.base_comment || null
+                    }, { where: { id: checkUnique.id } })
+                    update = `${update}/${item.base_id}`
+                    return;
+                } catch (e) {
+                    return error.push({
+                        base_id: item.base_id,
+                        error: e.message,
+                    })
+                }
             }
             if (!item.id_for_base) {
                 notIdForBase = `${notIdForBase}/${item.base_id}`
@@ -44,7 +64,7 @@ class BasesController {
         }))
         return res.json({
             bases,
-            dublicate,
+            update,
             notIdForBase,
             error,
         })

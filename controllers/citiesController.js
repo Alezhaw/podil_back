@@ -72,7 +72,7 @@ class CitiesController {
             const checkUnique = await Cities.findOne({ where: { id_for_base: item.id_for_base, godzina: item.godzina } })
             if (checkUnique) {
                 try {
-                    await Cities.update(getObjectForDataBase(item), { where: { id_for_base: item.id_for_base, godzina: item.godzina } })
+                    await Cities.update(getObjectForDataBase(item), { where: { id: checkUnique.id } })
                     updated = `${updated}/${item.id_for_base}`
                     return;
                 } catch (e) {
