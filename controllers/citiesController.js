@@ -9,7 +9,7 @@ class CitiesController {
         let error = []
         let cities = []
         const forPostman = [{ ...req.body }]
-        console.log(1, data, req.body)
+        //console.log(1, data, req.body)
         const result = await Promise.all(data.map(async (item, index) => {
             if (!item.id_for_base) {
                 not_id_for_base = `${not_id_for_base}/${item.miasto_lokal}`
@@ -21,6 +21,7 @@ class CitiesController {
                 return;
             }
             try {
+                console.log(1, item.rekodow_na_1_zgode, Number(item.rekodow_na_1_zgode), typeof (item.rekodow_na_1_zgode), typeof (Number(item.rekodow_na_1_zgode)))
                 const city = await Cities.create({
                     l_p: Number(item.l_p) || null,
                     godzina: item.godzina || null,
