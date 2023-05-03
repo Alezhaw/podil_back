@@ -81,7 +81,7 @@ class BasesController {
         if (!id && !base_id) {
             return next(ApiError.badRequest('Укажите id или base_id'))
         }
-        const base = await Bases.findOne({ where: { id: Number(id) } }) || await Bases.findOne({ where: { base_id: base_id } })
+        const base = await Bases.findOne({ where: { id: Number(id) || 0 } }) || await Bases.findOne({ where: { base_id: base_id } })
         if (!base) {
             return next(ApiError.internal('База не найдена'))
         }
