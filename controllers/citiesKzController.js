@@ -242,7 +242,7 @@ class CitiesController {
     async deleteCity(req, res, next) {
         const { id_for_base } = req.body
         if (!id_for_base) {
-            return next(ApiError.badRequest('id_for_base'))
+            return next(ApiError.badRequest('Укажите id_for_base'))
         }
         const city = await KzCities.findOne({ where: { id_for_base: Number(id_for_base) } })
         if (!city) {
@@ -250,6 +250,21 @@ class CitiesController {
         }
         await KzCities.destroy({
             where: { id_for_base: city.id_for_base }
+        })
+        return res.json({ ...city.dataValues })
+    }
+
+    async deleteOneTime(req, res, next) {
+        const { id } = req.body
+        if (!id) {
+            return next(ApiError.badRequest('Укажите id'))
+        }
+        const city = await KzCities.findOne({ where: { id: Number(id) } })
+        if (!city) {
+            return next(ApiError.internal('Город не найден'))
+        }
+        await KzCities.destroy({
+            where: { id }
         })
         return res.json({ ...city.dataValues })
     }
