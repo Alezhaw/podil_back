@@ -11,7 +11,7 @@ class BasesController {
         const forPostman = [{ ...req.body }]
         console.log(1, data, req.body)
         const result = await Promise.all(data.map(async (item, index) => {
-            const checkUnique = await KzBases.findOne({ where: { base_id: item.base_id } })
+            const checkUnique = await KzBases.findOne({ where: { id: Number(item.id) } }) || await KzBases.findOne({ where: { base_id: item.base_id } })
             if (checkUnique) {
                 try {
                     await KzBases.update({
