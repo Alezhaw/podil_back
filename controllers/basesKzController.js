@@ -141,7 +141,7 @@ class BasesController {
     if (!id && !base_id) {
       return next(ApiError.badRequest("Укажите id или base_id"));
     }
-    const base = (await KzBases.findOne({ where: { id: Number(id) } })) || (await KzBases.findOne({ where: { base_id: base_id } }));
+    const base = (await KzBases.findOne({ where: { id: Number(id) || null } })) || (await KzBases.findOne({ where: { base_id: base_id } }));
     if (!base) {
       return next(ApiError.internal("База не найдена"));
     }
