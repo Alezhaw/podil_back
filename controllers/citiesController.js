@@ -70,18 +70,20 @@ class CitiesController {
           not_id_for_base = `${not_id_for_base}/${item.miasto_lokal}`;
           return;
         }
-        const checkUnique = (await Cities.findOne({ where: { id: Number(item.id) || null } })) || (await Cities.findOne({ where: { id_for_base: item.id_for_base, godzina: item.godzina } }));
-        if (checkUnique) {
-          try {
-            await Cities.update(getObjectForDataBase(item), { where: { id: checkUnique.id } });
-            updated = `${updated}/${item.id_for_base}`;
-            return;
-          } catch (e) {
-            return error.push({
-              miasto: item.miasto_lokal,
-              id_for_base: item.id_for_base,
-              error: e.message,
-            });
+        if (item?.id !== "create") {
+          const checkUnique = (await Cities.findOne({ where: { id: Number(item.id) || null } })) || (await Cities.findOne({ where: { id_for_base: item.id_for_base, godzina: item.godzina } }));
+          if (checkUnique) {
+            try {
+              await Cities.update(getObjectForDataBase(item), { where: { id: checkUnique.id } });
+              updated = `${updated}/${item.id_for_base}`;
+              return;
+            } catch (e) {
+              return error.push({
+                miasto: item.miasto_lokal,
+                id_for_base: item.id_for_base,
+                error: e.message,
+              });
+            }
           }
         }
         try {
