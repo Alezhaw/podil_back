@@ -52,6 +52,7 @@ function getObjectForDataBase(item) {
     w_toku: !!item.w_toku ?? null,
     zamkniete: !!item.zamkniete ?? null,
     base_stat_6: item.base_stat_6 || null,
+    zgody_inne_miasto: Number(item.zgody_inne_miasto) || null,
   };
 }
 
@@ -178,6 +179,7 @@ class CitiesController {
       w_toku,
       zamkniete,
       base_stat_6,
+      zgody_inne_miasto,
     } = req.body;
 
     if (!id) {
@@ -239,6 +241,7 @@ class CitiesController {
         w_toku: !!w_toku ?? null,
         zamkniete: !!zamkniete ?? null,
         base_stat_6: base_stat_6 || null,
+        zgody_inne_miasto: Number(zgody_inne_miasto) || null,
       },
       { where: { id: city.id } }
     );
