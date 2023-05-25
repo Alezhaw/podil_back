@@ -90,6 +90,9 @@ const Cities = sequelize.define("city", {
   zamkniete: { type: DataTypes.BOOLEAN },
   base_stat_6: { type: DataTypes.STRING },
   zgody_inne_miasto: { type: DataTypes.INTEGER },
+  check_base: { type: DataTypes.BOOLEAN },
+  check_speaker: { type: DataTypes.BOOLEAN },
+  check_scenario: { type: DataTypes.BOOLEAN },
 });
 
 const KzCities = sequelize.define("kzcity", {
@@ -145,6 +148,9 @@ const KzCities = sequelize.define("kzcity", {
   zamkniete: { type: DataTypes.BOOLEAN },
   base_stat_6: { type: DataTypes.STRING },
   zgody_inne_miasto: { type: DataTypes.INTEGER },
+  check_base: { type: DataTypes.BOOLEAN },
+  check_speaker: { type: DataTypes.BOOLEAN },
+  check_scenario: { type: DataTypes.BOOLEAN },
 });
 
 const TelegramUsers = sequelize.define("telegram_user", {

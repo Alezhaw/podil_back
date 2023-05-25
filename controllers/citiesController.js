@@ -53,6 +53,9 @@ function getObjectForDataBase(item) {
     zamkniete: !!item.zamkniete ?? null,
     base_stat_6: item.base_stat_6 || null,
     zgody_inne_miasto: Number(item.zgody_inne_miasto) || null,
+    check_base: !!item.check_base ?? null,
+    check_speaker: !!item.check_speaker ?? null,
+    check_scenario: !!item.check_scenario ?? null,
   };
 }
 
