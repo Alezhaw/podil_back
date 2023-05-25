@@ -183,6 +183,9 @@ class CitiesController {
       zamkniete,
       base_stat_6,
       zgody_inne_miasto,
+      check_base,
+      check_speaker,
+      check_scenario,
     } = req.body;
 
     if (!id) {
@@ -245,6 +248,9 @@ class CitiesController {
         zamkniete: !!zamkniete ?? null,
         base_stat_6: base_stat_6 || null,
         zgody_inne_miasto: Number(zgody_inne_miasto) || null,
+        check_base: !!check_base ?? null,
+        check_speaker: !!check_speaker ?? null,
+        check_scenario: !!check_scenario ?? null,
       },
       { where: { id: city.id } }
     );
