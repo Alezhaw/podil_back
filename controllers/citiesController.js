@@ -276,7 +276,7 @@ class CitiesController {
     if (!id && !id_for_base) {
       return next(ApiError.badRequest("Укажите id или id_for_base"));
     }
-    console.log(1, check_base, typeof check_base, check_base ?? check_speaker ?? check_scenario);
+    console.log(1, check_base, typeof check_base, typeof check_base === "boolean", check_base ?? check_speaker ?? check_scenario);
     if (typeof (check_base ?? check_speaker ?? check_scenario) !== Boolean) {
       return next(ApiError.badRequest("Укажите данные для замены"));
     }
