@@ -1,5 +1,6 @@
 const ApiError = require("../error/ApiError");
 const { KzCities } = require("../models/models");
+
 function getObjectForDataBase(item) {
   return {
     l_p: Number(item.l_p) || null,
@@ -57,6 +58,17 @@ function getObjectForDataBase(item) {
     check_speaker: !!item.check_speaker ?? null,
     check_scenario: !!item.check_scenario ?? null,
   };
+}
+
+function checkValue(check_base, check_speaker, check_scenario) {
+  switch ("boolean") {
+    case typeof check_base:
+      return { check_base: !!check_base };
+    case typeof check_speaker:
+      return { check_speaker: !!check_speaker };
+    case typeof check_scenario:
+      return { check_scenario: !!check_scenario };
+  }
 }
 
 class CitiesController {
@@ -256,6 +268,21 @@ class CitiesController {
     );
 
     return res.json(updatedCity);
+  }
+
+  async changeCheck(req, res, next) {
+    const { id, id_for_base, check_base, check_speaker, check_scenario } = req.body;
+    if (!id && !id_for_base) {
+      return next(ApiError.badRequest("Укажите id или id_for_base"));
+    }
+    if (typeof (check_base ?? check_speaker ?? check_scenario) !== "boolean") {
+      return next(ApiError.badRequest("Укажите данные для замены"));
+    }
+    const city = (await KzCities.findOne({ where: { id: Number(id) || null } })) || (await KzCities.findOne({ where: { id_for_base } }));
+    const updated = await KzCities.update(checkValue(check_base, check_speaker, check_scenario), { where: { id_for_base: city.id_for_base } });
+    const allCities = await KzCities.findAll();
+
+    return res.json(allCities);
   }
 
   async deleteCity(req, res, next) {
