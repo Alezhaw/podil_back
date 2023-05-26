@@ -1,4 +1,3 @@
-const { BOOLEAN } = require("sequelize/types");
 const { DataTypes } = require("sequelize");
 const ApiError = require("../error/ApiError");
 const { Cities } = require("../models/models");
@@ -63,7 +62,7 @@ function getObjectForDataBase(item) {
 }
 
 function checkValue(check_base, check_speaker, check_scenario) {
-  switch (DataTypes.BOOLEAN) {
+  switch (Boolean) {
     case typeof check_base:
       return { check_base: !!check_base };
     case typeof check_speaker:
@@ -277,7 +276,7 @@ class CitiesController {
     if (!id && !id_for_base) {
       return next(ApiError.badRequest("Укажите id или id_for_base"));
     }
-    if (typeof (check_base ?? check_speaker ?? check_scenario) !== DataTypes.BOOLEAN) {
+    if (typeof (check_base ?? check_speaker ?? check_scenario) !== Boolean) {
       return next(ApiError.badRequest("Укажите данные для замены"));
     }
     const city = (await Cities.findOne({ where: { id: Number(id) || null } })) || (await Cities.findOne({ where: { id_for_base: item.id_for_base } }));
