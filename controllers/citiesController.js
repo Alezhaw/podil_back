@@ -280,9 +280,9 @@ class CitiesController {
     if (typeof (check_base ?? check_speaker ?? check_scenario) !== "boolean") {
       return next(ApiError.badRequest("Укажите данные для замены"));
     }
-    const city = (await Cities.findOne({ where: { id: Number(id) || null } })) || (await Cities.findOne({ where: { id_for_base: item.id_for_base } }));
+    const city = (await Cities.findOne({ where: { id: Number(id) || null } })) || (await Cities.findOne({ where: { id_for_base } }));
     const updated = await Cities.update(checkValue(check_base, check_speaker, check_scenario), { where: { id_for_base: city.id_for_base } });
-    const test = await Cities.findAll({ where: { id_for_base: item.id_for_base } });
+    const test = await Cities.findAll({ where: { id_for_base: city.id_for_base } });
     console.log("test", check_base, check_speaker, check_scenario, test);
 
     const allCities = await Cities.findAll();
