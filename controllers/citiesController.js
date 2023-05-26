@@ -62,7 +62,7 @@ function getObjectForDataBase(item) {
 }
 
 function checkValue(check_base, check_speaker, check_scenario) {
-  switch (Boolean) {
+  switch ("boolean") {
     case typeof check_base:
       return { check_base: !!check_base };
     case typeof check_speaker:
@@ -277,7 +277,7 @@ class CitiesController {
       return next(ApiError.badRequest("Укажите id или id_for_base"));
     }
     console.log(1, check_base, typeof check_base, typeof check_base === "boolean", check_base ?? check_speaker ?? check_scenario);
-    if (typeof (check_base ?? check_speaker ?? check_scenario) !== Boolean) {
+    if (typeof (check_base ?? check_speaker ?? check_scenario) !== "boolean") {
       return next(ApiError.badRequest("Укажите данные для замены"));
     }
     const city = (await Cities.findOne({ where: { id: Number(id) || null } })) || (await Cities.findOne({ where: { id_for_base: item.id_for_base } }));
