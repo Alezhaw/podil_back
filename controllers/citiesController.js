@@ -2,65 +2,6 @@ const { DataTypes } = require("sequelize");
 const ApiError = require("../error/ApiError");
 const { Cities } = require("../models/models");
 
-function getObjectForDataBase(item) {
-  return {
-    l_p: Number(item.l_p) || null,
-    godzina: item.godzina || null,
-    os_poj: item.os_poj || null,
-    pary: item.pary || null,
-    wyjasnienia: !!item.wyjasnienia ?? null,
-    projekt: item.projekt || null,
-    miasto_lokal: item.miasto_lokal || null,
-    timezone: Number(item.timezone) || null,
-    limit: Number(item.limit) || null,
-    dodawanie_rekordow: item.dodawanie_rekordow || null,
-    scenariusze: item.scenariusze || null,
-    weryfikacja_dkj: item.weryfikacja_dkj || null,
-    podpinanie_scenariuszy: item.podpinanie_scenariuszy || null,
-    present: item.present || null,
-    rekodow_na_1_zgode: Number(item.rekodow_na_1_zgode) || null,
-    wb_1: item.wb_1 || null,
-    wb_2: Number(item.wb_2) || null,
-    ilosc_zaproszen: Number(item.ilosc_zaproszen) || null,
-    dzien_1_data: item.dzien_1_data || null,
-    dzien_1_rekodow_na_1_zgode: Number(item.dzien_1_rekodow_na_1_zgode) || null,
-    dzien_1_aktualna_ilosc_zaproszen: Number(item.dzien_1_aktualna_ilosc_zaproszen) || null,
-    dzien_2_data: item.dzien_2_data || null,
-    dzien_2_rekodow_na_1_zgode: Number(item.dzien_2_rekodow_na_1_zgode) || null,
-    dzien_2_aktualna_ilosc_zaproszen: Number(item.dzien_2_aktualna_ilosc_zaproszen) || null,
-    dzien_3_data: item.dzien_3_data || null,
-    dzien_3_rekodow_na_1_zgode: Number(item.dzien_3_rekodow_na_1_zgode) || null,
-    dzien_3_aktualna_ilosc_zaproszen: Number(item.dzien_3_aktualna_ilosc_zaproszen) || null,
-    vip_id: item.vip_id || null,
-    vip_format: item.vip_format || null,
-    vip_limit: item.vip_limit || null,
-    vip_coming: item.vip_coming || null,
-    vip_total_steam: item.vip_total_steam || null,
-    vip_percent_coming: item.vip_percent_coming || null,
-    system: item.system || null,
-    zgoda_wyniki_potwierdzen: Number(item.zgoda_wyniki_potwierdzen) || null,
-    odmowy_wyniki_potwierdzen: Number(item.odmowy_wyniki_potwierdzen) || null,
-    kropki_wyniki_potwierdzen: Number(item.kropki_wyniki_potwierdzen) || null,
-    sms_umawianie: !!item.sms_umawianie ?? null,
-    sms_potwierdzen: !!item.sms_potwierdzen ?? null,
-    wiretap_note: item.wiretap_note || null,
-    wiretapping_sogl: item.wiretapping_sogl || null,
-    base_stat_1: item.base_stat_1 || null,
-    base_stat_2: item.base_stat_2 || null,
-    base_stat_3: item.base_stat_3 || null,
-    base_stat_4: item.base_stat_4 || null,
-    base_stat_5: item.base_stat_5 || null,
-    id_for_base: Number(item.id_for_base) || null,
-    w_toku: !!item.w_toku ?? null,
-    zamkniete: !!item.zamkniete ?? null,
-    base_stat_6: item.base_stat_6 || null,
-    zgody_inne_miasto: Number(item.zgody_inne_miasto) || null,
-    check_base: !!item.check_base ?? null,
-    check_speaker: !!item.check_speaker ?? null,
-    check_scenario: !!item.check_scenario ?? null,
-  };
-}
-
 function checkValue(check_base, check_speaker, check_scenario) {
   switch ("boolean") {
     case typeof check_base:
@@ -91,7 +32,7 @@ class CitiesController {
           const checkUnique = (await Cities.findOne({ where: { id: Number(item.id) || null } })) || (await Cities.findOne({ where: { id_for_base: item.id_for_base, godzina: item.godzina } }));
           if (checkUnique) {
             try {
-              await Cities.update(getObjectForDataBase(item), { where: { id: checkUnique.id } });
+              await Cities.update(item, { where: { id: checkUnique.id } });
               updated = `${updated}/${item.id_for_base}`;
               return;
             } catch (e) {
@@ -105,7 +46,7 @@ class CitiesController {
         }
         try {
           //console.log(1, item.rekodow_na_1_zgode, Number(item.rekodow_na_1_zgode), typeof (item.rekodow_na_1_zgode), typeof (Number(item.rekodow_na_1_zgode)))
-          const city = await Cities.create(getObjectForDataBase(item));
+          const city = await Cities.create(item);
           cities.push(city.dataValues);
         } catch (e) {
           return error.push({
