@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const ApiError = require("../error/ApiError");
+const ObjectHelper = require("../utils/objectHelper");
 const { Cities } = require("../models/models");
 
 function checkValue(check_base, check_speaker, check_scenario) {
@@ -31,6 +32,7 @@ class CitiesController {
         }
         if (item?.id !== "create") {
           const checkUnique = (await Cities.findOne({ where: { id: Number(item.id) || null } })) || (await Cities.findOne({ where: { id_for_base: item.id_for_base, godzina: item.godzina } }));
+          console.log("changes","user: ",user.id,ObjectHelper.getObjectDifferences(checkUnique.dataValues,item).filter(x=>x[0]!="createdAt" && x[0]!="updatedAt"));
           if (checkUnique) {
             try {
               await Cities.update(item, { where: { id: checkUnique.id } });
