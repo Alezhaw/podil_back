@@ -15,6 +15,7 @@ function checkValue(check_base, check_speaker, check_scenario) {
 
 class CitiesController {
   async create(req, res, next) {
+    let user = req.user;
     const { data } = req.body;
     let updated = "";
     let not_id_for_base = "";

@@ -1,8 +1,9 @@
 const Router = require("express");
 const router = new Router();
+const auth = require('../middleware/authMiddleware')
 const citiesController = require("../controllers/citiesController");
 
-router.post("/create", citiesController.create);
+router.post("/create", auth, citiesController.create);
 router.post("/getOne", citiesController.getOneCity);
 router.post("/changeOne", citiesController.changeCity);
 router.post("/changeCheck", citiesController.changeCheck);
