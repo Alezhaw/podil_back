@@ -79,7 +79,7 @@ class CitiesController {
     if (!id && !id_for_base) {
       return next(ApiError.badRequest("Укажите id или id_for_base"));
     }
-    const city = (await Cities.findOne({ where: { id: Number(id) } })) || (await Cities.findAll({ where: { id_for_base: Number(id_for_base) } }));
+    const city = id ? (await Cities.findOne({ where: { id: Number(id) } })) : (await Cities.findAll({ where: { id_for_base: Number(id_for_base) } }));
     if (!city) {
       return next(ApiError.internal("Город не найден"));
     }
