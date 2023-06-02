@@ -34,7 +34,7 @@ class CitiesController {
 
           if (checkUnique) {
             try {
-              const result = ObjectHelper.sendCityToDatabase(checkUnique, item, "russia", "update", user);
+              const result = ObjectHelper.sendDifferencesToDatabase(checkUnique, item, "russia", "update", user, "city");
               if (!result) {
                 error.push({
                   miasto: item.miasto_lokal,
@@ -57,7 +57,7 @@ class CitiesController {
         try {
           const city = await Cities.create(item);
           cities.push(city.dataValues);
-          const result = ObjectHelper.sendCityToDatabase(city, item, "russia", "create", user);
+          const result = ObjectHelper.sendDifferencesToDatabase(city, item, "russia", "create", user, "city");
           if (!result) {
             error.push({
               miasto: item.miasto_lokal,
@@ -245,7 +245,9 @@ class CitiesController {
 
     const cities = await Cities.findAll({ where: { id_for_base: city.id_for_base } });
 
-    const result = cities?.map((city) => ObjectHelper.sendCityToDatabase(city, { ...city.dataValues, ...checkValue(check_base, check_speaker, check_scenario) }, "russia", "update", user));
+    const result = cities?.map((city) =>
+      ObjectHelper.sendDifferencesToDatabase(city, { ...city.dataValues, ...checkValue(check_base, check_speaker, check_scenario) }, "russia", "update", user, "city")
+    );
     if (!result[0]) {
       return next(ApiError.internal("Failed to write log"));
     }
@@ -269,7 +271,7 @@ class CitiesController {
 
     const cities = await Cities.findAll({ where: { id_for_base: Number(id_for_base) } });
 
-    const result = cities?.map((city) => ObjectHelper.sendCityToDatabase(city, city.dataValues, "russia", "delete", user));
+    const result = cities?.map((city) => ObjectHelper.sendDifferencesToDatabase(city, city.dataValues, "russia", "delete", user, "city"));
     if (!result[0]) {
       return next(ApiError.internal("Failed to write log"));
     }
@@ -293,7 +295,7 @@ class CitiesController {
     if (!city) {
       return next(ApiError.internal("Город не найден"));
     }
-    const result = ObjectHelper.sendCityToDatabase(city, city.dataValues, "russia", "delete", user);
+    const result = ObjectHelper.sendDifferencesToDatabase(city, city.dataValues, "russia", "delete", user, "city");
     if (!result) {
       return next(ApiError.internal("Failed to write log"));
     }

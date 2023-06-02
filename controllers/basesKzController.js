@@ -4,6 +4,7 @@ const { KzBases } = require("../models/models");
 class BasesController {
   async create(req, res, next) {
     const { data } = req.body;
+    let user = req.user;
     let update = "";
     let notIdForBase = "";
     let error = [];
@@ -15,6 +16,13 @@ class BasesController {
         const checkUnique = (await KzBases.findOne({ where: { id: Number(item.id) || null } })) || (await KzBases.findOne({ where: { base_id: item.base_id } }));
         if (checkUnique) {
           try {
+            const result = ObjectHelper.sendDifferencesToDatabase(checkUnique, item, "kazakhstan", "update", user, "base");
+            if (!result) {
+              error.push({
+                base_id: item.base_id,
+                error: "Failed to write log",
+              });
+            }
             await KzBases.update(
               {
                 id_for_base: Number(item.id_for_base),
@@ -59,6 +67,13 @@ class BasesController {
             base_comment: item.base_comment || null,
           });
           bases.push(base.dataValues);
+          const result = ObjectHelper.sendDifferencesToDatabase(base, item, "kazakhstan", "create", user, "base");
+          if (!result) {
+            error.push({
+              base_id: item.base_id,
+              error: "Failed to write log",
+            });
+          }
         } catch (e) {
           return error.push({
             base_id: item.base_id,
@@ -108,6 +123,7 @@ class BasesController {
 
   async changeBase(req, res, next) {
     const { id_for_base, id, base_id, base_stat_1, base_stat_2, base_stat_3, base_type, base_sort, base_sogl_1, base_sogl_2, base_sogl_3, base_comment } = req.body;
+    let user = req.user;
 
     if (!id && !base_id) {
       return next(ApiError.badRequest("Укажите id или base_id"));
@@ -115,6 +131,18 @@ class BasesController {
     const base = (await KzBases.findOne({ where: { id: Number(id) } })) || (await KzBases.findOne({ where: { base_id: base_id } }));
     if (!base) {
       return next(ApiError.internal("База не найдена"));
+    }
+
+    const result = ObjectHelper.sendDifferencesToDatabase(
+      base,
+      { id_for_base, id, base_id, base_stat_1, base_stat_2, base_stat_3, base_type, base_sort, base_sogl_1, base_sogl_2, base_sogl_3, base_comment },
+      "kazakhstan",
+      "update",
+      user,
+      "base"
+    );
+    if (!result) {
+      return next(ApiError.internal("Failed to write log"));
     }
     const updatedBase = await KzBases.update(
       {
@@ -138,6 +166,7 @@ class BasesController {
 
   async deleteBase(req, res, next) {
     const { id, base_id } = req.body;
+    let user = req.user;
     if (!id && !base_id) {
       return next(ApiError.badRequest("Укажите id или base_id"));
     }
@@ -145,6 +174,11 @@ class BasesController {
     if (!base) {
       return next(ApiError.internal("База не найдена"));
     }
+    const result = ObjectHelper.sendDifferencesToDatabase(base, base.dataValues, "kazakhstan", "delete", user, "base");
+    if (!result) {
+      return next(ApiError.internal("Failed to write log"));
+    }
+
     await KzBases.destroy({
       where: { id: base.id },
     });

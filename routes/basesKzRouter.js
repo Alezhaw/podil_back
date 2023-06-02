@@ -1,12 +1,13 @@
-const Router = require('express')
-const router = new Router()
-const basesKzController = require('../controllers/basesKzController')
+const Router = require("express");
+const router = new Router();
+const auth = require("../middleware/authMiddleware");
+const basesKzController = require("../controllers/basesKzController");
 
-router.post('/create', basesKzController.create)
-router.post('/getOne', basesKzController.getOneBase)
-router.post('/getForCity', basesKzController.getBasesForCity)
-router.post('/changeOne', basesKzController.changeBase)
-router.post('/deleteOne', basesKzController.deleteBase)
-router.get('/get', basesKzController.getAll)
+router.post("/create", auth, basesKzController.create);
+router.post("/getOne", basesKzController.getOneBase);
+router.post("/getForCity", basesKzController.getBasesForCity);
+router.post("/changeOne", auth, basesKzController.changeBase);
+router.post("/deleteOne", auth, basesKzController.deleteBase);
+router.get("/get", basesKzController.getAll);
 
-module.exports = router
+module.exports = router;
