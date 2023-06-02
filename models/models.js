@@ -373,4 +373,5 @@ module.exports = {
   Cities,
   KzBases,
   KzCities,
+  Logs,
 };

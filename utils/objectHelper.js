@@ -1,3 +1,6 @@
+//const { Logs } = require("../models/models");
+const { Logs } = require("../models/models");
+
 class ObjectHelper {
   constructor() {}
 
@@ -28,7 +31,7 @@ class ObjectHelper {
     return differences;
   }
 
-  static sendCityToDatabase(city1, city2, country, action, user) {
+  static async sendCityToDatabase(city1, city2, country, action, user) {
     const differences =
       action === "update"
         ? this.getObjectDifferences(city1.dataValues, city2).filter((x) => x[0] != "createdAt" && x[0] != "updatedAt")
@@ -36,18 +39,18 @@ class ObjectHelper {
     if (!differences[0]) return console.log("Нет отличий");
     const date = new Date();
     try {
-      console.log(
+      await Logs.create({
         country,
         action,
-        "user: ",
-        user.id,
-        user.email,
-        JSON.stringify(differences),
-        city1.dataValues?.id_for_base,
-        differences.filter((dif) => dif[0] === "godzina")[0] ? null : city1.dataValues?.godzina,
-        city1.dataValues?.miasto_lokal,
-        date
-      );
+        user_id: user.id,
+        user_email: user.email,
+        differences: JSON.stringify(differences),
+        id_for_base: city1.dataValues?.id_for_base,
+        godzina: differences.filter((dif) => dif[0] === "godzina")[0] ? null : city1.dataValues?.godzina,
+        miasto_lokal: city1.dataValues?.miasto_lokal,
+        time: date,
+      });
+
       return true;
     } catch (e) {
       console.log(e);
