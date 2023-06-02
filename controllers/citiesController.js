@@ -1,4 +1,3 @@
-const { DataTypes } = require("sequelize");
 const ApiError = require("../error/ApiError");
 const ObjectHelper = require("../utils/objectHelper");
 const { Cities } = require("../models/models");

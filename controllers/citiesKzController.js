@@ -1,64 +1,6 @@
 const ApiError = require("../error/ApiError");
+const ObjectHelper = require("../utils/objectHelper");
 const { KzCities } = require("../models/models");
-
-function getObjectForDataBase(item) {
-  return {
-    l_p: Number(item.l_p) || null,
-    godzina: item.godzina || null,
-    os_poj: item.os_poj || null,
-    pary: item.pary || null,
-    wyjasnienia: !!item.wyjasnienia ?? null,
-    projekt: item.projekt || null,
-    miasto_lokal: item.miasto_lokal || null,
-    timezone: Number(item.timezone) || null,
-    limit: Number(item.limit) || null,
-    dodawanie_rekordow: item.dodawanie_rekordow || null,
-    scenariusze: item.scenariusze || null,
-    weryfikacja_dkj: item.weryfikacja_dkj || null,
-    podpinanie_scenariuszy: item.podpinanie_scenariuszy || null,
-    present: item.present || null,
-    rekodow_na_1_zgode: Number(item.rekodow_na_1_zgode) || null,
-    wb_1: item.wb_1 || null,
-    wb_2: Number(item.wb_2) || null,
-    ilosc_zaproszen: Number(item.ilosc_zaproszen) || null,
-    dzien_1_data: item.dzien_1_data || null,
-    dzien_1_rekodow_na_1_zgode: Number(item.dzien_1_rekodow_na_1_zgode) || null,
-    dzien_1_aktualna_ilosc_zaproszen: Number(item.dzien_1_aktualna_ilosc_zaproszen) || null,
-    dzien_2_data: item.dzien_2_data || null,
-    dzien_2_rekodow_na_1_zgode: Number(item.dzien_2_rekodow_na_1_zgode) || null,
-    dzien_2_aktualna_ilosc_zaproszen: Number(item.dzien_2_aktualna_ilosc_zaproszen) || null,
-    dzien_3_data: item.dzien_3_data || null,
-    dzien_3_rekodow_na_1_zgode: Number(item.dzien_3_rekodow_na_1_zgode) || null,
-    dzien_3_aktualna_ilosc_zaproszen: Number(item.dzien_3_aktualna_ilosc_zaproszen) || null,
-    vip_id: item.vip_id || null,
-    vip_format: item.vip_format || null,
-    vip_limit: item.vip_limit || null,
-    vip_coming: item.vip_coming || null,
-    vip_total_steam: item.vip_total_steam || null,
-    vip_percent_coming: item.vip_percent_coming || null,
-    system: item.system || null,
-    zgoda_wyniki_potwierdzen: Number(item.zgoda_wyniki_potwierdzen) || null,
-    odmowy_wyniki_potwierdzen: Number(item.odmowy_wyniki_potwierdzen) || null,
-    kropki_wyniki_potwierdzen: Number(item.kropki_wyniki_potwierdzen) || null,
-    sms_umawianie: !!item.sms_umawianie ?? null,
-    sms_potwierdzen: !!item.sms_potwierdzen ?? null,
-    wiretap_note: item.wiretap_note || null,
-    wiretapping_sogl: item.wiretapping_sogl || null,
-    base_stat_1: item.base_stat_1 || null,
-    base_stat_2: item.base_stat_2 || null,
-    base_stat_3: item.base_stat_3 || null,
-    base_stat_4: item.base_stat_4 || null,
-    base_stat_5: item.base_stat_5 || null,
-    id_for_base: Number(item.id_for_base) || null,
-    w_toku: !!item.w_toku ?? null,
-    zamkniete: !!item.zamkniete ?? null,
-    base_stat_6: item.base_stat_6 || null,
-    zgody_inne_miasto: Number(item.zgody_inne_miasto) || null,
-    check_base: !!item.check_base ?? null,
-    check_speaker: !!item.check_speaker ?? null,
-    check_scenario: !!item.check_scenario ?? null,
-  };
-}
 
 function checkValue(check_base, check_speaker, check_scenario) {
   switch ("boolean") {
@@ -73,6 +15,7 @@ function checkValue(check_base, check_speaker, check_scenario) {
 
 class CitiesController {
   async create(req, res, next) {
+    let user = req.user;
     const { data } = req.body;
     let updated = "";
     let not_id_for_base = "";
@@ -88,9 +31,18 @@ class CitiesController {
         }
         if (item?.id !== "create") {
           const checkUnique = (await KzCities.findOne({ where: { id: Number(item.id) || null } })) || (await KzCities.findOne({ where: { id_for_base: item.id_for_base, godzina: item.godzina } }));
+
           if (checkUnique) {
             try {
-              await KzCities.update(getObjectForDataBase(item), { where: { id: checkUnique.id } });
+              const result = ObjectHelper.sendCityToDatabase(checkUnique, item, "russia", "update", user);
+              if (!result) {
+                error.push({
+                  miasto: item.miasto_lokal,
+                  id_for_base: item.id_for_base,
+                  error: "Failed to write log",
+                });
+              }
+              await KzCities.update(item, { where: { id: checkUnique.id } });
               updated = `${updated}/${item.id_for_base}`;
               return;
             } catch (e) {
@@ -103,9 +55,16 @@ class CitiesController {
           }
         }
         try {
-          //console.log(1, item.rekodow_na_1_zgode, Number(item.rekodow_na_1_zgode), typeof (item.rekodow_na_1_zgode), typeof (Number(item.rekodow_na_1_zgode)))
-          const city = await KzCities.create(getObjectForDataBase(item));
+          const city = await KzCities.create(item);
           cities.push(city.dataValues);
+          const result = ObjectHelper.sendCityToDatabase(city, item, "russia", "create", user);
+          if (!result) {
+            error.push({
+              miasto: item.miasto_lokal,
+              id_for_base: item.id_for_base,
+              error: "Failed to write log",
+            });
+          }
         } catch (e) {
           return error.push({
             miasto: item.miasto_lokal,
@@ -134,7 +93,7 @@ class CitiesController {
     if (!id && !id_for_base) {
       return next(ApiError.badRequest("Укажите id или id_for_base"));
     }
-    const city = (await KzCities.findOne({ where: { id: Number(id) } })) || (await KzCities.findAll({ where: { id_for_base: Number(id_for_base) } }));
+    const city = id ? await KzCities.findOne({ where: { id: Number(id) } }) : await KzCities.findAll({ where: { id_for_base: Number(id_for_base) } });
     if (!city) {
       return next(ApiError.internal("Город не найден"));
     }
@@ -272,13 +231,24 @@ class CitiesController {
 
   async changeCheck(req, res, next) {
     const { id, id_for_base, check_base, check_speaker, check_scenario } = req.body;
+    let user = req.user;
     if (!id && !id_for_base) {
       return next(ApiError.badRequest("Укажите id или id_for_base"));
     }
     if (typeof (check_base ?? check_speaker ?? check_scenario) !== "boolean") {
       return next(ApiError.badRequest("Укажите данные для замены"));
     }
-    const city = (await KzCities.findOne({ where: { id: Number(id) || null } })) || (await KzCities.findOne({ where: { id_for_base } }));
+    const city = id ? await KzCities.findOne({ where: { id: Number(id) || null } }) : await KzCities.findOne({ where: { id_for_base } });
+    if (!city) {
+      return next(ApiError.internal("Город не найден"));
+    }
+
+    const cities = await KzCities.findAll({ where: { id_for_base: city.id_for_base } });
+
+    const result = cities?.map((city) => ObjectHelper.sendCityToDatabase(city, { ...city.dataValues, ...checkValue(check_base, check_speaker, check_scenario) }, "russia", "update", user));
+    if (!result[0]) {
+      return next(ApiError.internal("Failed to write log"));
+    }
     const updated = await KzCities.update(checkValue(check_base, check_speaker, check_scenario), { where: { id_for_base: city.id_for_base } });
     const allCities = await KzCities.findAll();
 
@@ -287,6 +257,8 @@ class CitiesController {
 
   async deleteCity(req, res, next) {
     const { id_for_base } = req.body;
+    let user = req.user;
+
     if (!id_for_base) {
       return next(ApiError.badRequest("Укажите id_for_base"));
     }
@@ -294,20 +266,36 @@ class CitiesController {
     if (!city) {
       return next(ApiError.internal("Город не найден"));
     }
-    await KzCities.destroy({
-      where: { id_for_base: city.id_for_base },
-    });
-    return res.json({ ...city.dataValues });
+
+    const cities = await KzCities.findAll({ where: { id_for_base: Number(id_for_base) } });
+
+    const result = cities?.map((city) => ObjectHelper.sendCityToDatabase(city, city.dataValues, "russia", "delete", user));
+    if (!result[0]) {
+      return next(ApiError.internal("Failed to write log"));
+    }
+    try {
+      await KzCities.destroy({
+        where: { id_for_base: city.id_for_base },
+      });
+      return res.json({ ...city.dataValues });
+    } catch (e) {
+      return next(ApiError.internal("Delete failed"));
+    }
   }
 
   async deleteOneTime(req, res, next) {
     const { id } = req.body;
+    let user = req.user;
     if (!id) {
       return next(ApiError.badRequest("Укажите id"));
     }
     const city = await KzCities.findOne({ where: { id: Number(id) } });
     if (!city) {
       return next(ApiError.internal("Город не найден"));
+    }
+    const result = ObjectHelper.sendCityToDatabase(city, city.dataValues, "russia", "delete", user);
+    if (!result) {
+      return next(ApiError.internal("Failed to write log"));
     }
     await KzCities.destroy({
       where: { id },

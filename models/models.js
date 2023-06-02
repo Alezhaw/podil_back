@@ -7,6 +7,19 @@ const SiteName = sequelize.define("site_name", {
   wallet: { type: DataTypes.STRING },
 });
 
+const Logs = sequelize.define("log", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  country: { type: DataTypes.STRING },
+  action: { type: DataTypes.STRING },
+  user_id: { type: DataTypes.INTEGER },
+  user_email: { type: DataTypes.STRING },
+  differences: { type: DataTypes.JSON },
+  id_for_base: { type: DataTypes.INTEGER },
+  godzina: { type: DataTypes.STRING },
+  miasto_lokal: { type: DataTypes.STRING },
+  time: { type: DataTypes.DATE },
+});
+
 const Bases = sequelize.define("base", {
   id_for_base: { type: DataTypes.INTEGER },
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
