@@ -34,6 +34,7 @@ class CitiesController {
 
           if (checkUnique) {
             try {
+              console.log(1);
               const result = ObjectHelper.sendDifferencesToDatabase(checkUnique, item, "kazakhstan", "update", user, "city");
               if (!result) {
                 error.push({
