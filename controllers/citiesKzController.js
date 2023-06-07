@@ -34,7 +34,6 @@ class CitiesController {
 
           if (checkUnique) {
             try {
-              console.log(1);
               const result = ObjectHelper.sendDifferencesToDatabase(checkUnique, item, "kazakhstan", "update", user, "city");
               if (!result) {
                 error.push({
@@ -42,6 +41,7 @@ class CitiesController {
                   id_for_base: item.id_for_base,
                   error: "Failed to write log",
                 });
+                return;
               }
               await KzCities.update(item, { where: { id: checkUnique.id } });
               updated = `${updated}/${item.id_for_base}`;

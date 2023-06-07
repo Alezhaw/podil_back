@@ -41,6 +41,7 @@ class CitiesController {
                   id_for_base: item.id_for_base,
                   error: "Failed to write log",
                 });
+                return;
               }
               await Cities.update(item, { where: { id: checkUnique.id } });
               updated = `${updated}/${item.id_for_base}`;
