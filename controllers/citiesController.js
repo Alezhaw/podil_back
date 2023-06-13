@@ -88,6 +88,43 @@ class CitiesController {
     return res.json(cities);
   }
 
+  async getFilteredCities(req, res, next) {
+    const { search, inProgress, zamkniete, baseInProgress, baseZamkniete, scenarioInProgress, scenarioZamkniete, speakerInProgress, speakerZamkniete, sort, pageSize, page } = req.body;
+
+    if (!pageSize || !page) {
+      return next(ApiError.badRequest("Укажите page и pageSize"));
+    }
+    const city = await Cities.findAll();
+    if (!city) {
+      return next(ApiError.internal("Нет городов в базе данных"));
+    }
+
+    let filteredCities = city
+      ?.filter((el) => (search ? el?.miasto_lokal?.toLowerCase()?.includes(search.toLowerCase()) : true))
+      ?.filter((item, i, ar) => {
+        return ar.map((el) => el.id_for_base).indexOf(item.id_for_base) === i;
+      })
+      ?.filter(
+        (checkbox) =>
+          (!checkbox?.zamkniete && inProgress) ||
+          (!!checkbox?.zamkniete && zamkniete) ||
+          (!checkbox?.check_base && baseInProgress) ||
+          (!!checkbox?.check_base && baseZamkniete) ||
+          (!checkbox?.check_scenario && scenarioInProgress) ||
+          (!!checkbox?.check_scenario && scenarioZamkniete) ||
+          (!checkbox?.check_speaker && speakerInProgress) ||
+          (!!checkbox?.check_speaker && speakerZamkniete)
+      )
+      ?.sort((a, b) => (!sort ? Number(b.id_for_base) - Number(a.id_for_base) : Number(a.id_for_base) - Number(b.id_for_base)))
+      ?.slice(page * pageSize - pageSize, page * pageSize)
+      ?.map((el) => city?.filter((time) => time.id_for_base === el.id_for_base))
+      ?.flat();
+    if (!city) {
+      return next(ApiError.internal("Город не найден"));
+    }
+    return res.json(filteredCities);
+  }
+
   async getOneCity(req, res, next) {
     const { id, id_for_base } = req.body;
 

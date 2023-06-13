@@ -5,6 +5,7 @@ const citiesController = require("../controllers/citiesController");
 
 router.post("/create", auth, citiesController.create);
 router.post("/getOne", citiesController.getOneCity);
+router.post("/search", citiesController.getFilteredCities);
 router.post("/changeOne", auth, citiesController.changeCity);
 router.post("/changeCheck", auth, citiesController.changeCheck);
 router.post("/deleteOne", auth, citiesController.deleteCity);
