@@ -37,7 +37,8 @@ class ObjectHelper {
         ? this.getObjectDifferences(city1.dataValues, city2).filter((x) => x[0] != "createdAt" && x[0] != "updatedAt")
         : Object.keys(city1.dataValues)?.map((item) => [item, city1.dataValues[item], null]);
     if (!differences[0]) return console.log("Нет отличий");
-    const date = new Date();
+    let date = new Date();
+    date = date.setHours(date.getHours() + 3);
     try {
       if (type === "city") {
         await Logs.create({
