@@ -6,6 +6,6 @@ const logsController = require("../controllers/logsController");
 router.get("/getCities", auth, logsController.getAllCitiesLog);
 router.post("/searchCity", auth, logsController.getFilteredLogsCities);
 router.get("/getBases", auth, logsController.getAllBasesLog);
-router.post("/searchCity", auth, logsController.getFilteredLogsBases);
+router.post("/searchBase", auth, logsController.getFilteredLogsBases);
 
 module.exports = router;
