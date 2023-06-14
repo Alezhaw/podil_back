@@ -1,6 +1,7 @@
 const ApiError = require("../error/ApiError");
 const ObjectHelper = require("../utils/objectHelper");
 const { KzBases } = require("../models/models");
+const { KzCities } = require("../models/models");
 
 class BasesController {
   async create(req, res, next) {
@@ -119,6 +120,30 @@ class BasesController {
     if (!bases) {
       return next(ApiError.internal("Базы не найдены"));
     }
+    return res.json(bases);
+  }
+
+  async getFilteredBases(req, res, next) {
+    const { search } = req.body;
+
+    if (!search) {
+      return next(ApiError.badRequest("Укажите запрос"));
+    }
+    const city = await KzCities.findAll();
+    if (!city) {
+      return next(ApiError.internal("Нет городов в базе данных"));
+    }
+
+    const filteredCities = city
+      ?.filter((el) => (search ? el?.miasto_lokal?.toLowerCase()?.includes(search.toLowerCase()) : true))
+      ?.filter((item, i, ar) => {
+        return ar.map((el) => el.id_for_base).indexOf(item.id_for_base) === i;
+      })
+      ?.map((el) => el.id_for_base);
+    const allBases = await KzBases.findAll();
+    let bases = filteredCities?.map((cityBaseId) => allBases.filter((base) => base.id_for_base === cityBaseId))?.flat();
+    bases = bases[0] ? bases : allBases.filter((base) => base.id_for_base === search);
+
     return res.json(bases);
   }
 

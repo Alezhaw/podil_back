@@ -119,9 +119,6 @@ class CitiesController {
       ?.slice(page * pageSize - pageSize, page * pageSize)
       ?.map((el) => city?.filter((time) => time.id_for_base === el.id_for_base))
       ?.flat();
-    if (!city) {
-      return next(ApiError.internal("Город не найден"));
-    }
     return res.json(filteredCities);
   }
 
