@@ -22,7 +22,6 @@ class CitiesController {
     let error = [];
     let cities = [];
     const forPostman = [{ ...req.body }];
-    //console.log(1, data, req.body)
     const result = await Promise.all(
       data.map(async (item, index) => {
         if (!item.id_for_base) {
@@ -56,6 +55,7 @@ class CitiesController {
           }
         }
         try {
+          delete item.id;
           const city = await Cities.create(item);
           cities.push(city.dataValues);
           const result = ObjectHelper.sendDifferencesToDatabase(city, item, "russia", "create", user, "city");
@@ -283,9 +283,8 @@ class CitiesController {
       return next(ApiError.internal("Failed to write log"));
     }
     const updated = await Cities.update(checkValue(check_base, check_speaker, check_scenario), { where: { id_for_base: city.id_for_base } });
-    const allCities = await Cities.findAll();
 
-    return res.json(allCities);
+    return res.json("Успешно");
   }
 
   async deleteCity(req, res, next) {

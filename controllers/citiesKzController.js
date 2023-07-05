@@ -281,9 +281,8 @@ class CitiesController {
       return next(ApiError.internal("Failed to write log"));
     }
     const updated = await KzCities.update(checkValue(check_base, check_speaker, check_scenario), { where: { id_for_base: city.id_for_base } });
-    const allCities = await KzCities.findAll();
 
-    return res.json(allCities);
+    return res.json("Успешно");
   }
 
   async deleteCity(req, res, next) {

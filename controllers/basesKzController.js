@@ -142,7 +142,8 @@ class BasesController {
       ?.map((el) => el.id_for_base);
     const allBases = await KzBases.findAll();
     let bases = filteredCities?.map((cityBaseId) => allBases.filter((base) => base.id_for_base === cityBaseId))?.flat();
-    bases = bases[0] ? bases : allBases.filter((base) => base.id_for_base === search);
+    bases = bases[0] ? bases : allBases.filter((base) => String(base.base_id).toLowerCase().includes(String(search).toLowerCase()));
+    bases = bases?.map((base) => ({ ...(base.dataValues || base), miasto_lokal: city?.filter((oneCity) => Number(oneCity.id_for_base) === Number(base.id_for_base))[0]?.miasto_lokal }));
 
     return res.json(bases);
   }

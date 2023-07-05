@@ -4,12 +4,12 @@ const auth = require("../middleware/authMiddleware");
 const citiesController = require("../controllers/citiesController");
 
 router.post("/create", auth, citiesController.create);
-router.post("/getOne", citiesController.getOneCity);
-router.post("/search", citiesController.getFilteredCities);
+router.post("/getOne", auth, citiesController.getOneCity);
+router.post("/search", auth, citiesController.getFilteredCities);
 router.post("/changeOne", auth, citiesController.changeCity);
 router.post("/changeCheck", auth, citiesController.changeCheck);
 router.post("/deleteOne", auth, citiesController.deleteCity);
 router.post("/deleteTime", auth, citiesController.deleteOneTime);
-router.get("/get", citiesController.getAll);
+router.get("/get", auth, citiesController.getAll);
 
 module.exports = router;
