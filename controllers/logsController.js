@@ -1,6 +1,10 @@
 const ApiError = require("../error/ApiError");
 const { Logs, LogsForBase } = require("../models/models");
 
+function getCorrectTime(element) {
+  return String(element.time).split(".")[0]?.replace("T", " ") || element.time;
+}
+
 class LogsController {
   async getAllCitiesLog(req, res) {
     const logs = await Logs.findAll();
@@ -13,17 +17,33 @@ class LogsController {
     if (!pageSize || !page) {
       return next(ApiError.badRequest("Укажите page и pageSize"));
     }
-    const city = await Logs.findAll();
-    if (!city) {
+    const logs = await Logs.findAll();
+    if (!logs) {
       return next(ApiError.internal("Нет логов по городам"));
     }
 
-    let filteredCities = city
-      ?.filter((el) => (search ? el?.miasto_lokal?.toLowerCase()?.includes(search.toLowerCase()) : true))
-      ?.filter((checkbox) => (checkbox?.action === "update" && updateFilter) || (checkbox?.action === "create" && createFilter) || (checkbox?.action === "delete" && deleteFilter))
+    let filteredLogs = logs
+      ?.map((item) => item.dataValues)
       ?.filter((el) => (country ? country === el.country : true))
-      ?.slice(page * pageSize - pageSize, page * pageSize);
-    return res.json(filteredCities);
+      ?.filter((el) => (search ? el?.miasto_lokal?.toLowerCase()?.includes(search.toLowerCase()) : true))
+      ?.filter((item, i, ar) => {
+        return ar.map((el) => `${el.miasto_lokal} ${getCorrectTime(el)}`).indexOf(`${item.miasto_lokal} ${getCorrectTime(item)}`) === i;
+      })
+      ?.filter((checkbox) => (checkbox?.action === "update" && updateFilter) || (checkbox?.action === "create" && createFilter) || (checkbox?.action === "delete" && deleteFilter))
+      ?.sort((a, b) => Number(b.id) - Number(a.id));
+    const count = Math.ceil(filteredLogs?.length / pageSize);
+    filteredLogs = filteredLogs
+      ?.slice(page * pageSize - pageSize, page * pageSize)
+      ?.map((el) => logs?.filter((log) => log.miasto_lokal === el.miasto_lokal && getCorrectTime(log) === getCorrectTime(el)))
+      ?.flat();
+
+    const countries = logs
+      ?.filter((item, i, ar) => {
+        return ar.map((el) => el.country).indexOf(item.country) === i;
+      })
+      ?.map((log) => log.country);
+
+    return res.json({ logs: filteredLogs, count, countries });
   }
 
   async getAllBasesLog(req, res) {
@@ -42,12 +62,21 @@ class LogsController {
       return next(ApiError.internal("Нет логов по городам"));
     }
 
-    let filteredBases = base
+    let filteredLogs = base
+      ?.filter((el) => (country ? country === el.country : true))
       ?.filter((el) => (search ? el?.base_id?.toLowerCase()?.includes(search.toLowerCase()) : true))
       ?.filter((checkbox) => (checkbox?.action === "update" && updateFilter) || (checkbox?.action === "create" && createFilter) || (checkbox?.action === "delete" && deleteFilter))
-      ?.filter((el) => (country ? country === el.country : true))
-      ?.slice(page * pageSize - pageSize, page * pageSize);
-    return res.json(filteredBases);
+      ?.sort((a, b) => Number(b.id) - Number(a.id));
+    const count = Math.ceil(filteredLogs?.length / pageSize);
+    filteredLogs = filteredLogs?.slice(page * pageSize - pageSize, page * pageSize);
+
+    const countries = base
+      ?.filter((item, i, ar) => {
+        return ar.map((el) => el.country).indexOf(item.country) === i;
+      })
+      ?.map((log) => log.country);
+
+    return res.json({ logs: filteredLogs, count, countries });
   }
 }
 
