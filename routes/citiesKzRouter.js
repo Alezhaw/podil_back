@@ -6,7 +6,6 @@ const citiesKzController = require("../controllers/citiesKzController");
 router.post("/create", auth, citiesKzController.create);
 router.post("/getOne", auth, citiesKzController.getOneCity);
 router.post("/search", auth, citiesKzController.getFilteredCities);
-router.post("/changeOne", auth, citiesKzController.changeCity);
 router.post("/changeCheck", auth, citiesKzController.changeCheck);
 router.post("/deleteOne", auth, citiesKzController.deleteCity);
 router.post("/deleteTime", auth, citiesKzController.deleteOneTime);

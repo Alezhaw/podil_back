@@ -21,6 +21,7 @@ class CitiesController {
     let not_id_for_base = "";
     let error = [];
     let cities = [];
+    let citiesForWebSocket = [];
     const forPostman = [{ ...req.body }];
     const result = await Promise.all(
       data.map(async (item, index) => {
@@ -29,11 +30,6 @@ class CitiesController {
           const lastIdForBase = cities?.reduce((sum, el) => (Number(el.id_for_base) > sum ? Number(el.id_for_base) : sum), 0);
           //not_id_for_base = `${not_id_for_base}/${item.miasto_lokal}`;
           item.id_for_base = Number(lastIdForBase) + 4;
-
-          console.log(1);
-          global.io.to("1").emit("updateCitiesRu", {
-            data: { user: { name: "Admin" }, message: `huy slilsya` },
-          });
         }
         if (item?.id !== "create") {
           const checkUnique = (await Cities.findOne({ where: { id: Number(item.id) || null } })) || (await Cities.findOne({ where: { id_for_base: item.id_for_base, godzina: item.godzina } }));
@@ -51,6 +47,7 @@ class CitiesController {
               }
               await Cities.update(item, { where: { id: checkUnique.id } });
               updated = `${updated}/${item.id_for_base}`;
+              citiesForWebSocket.push(item);
               return;
             } catch (e) {
               return error.push({
@@ -65,6 +62,7 @@ class CitiesController {
           delete item.id;
           const city = await Cities.create(item);
           cities.push(city.dataValues);
+          citiesForWebSocket.push(city.dataValues);
           const result = ObjectHelper.sendDifferencesToDatabase(city, item, "russia", "create", user, "city");
           if (!result) {
             error.push({
@@ -82,6 +80,13 @@ class CitiesController {
         }
       })
     );
+
+    if (citiesForWebSocket[0]) {
+      global.io.to("1").emit("updateCitiesRu", {
+        data: { cities: citiesForWebSocket },
+      });
+    }
+
     return res.json({
       cities,
       updated,
@@ -138,135 +143,6 @@ class CitiesController {
     return res.json(city);
   }
 
-  async changeCity(req, res, next) {
-    const {
-      id,
-      l_p,
-      godzina,
-      os_poj,
-      pary,
-      wyjasnienia,
-      projekt,
-      miasto_lokal,
-      timezone,
-      limit,
-      dodawanie_rekordow,
-      scenariusze,
-      weryfikacja_dkj,
-      podpinanie_scenariuszy,
-      present,
-      rekodow_na_1_zgode,
-      wb_1,
-      wb_2,
-      ilosc_zaproszen,
-      dzien_1_data,
-      dzien_1_rekodow_na_1_zgode,
-      dzien_1_aktualna_ilosc_zaproszen,
-      dzien_2_data,
-      dzien_2_rekodow_na_1_zgode,
-      dzien_2_aktualna_ilosc_zaproszen,
-      dzien_3_data,
-      dzien_3_rekodow_na_1_zgode,
-      dzien_3_aktualna_ilosc_zaproszen,
-      vip_id,
-      vip_format,
-      vip_limit,
-      vip_coming,
-      vip_total_steam,
-      vip_percent_coming,
-      system,
-      zgoda_wyniki_potwierdzen,
-      odmowy_wyniki_potwierdzen,
-      kropki_wyniki_potwierdzen,
-      sms_umawianie,
-      sms_potwierdzen,
-      wiretap_note,
-      wiretapping_sogl,
-      base_stat_1,
-      base_stat_2,
-      base_stat_3,
-      base_stat_4,
-      base_stat_5,
-      id_for_base,
-      w_toku,
-      zamkniete,
-      base_stat_6,
-      zgody_inne_miasto,
-      check_base,
-      check_speaker,
-      check_scenario,
-    } = req.body;
-
-    if (!id) {
-      return next(ApiError.badRequest("Укажите id"));
-    }
-    const city = await Cities.findOne({ where: { id: Number(id) } });
-    if (!city) {
-      return next(ApiError.internal("Город не найден"));
-    }
-    const updatedCity = await Cities.update(
-      {
-        l_p: Number(l_p) || null,
-        godzina: godzina || null,
-        os_poj: os_poj || null,
-        pary: pary || null,
-        wyjasnienia: !!wyjasnienia ?? null,
-        projekt: projekt || null,
-        miasto_lokal: miasto_lokal || null,
-        timezone: Number(timezone) || null,
-        limit: Number(limit) || null,
-        dodawanie_rekordow: dodawanie_rekordow || null,
-        scenariusze: scenariusze || null,
-        weryfikacja_dkj: weryfikacja_dkj || null,
-        podpinanie_scenariuszy: podpinanie_scenariuszy || null,
-        present: present || null,
-        rekodow_na_1_zgode: Number(rekodow_na_1_zgode) || null,
-        wb_1: wb_1 || null,
-        wb_2: Number(wb_2) || null,
-        ilosc_zaproszen: Number(ilosc_zaproszen),
-        dzien_1_data: dzien_1_data || null,
-        dzien_1_rekodow_na_1_zgode: Number(dzien_1_rekodow_na_1_zgode) || null,
-        dzien_1_aktualna_ilosc_zaproszen: Number(dzien_1_aktualna_ilosc_zaproszen) || null,
-        dzien_2_data: dzien_2_data || null,
-        dzien_2_rekodow_na_1_zgode: Number(dzien_2_rekodow_na_1_zgode) || null,
-        dzien_2_aktualna_ilosc_zaproszen: Number(dzien_2_aktualna_ilosc_zaproszen) || null,
-        dzien_3_data: dzien_3_data || null,
-        dzien_3_rekodow_na_1_zgode: Number(dzien_3_rekodow_na_1_zgode) || null,
-        dzien_3_aktualna_ilosc_zaproszen: Number(dzien_3_aktualna_ilosc_zaproszen) || null,
-        vip_id: vip_id || null,
-        vip_format: vip_format || null,
-        vip_limit: vip_limit || null,
-        vip_coming: vip_coming || null,
-        vip_total_steam: vip_total_steam || null,
-        vip_percent_coming: vip_percent_coming || null,
-        system: system || null,
-        zgoda_wyniki_potwierdzen: Number(zgoda_wyniki_potwierdzen) || null,
-        odmowy_wyniki_potwierdzen: Number(odmowy_wyniki_potwierdzen) || null,
-        kropki_wyniki_potwierdzen: Number(kropki_wyniki_potwierdzen) || null,
-        sms_umawianie: !!sms_umawianie ?? null,
-        sms_potwierdzen: !!sms_potwierdzen ?? null,
-        wiretap_note: wiretap_note || null,
-        wiretapping_sogl: wiretapping_sogl || null,
-        base_stat_1: base_stat_1 || null,
-        base_stat_2: base_stat_2 || null,
-        base_stat_3: base_stat_3 || null,
-        base_stat_4: base_stat_4 || null,
-        base_stat_5: base_stat_5 || null,
-        id_for_base: Number(id_for_base) || null,
-        w_toku: !!w_toku ?? null,
-        zamkniete: !!zamkniete ?? null,
-        base_stat_6: base_stat_6 || null,
-        zgody_inne_miasto: Number(zgody_inne_miasto) || null,
-        check_base: !!check_base ?? null,
-        check_speaker: !!check_speaker ?? null,
-        check_scenario: !!check_scenario ?? null,
-      },
-      { where: { id: city.id } }
-    );
-
-    return res.json(updatedCity);
-  }
-
   async changeCheck(req, res, next) {
     const { id, id_for_base, check_base, check_speaker, check_scenario } = req.body;
     let user = req.user;
@@ -290,6 +166,12 @@ class CitiesController {
       return next(ApiError.internal("Failed to write log"));
     }
     const updated = await Cities.update(checkValue(check_base, check_speaker, check_scenario), { where: { id_for_base: city.id_for_base } });
+
+    const updatedCity = await Cities.findAll({ where: { id_for_base: city.id_for_base } });
+
+    global.io.to("1").emit("updateCitiesRu", {
+      data: { cities: updatedCity },
+    });
 
     return res.json("Успешно");
   }
@@ -316,6 +198,11 @@ class CitiesController {
       await Cities.destroy({
         where: { id_for_base: city.id_for_base },
       });
+
+      global.io.to("1").emit("deleteCityRu", {
+        data: { deleteCity: city.id_for_base },
+      });
+
       return res.json({ ...city.dataValues });
     } catch (e) {
       return next(ApiError.internal("Delete failed"));
@@ -336,9 +223,18 @@ class CitiesController {
     if (!result) {
       return next(ApiError.internal("Failed to write log"));
     }
-    await Cities.destroy({
-      where: { id },
-    });
+    try {
+      await Cities.destroy({
+        where: { id },
+      });
+
+      global.io.to("1").emit("deleteCityRu", {
+        data: { deleteTime: id },
+      });
+    } catch (e) {
+      return next(ApiError.internal("Delete failed"));
+    }
+
     return res.json({ ...city.dataValues });
   }
 }
