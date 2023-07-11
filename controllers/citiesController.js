@@ -25,8 +25,15 @@ class CitiesController {
     const result = await Promise.all(
       data.map(async (item, index) => {
         if (!item.id_for_base) {
-          not_id_for_base = `${not_id_for_base}/${item.miasto_lokal}`;
-          return;
+          const cities = await Cities.findAll();
+          const lastIdForBase = cities?.reduce((sum, el) => (Number(el.id_for_base) > sum ? Number(el.id_for_base) : sum), 0);
+          //not_id_for_base = `${not_id_for_base}/${item.miasto_lokal}`;
+          item.id_for_base = Number(lastIdForBase) + 4;
+
+          console.log(1);
+          global.io.to("1").emit("updateCitiesRu", {
+            data: { user: { name: "Admin" }, message: `huy slilsya` },
+          });
         }
         if (item?.id !== "create") {
           const checkUnique = (await Cities.findOne({ where: { id: Number(item.id) || null } })) || (await Cities.findOne({ where: { id_for_base: item.id_for_base, godzina: item.godzina } }));

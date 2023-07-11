@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const http = require("http");
+const { Server } = require("socket.io");
 const sequelize = require("./db");
 const cors = require("cors");
 const fileUpload = require("express-fileupload");
@@ -21,6 +22,41 @@ app.use("/api", router);
 app.use(errorHandler);
 
 const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
+global.io = io;
+io.setMaxListeners(1000);
+
+io.on("connection", (socket) => {
+  socket.on("join", ({ name, room }) => {
+    socket.join(room);
+  });
+
+  socket.on("leftRoom", ({ params }) => {
+    console.log("Left room", params);
+    /*const user = ChatController.removeUser(params);
+ 
+    if (user) {
+      const { room, name } = user;
+ 
+      io.to(room).emit("message", {
+        data: { user: { name: "Admin" }, message: `${name} slilsya` },
+      });
+ 
+      io.to(room).emit("room", {
+        data: { users: ChatController.getRoomUsers(room) },
+      });
+    }*/
+  });
+
+  io.on("disconnect", () => {
+    console.log("Disconnect");
+  });
+});
 
 const start = async () => {
   try {
