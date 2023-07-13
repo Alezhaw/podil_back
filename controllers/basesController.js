@@ -11,6 +11,7 @@ class BasesController {
     let notIdForBase = "";
     let error = [];
     let bases = [];
+    let basesForWebSocket = [];
     const forPostman = [{ ...req.body }];
     console.log(1, data, req.body);
     const result = await Promise.all(
@@ -41,6 +42,7 @@ class BasesController {
               },
               { where: { id: checkUnique.id } }
             );
+            basesForWebSocket.push(item);
             update = `${update}/${item.base_id}`;
             return;
           } catch (e) {
@@ -69,6 +71,7 @@ class BasesController {
             base_comment: item.base_comment || null,
           });
           bases.push(base.dataValues);
+          basesForWebSocket.push(base.dataValues);
           const result = ObjectHelper.sendDifferencesToDatabase(base, item, "russia", "create", user, "base");
           if (!result) {
             error.push({
@@ -84,6 +87,13 @@ class BasesController {
         }
       })
     );
+
+    if (basesForWebSocket[0]) {
+      global.io.to("1").emit("updateBasesRu", {
+        data: { bases: basesForWebSocket },
+      });
+    }
+
     return res.json({
       bases,
       update,
@@ -147,49 +157,6 @@ class BasesController {
     return res.json(bases);
   }
 
-  async changeBase(req, res, next) {
-    const { id_for_base, id, base_id, base_stat_1, base_stat_2, base_stat_3, base_type, base_sort, base_sogl_1, base_sogl_2, base_sogl_3, base_comment } = req.body;
-    let user = req.user;
-
-    if (!id && !base_id) {
-      return next(ApiError.badRequest("Укажите id или base_id"));
-    }
-    const base = (await Bases.findOne({ where: { id: Number(id) } })) || (await Bases.findOne({ where: { base_id: base_id } }));
-    if (!base) {
-      return next(ApiError.internal("База не найдена"));
-    }
-
-    const result = ObjectHelper.sendDifferencesToDatabase(
-      base,
-      { id_for_base, id, base_id, base_stat_1, base_stat_2, base_stat_3, base_type, base_sort, base_sogl_1, base_sogl_2, base_sogl_3, base_comment },
-      "russia",
-      "update",
-      user,
-      "base"
-    );
-    if (!result) {
-      return next(ApiError.internal("Failed to write log"));
-    }
-    const updatedBase = await Bases.update(
-      {
-        id_for_base: Number(id_for_base),
-        base_id: base_id || null,
-        base_stat_1: base_stat_1 || null,
-        base_stat_2: base_stat_2 || null,
-        base_stat_3: base_stat_3 || null,
-        base_type: base_type || null,
-        base_sort: base_sort || null,
-        base_sogl_1: Number(base_sogl_1) || null,
-        base_sogl_2: Number(base_sogl_2) || null,
-        base_sogl_3: Number(base_sogl_3) || null,
-        base_comment: base_comment || null,
-      },
-      { where: { id: base.id } }
-    );
-
-    return res.json(updatedBase);
-  }
-
   async deleteBase(req, res, next) {
     const { id, base_id } = req.body;
     let user = req.user;
@@ -208,6 +175,11 @@ class BasesController {
     await Bases.destroy({
       where: { id: base.id },
     });
+
+    global.io.to("1").emit("deleteBaseRu", {
+      data: { deleteBase: base.id },
+    });
+
     return res.json({ ...base.dataValues });
   }
 }
