@@ -176,6 +176,37 @@ class CitiesController {
     return res.json("Успешно");
   }
 
+  async changeStatus(req, res, next) {
+    const { id, id_for_base, status } = req.body;
+    let user = req.user;
+    if (!id && !id_for_base) {
+      return next(ApiError.badRequest("Укажите id или id_for_base"));
+    }
+    if (typeof status !== "number") {
+      return next(ApiError.badRequest("Укажите данные для замены"));
+    }
+    const city = id ? await KzCities.findOne({ where: { id: Number(id) || null } }) : await KzCities.findOne({ where: { id_for_base } });
+    if (!city) {
+      return next(ApiError.internal("Город не найден"));
+    }
+
+    const cities = await KzCities.findAll({ where: { id_for_base: city.id_for_base } });
+
+    const result = cities?.map((city) => ObjectHelper.sendDifferencesToDatabase(city, { ...city.dataValues, status }, "kazakhstan", "update", user, "city"));
+    if (!result[0]) {
+      return next(ApiError.internal("Failed to write log"));
+    }
+    const updated = await KzCities.update({ status: status }, { where: { id_for_base: city.id_for_base } });
+
+    const updatedCity = await KzCities.findAll({ where: { id_for_base: city.id_for_base } });
+
+    global.io.to("1").emit("updateCitiesKz", {
+      data: { cities: updatedCity },
+    });
+
+    return res.json("Успешно");
+  }
+
   async deleteCity(req, res, next) {
     const { id_for_base } = req.body;
     let user = req.user;

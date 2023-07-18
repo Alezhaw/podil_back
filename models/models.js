@@ -112,6 +112,7 @@ const Cities = sequelize.define("city", {
   check_base: { type: DataTypes.BOOLEAN },
   check_speaker: { type: DataTypes.BOOLEAN },
   check_scenario: { type: DataTypes.BOOLEAN },
+  status: { type: DataTypes.INTEGER },
 });
 
 const KzCities = sequelize.define("kzcity", {
@@ -170,6 +171,7 @@ const KzCities = sequelize.define("kzcity", {
   check_base: { type: DataTypes.BOOLEAN },
   check_speaker: { type: DataTypes.BOOLEAN },
   check_scenario: { type: DataTypes.BOOLEAN },
+  status: { type: DataTypes.INTEGER },
 });
 
 const User = sequelize.define("user", {
