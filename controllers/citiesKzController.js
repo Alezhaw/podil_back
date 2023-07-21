@@ -101,7 +101,24 @@ class CitiesController {
   }
 
   async getFilteredCities(req, res, next) {
-    const { search, inProgress, zamkniete, baseInProgress, baseZamkniete, scenarioInProgress, scenarioZamkniete, speakerInProgress, speakerZamkniete, sort, pageSize, page } = req.body;
+    const {
+      search,
+      canceled,
+      inProgress,
+      zamkniete,
+      baseInProgress,
+      baseZamkniete,
+      baseCanceled,
+      scenarioInProgress,
+      scenarioZamkniete,
+      scenarioCanceled,
+      speakerInProgress,
+      speakerZamkniete,
+      speakerCanceled,
+      sort,
+      pageSize,
+      page,
+    } = req.body;
 
     if (!pageSize || !page) {
       return next(ApiError.badRequest("Укажите page и pageSize"));
@@ -116,10 +133,24 @@ class CitiesController {
       ?.filter((item, i, ar) => {
         return ar.map((el) => el.id_for_base).indexOf(item.id_for_base) === i;
       })
-      ?.filter((checkbox) => (!checkbox?.zamkniete && inProgress) || (!!checkbox?.zamkniete && zamkniete))
-      ?.filter((checkbox) => (!checkbox?.check_base && baseInProgress) || (!!checkbox?.check_base && baseZamkniete))
-      ?.filter((checkbox) => (!checkbox?.check_scenario && scenarioInProgress) || (!!checkbox?.check_scenario && scenarioZamkniete))
-      ?.filter((checkbox) => (!checkbox?.check_speaker && speakerInProgress) || (!!checkbox?.check_speaker && speakerZamkniete))
+      ?.filter((checkbox) => (checkbox?.status === 2 && zamkniete) || (checkbox?.status === 0 && canceled) || (checkbox?.status !== 2 && checkbox?.status !== 0 && inProgress))
+      ?.filter(
+        (checkbox) =>
+          (!checkbox?.check_base && checkbox?.status !== 0 && baseInProgress) || (!!checkbox?.check_base && checkbox?.status !== 0 && baseZamkniete) || (checkbox?.status === 0 && baseCanceled)
+      )
+      //?.filter((checkbox) => baseCanceled && checkbox?.status !== 0)
+      ?.filter(
+        (checkbox) =>
+          (!checkbox?.check_scenario && checkbox?.status !== 0 && scenarioInProgress) ||
+          (!!checkbox?.check_scenario && checkbox?.status !== 0 && scenarioZamkniete) ||
+          (checkbox?.status === 0 && scenarioCanceled)
+      )
+      ?.filter(
+        (checkbox) =>
+          (!checkbox?.check_speaker && checkbox?.status !== 0 && speakerInProgress) ||
+          (!!checkbox?.check_speaker && checkbox?.status !== 0 && speakerZamkniete) ||
+          (checkbox?.status === 0 && speakerCanceled)
+      )
       ?.sort((a, b) => (!sort ? Number(b.id_for_base) - Number(a.id_for_base) : Number(a.id_for_base) - Number(b.id_for_base)));
     const count = Math.ceil(filteredCities?.length / pageSize);
     filteredCities = filteredCities
