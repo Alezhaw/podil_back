@@ -204,6 +204,7 @@ const Formularz = sequelize.define("formularz", {
   informacje_dot_terminow: { type: DataTypes.STRING },
   kolumna_techniczna: { type: DataTypes.INTEGER, unique: true },
   statusForDatabase: { type: DataTypes.INTEGER },
+  newScript: { type: DataTypes.BOOLEAN },
 });
 
 const User = sequelize.define("user", {

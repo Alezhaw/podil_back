@@ -7,5 +7,6 @@ router.post("/create", auth, formularzController.create);
 router.get("/getAll", auth, formularzController.getAll);
 router.get("/getActive", auth, formularzController.getActiveApplications);
 router.get("/getInvalid", auth, formularzController.getInvalidApplications);
+router.get("/newScript", auth, formularzController.updateNewScriptParametr);
 
 module.exports = router;
