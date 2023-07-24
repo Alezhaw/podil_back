@@ -34,19 +34,17 @@ class FormularzController {
     );
     const allApplications = await Formularz.findAll();
 
-    if (allApplications[0]) {
-      const removedApplications = allApplications.filter((el) => !applications.map((item) => item.kolumna_techniczna).includes(el.kolumna_techniczna));
-      const statusRemoved = await Promise.all(
-        removedApplications.map(async (el) => {
-          try {
-            await Formularz.update({ statusForDatabase: 0 }, { where: { kolumna_techniczna: el.kolumna_techniczna } });
-            return;
-          } catch (e) {
-            return;
-          }
-        })
-      );
-    }
+    const removedApplications = allApplications.filter((el) => !applications.map((item) => item.kolumna_techniczna).includes(el.kolumna_techniczna));
+    const statusRemoved = await Promise.all(
+      removedApplications.map(async (el) => {
+        try {
+          await Formularz.update({ statusForDatabase: 0 }, { where: { kolumna_techniczna: el.kolumna_techniczna } });
+          return;
+        } catch (e) {
+          return;
+        }
+      })
+    );
 
     return res.json({
       applications,
