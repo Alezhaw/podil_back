@@ -14,7 +14,7 @@ class FormularzController {
     const result = await Promise.all(
       data.map(async (item, index) => {
         if (item?.kolumna_techniczna) {
-          const checkUnique = await Formularz.findOne({ kolumna_techniczna: { id: Number(item.kolumna_techniczna) || null } });
+          const checkUnique = await Formularz.findOne({ kolumna_techniczna: { kolumna_techniczna: Number(item.kolumna_techniczna) || null } });
           if (checkUnique) {
             try {
               await Formularz.update(item, { where: { kolumna_techniczna: checkUnique.kolumna_techniczna } });
@@ -41,7 +41,7 @@ class FormularzController {
         3,
         data
           .map((item) => item.kolumna_techniczna)
-          .includes(removedApplications[0].el.kolumna_techniczna)
+          .includes(removedApplications[0].kolumna_techniczna)
           ?.slice(0, 5)
       );
       const statusRemoved = await Promise.all(
