@@ -6,7 +6,6 @@ class FormularzController {
   async create(req, res, next) {
     const { data } = req.body;
     const forPostman = [{ ...req.body }];
-    console.log(1, forPostman, typeof forPostman, typeof data, req.body);
     if (!data) {
       return next(ApiError.internal("Отправьте данные"));
     }
@@ -14,7 +13,9 @@ class FormularzController {
     const result = await Promise.all(
       data.map(async (item, index) => {
         if (item?.kolumna_techniczna) {
+          console.log(1, item?.kolumna_techniczna);
           const checkUnique = await Formularz.findOne({ kolumna_techniczna: { kolumna_techniczna: Number(item.kolumna_techniczna) || null } });
+          console.log(2, checkUnique);
           if (checkUnique) {
             try {
               await Formularz.update(item, { where: { kolumna_techniczna: checkUnique.kolumna_techniczna } });
@@ -34,13 +35,10 @@ class FormularzController {
     );
     const allApplications = await Formularz.findAll();
 
-    console.log(4, allApplications[1].dataValues, allApplications[0]);
     const newScriptApplications = allApplications.filter((el) => el.dataValues.newScript);
     const removedApplications = allApplications.filter((el) => newScriptApplications.includes(el.dataValues.kolumna_techniczna))?.map((item) => item.dataValues);
-    console.log(2, removedApplications);
     if (removedApplications[0]) {
       // console.log(3, data.map((item) => item.kolumna_techniczna).includes(removedApplications[0].kolumna_techniczna));
-      console.log(3, removedApplications[0]);
       const statusRemoved = await Promise.all(
         removedApplications.map(async (el) => {
           try {
