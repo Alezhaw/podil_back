@@ -5,9 +5,13 @@ const { Formularz } = require("../models/models");
 class FormularzController {
   async create(req, res, next) {
     const { data } = req.body;
+    console.log(1, data);
+    if (!data) {
+      return next(ApiError.internal("Отправьте данные"));
+    }
     let applications = [];
     const result = await Promise.all(
-      data?.map(async (item, index) => {
+      data.map(async (item, index) => {
         if (item?.kolumna_techniczna) {
           const checkUnique = await Formularz.findOne({ kolumna_techniczna: { id: Number(item.kolumna_techniczna) || null } });
           if (checkUnique) {
