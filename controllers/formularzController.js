@@ -6,7 +6,7 @@ class FormularzController {
   async create(req, res, next) {
     const { data } = req.body;
     const forPostman = [{ ...req.body }];
-    console.log(1, forPostman);
+    console.log(1, forPostman, typeof forPostman, typeof data, req.body);
     if (!data) {
       return next(ApiError.internal("Отправьте данные"));
     }
