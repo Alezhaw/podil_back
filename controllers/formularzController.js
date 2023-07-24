@@ -7,7 +7,7 @@ class FormularzController {
     const { data } = req.body;
     let applications = [];
     const result = await Promise.all(
-      data.map(async (item, index) => {
+      data?.map(async (item, index) => {
         if (item?.kolumna_techniczna) {
           const checkUnique = await Formularz.findOne({ kolumna_techniczna: { id: Number(item.kolumna_techniczna) || null } });
           if (checkUnique) {
