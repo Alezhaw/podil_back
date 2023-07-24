@@ -14,7 +14,7 @@ class FormularzController {
       data.map(async (item, index) => {
         if (item?.kolumna_techniczna) {
           console.log(1, item?.kolumna_techniczna);
-          const checkUnique = await Formularz.findOne({ kolumna_techniczna: { kolumna_techniczna: Number(item.kolumna_techniczna) || null } });
+          const checkUnique = await Formularz.findOne({ where: { kolumna_techniczna: Number(item.kolumna_techniczna) || null } });
           console.log(2, checkUnique);
           if (checkUnique) {
             try {
