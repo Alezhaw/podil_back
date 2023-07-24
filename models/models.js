@@ -202,7 +202,7 @@ const Formularz = sequelize.define("formularz", {
   ogrzewanie: { type: DataTypes.STRING },
   klimatyzacja: { type: DataTypes.STRING },
   informacje_dot_terminow: { type: DataTypes.STRING },
-  kolumna_techniczna: { type: DataTypes.INTEGER },
+  kolumna_techniczna: { type: DataTypes.INTEGER, unique: true },
   statusForDatabase: { type: DataTypes.INTEGER },
 });
 
