@@ -35,9 +35,15 @@ class FormularzController {
     const allApplications = await Formularz.findAll();
 
     const removedApplications = allApplications.filter((el) => !data.map((item) => item.kolumna_techniczna).includes(el.kolumna_techniczna));
-    console.log(2, removedApplications);
+    console.log(2, removedApplications?.slice(0, 5));
     if (removedApplications[0]) {
-      console.log(3, data.map((item) => item.kolumna_techniczna).includes(removedApplications[0].el.kolumna_techniczna));
+      console.log(
+        3,
+        data
+          .map((item) => item.kolumna_techniczna)
+          .includes(removedApplications[0].el.kolumna_techniczna)
+          ?.slice(0, 5)
+      );
       const statusRemoved = await Promise.all(
         removedApplications.map(async (el) => {
           try {
