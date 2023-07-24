@@ -77,35 +77,9 @@ class FormularzController {
   }
 
   async updateNewScriptParametr(req, res) {
-    await Formularz.update({ newScript: false });
+    await Formularz.update({ newScript: false }, { where: {} });
     return res.json("Success");
   }
-
-  //   async deleteBase(req, res, next) {
-  //     const { id, base_id } = req.body;
-  //     let user = req.user;
-  //     if (!id && !base_id) {
-  //       return next(ApiError.badRequest("Укажите id или base_id"));
-  //     }
-  //     const base = (await Bases.findOne({ where: { id: Number(id) || null } })) || (await Bases.findOne({ where: { base_id: base_id } }));
-  //     if (!base) {
-  //       return next(ApiError.internal("База не найдена"));
-  //     }
-  //     const result = ObjectHelper.sendDifferencesToDatabase(base, base.dataValues, "russia", "delete", user, "base");
-  //     if (!result) {
-  //       return next(ApiError.internal("Failed to write log"));
-  //     }
-
-  //     await Bases.destroy({
-  //       where: { id: base.id },
-  //     });
-
-  //     global.io.to("1").emit("deleteBaseRu", {
-  //       data: { deleteBase: base.id },
-  //     });
-
-  //     return res.json({ ...base.dataValues });
-  //   }
 }
 
 module.exports = new FormularzController();
