@@ -35,17 +35,20 @@ class FormularzController {
     const allApplications = await Formularz.findAll();
 
     const removedApplications = allApplications.filter((el) => !data.map((item) => item.kolumna_techniczna).includes(el.kolumna_techniczna));
-    console.log(2, removedApplications, data.map((item) => item.kolumna_techniczna).includes(removedApplications[0].el.kolumna_techniczna));
-    const statusRemoved = await Promise.all(
-      removedApplications.map(async (el) => {
-        try {
-          await Formularz.update({ statusForDatabase: 0 }, { where: { kolumna_techniczna: el.kolumna_techniczna } });
-          return;
-        } catch (e) {
-          return;
-        }
-      })
-    );
+    console.log(2, removedApplications);
+    if (removedApplications[0]) {
+      console.log(3, data.map((item) => item.kolumna_techniczna).includes(removedApplications[0].el.kolumna_techniczna));
+      const statusRemoved = await Promise.all(
+        removedApplications.map(async (el) => {
+          try {
+            await Formularz.update({ statusForDatabase: 0 }, { where: { kolumna_techniczna: el.kolumna_techniczna } });
+            return;
+          } catch (e) {
+            return;
+          }
+        })
+      );
+    }
 
     return res.json({
       applications,
