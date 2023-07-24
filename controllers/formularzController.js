@@ -1,87 +1,49 @@
 const ApiError = require("../error/ApiError");
 const ObjectHelper = require("../utils/objectHelper");
 const { Formularz } = require("../models/models");
-const { Cities } = require("../models/models");
 
 class FormularzController {
   async create(req, res, next) {
-    let user = req.user;
     const { data } = req.body;
-    let updated = "";
-    let not_id_for_base = "";
-    let error = [];
-    let cities = [];
-    let citiesForWebSocket = [];
-    const forPostman = [{ ...req.body }];
+    let applications = [];
     const result = await Promise.all(
       data.map(async (item, index) => {
-        if (!item.id_for_base) {
-          const cities = await Cities.findAll();
-          const lastIdForBase = cities?.reduce((sum, el) => (Number(el.id_for_base) > sum ? Number(el.id_for_base) : sum), 0);
-          //not_id_for_base = `${not_id_for_base}/${item.miasto_lokal}`;
-          item.id_for_base = Number(lastIdForBase) + 4;
-        }
-        if (item?.id !== "create") {
-          const checkUnique = (await Cities.findOne({ where: { id: Number(item.id) || null } })) || (await Cities.findOne({ where: { id_for_base: item.id_for_base, godzina: item.godzina } }));
-
+        if (item?.kolumna_techniczna) {
+          const checkUnique = await Formularz.findOne({ kolumna_techniczna: { id: Number(item.kolumna_techniczna) || null } });
           if (checkUnique) {
             try {
-              const result = ObjectHelper.sendDifferencesToDatabase(checkUnique, item, "russia", "update", user, "city");
-              if (!result) {
-                error.push({
-                  miasto: item.miasto_lokal,
-                  id_for_base: item.id_for_base,
-                  error: "Failed to write log",
-                });
-                return;
-              }
-              await Cities.update(item, { where: { id: checkUnique.id } });
-              updated = `${updated}/${item.id_for_base}`;
-              citiesForWebSocket.push(item);
+              await Formularz.update(item, { where: { kolumna_techniczna: checkUnique.kolumna_techniczna } });
+              applications.push(item);
               return;
             } catch (e) {
-              return error.push({
-                miasto: item.miasto_lokal,
-                id_for_base: item.id_for_base,
-                error: e.message,
-              });
+              return;
             }
+          } else {
+            const application = await Formularz.create(item);
+            applications.push(application.dataValues);
           }
+        } else {
+          return;
         }
+      })
+    );
+    const allApplications = await Formularz.findAll();
+
+    const removedApplications = allApplications.filter((el) => !applications.includes(el));
+    const statusRemoved = await Promise.all(
+      removedApplications.map(async (el) => {
         try {
-          delete item.id;
-          const city = await Cities.create(item);
-          cities.push(city.dataValues);
-          citiesForWebSocket.push(city.dataValues);
-          const result = ObjectHelper.sendDifferencesToDatabase(city, item, "russia", "create", user, "city");
-          if (!result) {
-            error.push({
-              miasto: item.miasto_lokal,
-              id_for_base: item.id_for_base,
-              error: "Failed to write log",
-            });
-          }
+          await Formularz.update({ statusForDatabase: 0 }, { where: { kolumna_techniczna: el.kolumna_techniczna } });
+          return;
         } catch (e) {
-          return error.push({
-            miasto: item.miasto_lokal,
-            id_for_base: item.id_for_base,
-            error: e.message,
-          });
+          return;
         }
       })
     );
 
-    if (citiesForWebSocket[0]) {
-      global.io.to("1").emit("updateCitiesRu", {
-        data: { cities: citiesForWebSocket },
-      });
-    }
-
     return res.json({
-      cities,
-      updated,
-      not_id_for_base,
-      error,
+      applications,
+      removedApplications,
     });
   }
 
