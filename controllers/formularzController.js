@@ -4,7 +4,7 @@ const { Formularz } = require("../models/models");
 
 class FormularzController {
   async create(req, res, next) {
-    const { data } = req.body;
+    const { data, kolumnaTechnicznaArray } = req.body;
     const forPostman = [{ ...req.body }];
     console.log(1, forPostman, typeof forPostman, typeof data, req.body);
     if (!data) {
@@ -35,10 +35,11 @@ class FormularzController {
     const allApplications = await Formularz.findAll();
 
     console.log(4, allApplications[1].dataValues, allApplications[0]);
-    const removedApplications = allApplications.filter((el) => !data.map((item) => item.kolumna_techniczna).includes(el.dataValues.kolumna_techniczna))?.map((item) => item.dataValues);
-    console.log(2, removedApplications?.slice(0, 5));
+    const removedApplications = allApplications.filter((el) => kolumnaTechnicznaArray.includes(el.dataValues.kolumna_techniczna))?.map((item) => item.dataValues);
+    console.log(2, removedApplications);
     if (removedApplications[0]) {
-      console.log(3, data.map((item) => item.kolumna_techniczna).includes(removedApplications[0].kolumna_techniczna));
+      // console.log(3, data.map((item) => item.kolumna_techniczna).includes(removedApplications[0].kolumna_techniczna));
+      console.log(3, removedApplications[0]);
       const statusRemoved = await Promise.all(
         removedApplications.map(async (el) => {
           try {
