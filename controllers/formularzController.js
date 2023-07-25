@@ -37,6 +37,7 @@ class FormularzController {
 
     const newScriptApplications = allApplications.filter((el) => el.dataValues.newScript).map((el) => el?.dataValues?.kolumna_techniczna);
     const removedApplications = allApplications.filter((el) => !newScriptApplications.includes(el.dataValues.kolumna_techniczna))?.map((item) => item.dataValues);
+    console.log(1, removedApplications);
     if (removedApplications[0]) {
       // console.log(3, data.map((item) => item.kolumna_techniczna).includes(removedApplications[0].kolumna_techniczna));
       const statusRemoved = await Promise.all(
