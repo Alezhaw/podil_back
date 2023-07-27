@@ -76,6 +76,13 @@ class FormularzController {
     await Formularz.update({ newScript: false }, { where: {} });
     return res.json("Success");
   }
+
+  async deleteAll(req, res) {
+    await Formularz.destroy({
+      where: {},
+    });
+    return res.json("Success");
+  }
 }
 
 module.exports = new FormularzController();
