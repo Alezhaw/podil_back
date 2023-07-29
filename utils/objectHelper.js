@@ -1,5 +1,6 @@
 //const { Logs } = require("../models/models");
 const { Logs, LogsForBase } = require("../models/models");
+const ApiError = require("../error/ApiError");
 
 class ObjectHelper {
   constructor() {}
