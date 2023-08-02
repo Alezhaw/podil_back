@@ -36,7 +36,7 @@ class CitiesController {
       sort,
       pageSize,
       page,
-      country
+      country,
     } = req.body;
     console.log(req.body);
     if (!pageSize || !page) {
@@ -113,8 +113,7 @@ class CitiesController {
     try {
       let result = await CityService.ChangeCheck(id, id_for_base, check_base, check_speaker, check_scenario, user, country);
       return res.status(200).json(result);
-    }
-    catch (error) {
+    } catch (error) {
       return next(error);
     }
   }
@@ -134,8 +133,7 @@ class CitiesController {
     try {
       let result = await CityService.ChangeStatus(id, id_for_base, status, user, country);
       return res.status(200).json(result);
-    }
-    catch (error) {
+    } catch (error) {
       return next(error);
     }
   }
@@ -155,8 +153,7 @@ class CitiesController {
     try {
       let result = await CityService.DeleteCity(id_for_base, user, country);
       return res.status(200).json(result);
-    }
-    catch (error) {
+    } catch (error) {
       return next(error);
     }
   }
@@ -176,8 +173,7 @@ class CitiesController {
     try {
       let result = await CityService.DeleteTime(id, user, country);
       return res.status(200).json(result);
-    }
-    catch (error) {
+    } catch (error) {
       return next(error);
     }
   }
@@ -187,8 +183,7 @@ class CitiesController {
     try {
       let result = await CityService.GetFiltered(inProgress, canceled, zamkniete, "test", country);
       return res.status(200).json(result);
-    }
-    catch (error) {
+    } catch (error) {
       return next(error);
     }
   }
