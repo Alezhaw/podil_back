@@ -1,103 +1,21 @@
 const ApiError = require("../error/ApiError");
-const ObjectHelper = require("../utils/objectHelper");
-const { Cities } = require("../models/models");
-
-function checkValue(check_base, check_speaker, check_scenario) {
-  switch ("boolean") {
-    case typeof check_base:
-      return { check_base: !!check_base };
-    case typeof check_speaker:
-      return { check_speaker: !!check_speaker };
-    case typeof check_scenario:
-      return { check_scenario: !!check_scenario };
-  }
-}
+const CityService = require("../services/cityService");
 
 class CitiesController {
   async create(req, res, next) {
     let user = req.user;
-    const { data } = req.body;
-    let updated = "";
-    let not_id_for_base = "";
-    let error = [];
-    let cities = [];
-    let citiesForWebSocket = [];
-    const forPostman = [{ ...req.body }];
-    const result = await Promise.all(
-      data.map(async (item, index) => {
-        if (!item.id_for_base) {
-          const cities = await Cities.findAll();
-          const lastIdForBase = cities?.reduce((sum, el) => (Number(el.id_for_base) > sum ? Number(el.id_for_base) : sum), 0);
-          //not_id_for_base = `${not_id_for_base}/${item.miasto_lokal}`;
-          item.id_for_base = Number(lastIdForBase) + 4;
-        }
-        if (item?.id !== "create") {
-          const checkUnique = (await Cities.findOne({ where: { id: Number(item.id) || null } })) || (await Cities.findOne({ where: { id_for_base: item.id_for_base, godzina: item.godzina } }));
-
-          if (checkUnique) {
-            try {
-              const result = ObjectHelper.sendDifferencesToDatabase(checkUnique, item, "russia", "update", user, "city");
-              if (!result) {
-                error.push({
-                  miasto: item.miasto_lokal,
-                  id_for_base: item.id_for_base,
-                  error: "Failed to write log",
-                });
-                return;
-              }
-              await Cities.update(item, { where: { id: checkUnique.id } });
-              updated = `${updated}/${item.id_for_base}`;
-              citiesForWebSocket.push(item);
-              return;
-            } catch (e) {
-              return error.push({
-                miasto: item.miasto_lokal,
-                id_for_base: item.id_for_base,
-                error: e.message,
-              });
-            }
-          }
-        }
-        try {
-          delete item.id;
-          const city = await Cities.create(item);
-          cities.push(city.dataValues);
-          citiesForWebSocket.push(city.dataValues);
-          const result = ObjectHelper.sendDifferencesToDatabase(city, item, "russia", "create", user, "city");
-          if (!result) {
-            error.push({
-              miasto: item.miasto_lokal,
-              id_for_base: item.id_for_base,
-              error: "Failed to write log",
-            });
-          }
-        } catch (e) {
-          return error.push({
-            miasto: item.miasto_lokal,
-            id_for_base: item.id_for_base,
-            error: e.message,
-          });
-        }
-      })
-    );
-
-    if (citiesForWebSocket[0]) {
-      global.io.to("1").emit("updateCitiesRu", {
-        data: { cities: citiesForWebSocket },
-      });
-    }
-
-    return res.json({
-      cities,
-      updated,
-      not_id_for_base,
-      error,
-    });
+    const { data, country } = req.body;
+    let result = CityService.UpdateOrCreate(data, user, country);
+    return res.json(result);
   }
 
   async getAll(req, res) {
-    const cities = await Cities.findAll();
-    return res.json(cities);
+    const { country } = req.body;
+    if (!country) {
+      return next(ApiError.badRequest("Укажите country"));
+    }
+
+    return res.json(await CityService.GetAll(country));
   }
 
   async getFilteredCities(req, res, next) {
@@ -118,12 +36,13 @@ class CitiesController {
       sort,
       pageSize,
       page,
+      country
     } = req.body;
-
+    console.log(req.body);
     if (!pageSize || !page) {
       return next(ApiError.badRequest("Укажите page и pageSize"));
     }
-    const city = await Cities.findAll();
+    const city = await CityService.GetAll(country);
     if (!city) {
       return next(ApiError.internal("Нет городов в базе данных"));
     }
@@ -162,12 +81,16 @@ class CitiesController {
   }
 
   async getOneCity(req, res, next) {
-    const { id, id_for_base } = req.body;
+    const { id, id_for_base, country } = req.body;
 
     if (!id && !id_for_base) {
       return next(ApiError.badRequest("Укажите id или id_for_base"));
     }
-    const city = id ? await Cities.findOne({ where: { id: Number(id) } }) : await Cities.findAll({ where: { id_for_base: Number(id_for_base) } });
+    if (!country) {
+      return next(ApiError.badRequest("Укажите country"));
+    }
+
+    const city = id ? await CityService.GetTimeById(id, country) : await CityService.GetTimes(id_for_base, country);
     if (!city) {
       return next(ApiError.internal("Город не найден"));
     }
@@ -175,40 +98,29 @@ class CitiesController {
   }
 
   async changeCheck(req, res, next) {
-    const { id, id_for_base, check_base, check_speaker, check_scenario } = req.body;
+    const { id, id_for_base, check_base, check_speaker, check_scenario, country } = req.body;
     let user = req.user;
     if (!id && !id_for_base) {
       return next(ApiError.badRequest("Укажите id или id_for_base"));
     }
+    if (!country) {
+      return next(ApiError.badRequest("Укажите country"));
+    }
+
     if (typeof (check_base ?? check_speaker ?? check_scenario) !== "boolean") {
       return next(ApiError.badRequest("Укажите данные для замены"));
     }
-    const city = id ? await Cities.findOne({ where: { id: Number(id) || null } }) : await Cities.findOne({ where: { id_for_base } });
-    if (!city) {
-      return next(ApiError.internal("Город не найден"));
+    try {
+      let result = await CityService.ChangeCheck(id, id_for_base, check_base, check_speaker, check_scenario, user, country);
+      return res.status(200).json(result);
     }
-
-    const cities = await Cities.findAll({ where: { id_for_base: city.id_for_base } });
-
-    const result = cities?.map((city) =>
-      ObjectHelper.sendDifferencesToDatabase(city, { ...city.dataValues, ...checkValue(check_base, check_speaker, check_scenario) }, "russia", "update", user, "city")
-    );
-    if (!result[0]) {
-      return next(ApiError.internal("Failed to write log"));
+    catch (error) {
+      return next(error);
     }
-    const updated = await Cities.update(checkValue(check_base, check_speaker, check_scenario), { where: { id_for_base: city.id_for_base } });
-
-    const updatedCity = await Cities.findAll({ where: { id_for_base: city.id_for_base } });
-
-    global.io.to("1").emit("updateCitiesRu", {
-      data: { cities: updatedCity },
-    });
-
-    return res.json("Успешно");
   }
 
   async changeStatus(req, res, next) {
-    const { id, id_for_base, status } = req.body;
+    const { id, id_for_base, status, country } = req.body;
     let user = req.user;
     if (!id && !id_for_base) {
       return next(ApiError.badRequest("Укажите id или id_for_base"));
@@ -216,88 +128,69 @@ class CitiesController {
     if (typeof status !== "number") {
       return next(ApiError.badRequest("Укажите данные для замены"));
     }
-    const city = id ? await Cities.findOne({ where: { id: Number(id) || null } }) : await Cities.findOne({ where: { id_for_base } });
-    if (!city) {
-      return next(ApiError.internal("Город не найден"));
+    if (!country) {
+      return next(ApiError.badRequest("Укажите country"));
     }
-
-    const cities = await Cities.findAll({ where: { id_for_base: city.id_for_base } });
-
-    const result = cities?.map((city) => ObjectHelper.sendDifferencesToDatabase(city, { ...city.dataValues, status }, "russia", "update", user, "city"));
-    if (!result[0]) {
-      return next(ApiError.internal("Failed to write log"));
+    try {
+      let result = await CityService.ChangeStatus(id, id_for_base, status, user, country);
+      return res.status(200).json(result);
     }
-    const updated = await Cities.update({ status: status }, { where: { id_for_base: city.id_for_base } });
-
-    const updatedCity = await Cities.findAll({ where: { id_for_base: city.id_for_base } });
-
-    global.io.to("1").emit("updateCitiesRu", {
-      data: { cities: updatedCity },
-    });
-
-    return res.json("Успешно");
+    catch (error) {
+      return next(error);
+    }
   }
 
   async deleteCity(req, res, next) {
-    const { id_for_base } = req.body;
+    const { id_for_base, country } = req.body;
     let user = req.user;
 
     if (!id_for_base) {
       return next(ApiError.badRequest("Укажите id_for_base"));
     }
-    const city = await Cities.findOne({ where: { id_for_base: Number(id_for_base) } });
-    if (!city) {
-      return next(ApiError.internal("Город не найден"));
+
+    if (!country) {
+      return next(ApiError.badRequest("Укажите country"));
     }
 
-    const cities = await Cities.findAll({ where: { id_for_base: Number(id_for_base) } });
-
-    const result = cities?.map((city) => ObjectHelper.sendDifferencesToDatabase(city, city.dataValues, "russia", "delete", user, "city"));
-    if (!result[0]) {
-      return next(ApiError.internal("Failed to write log"));
-    }
     try {
-      await Cities.destroy({
-        where: { id_for_base: city.id_for_base },
-      });
-
-      global.io.to("1").emit("deleteCityRu", {
-        data: { deleteCity: city.id_for_base },
-      });
-
-      return res.json({ ...city.dataValues });
-    } catch (e) {
-      return next(ApiError.internal("Delete failed"));
+      let result = await CityService.DeleteCity(id_for_base, user, country);
+      return res.status(200).json(result);
+    }
+    catch (error) {
+      return next(error);
     }
   }
 
-  async deleteOneTime(req, res, next) {
-    const { id } = req.body;
+  async deleteTime(req, res, next) {
+    const { id, country } = req.body;
     let user = req.user;
+
     if (!id) {
       return next(ApiError.badRequest("Укажите id"));
     }
-    const city = await Cities.findOne({ where: { id: Number(id) } });
-    if (!city) {
-      return next(ApiError.internal("Город не найден"));
+
+    if (!country) {
+      return next(ApiError.badRequest("Укажите country"));
     }
-    const result = ObjectHelper.sendDifferencesToDatabase(city, city.dataValues, "russia", "delete", user, "city");
-    if (!result) {
-      return next(ApiError.internal("Failed to write log"));
-    }
+
     try {
-      await Cities.destroy({
-        where: { id },
-      });
-
-      global.io.to("1").emit("deleteCityRu", {
-        data: { deleteTime: id },
-      });
-    } catch (e) {
-      return next(ApiError.internal("Delete failed"));
+      let result = await CityService.DeleteTime(id, user, country);
+      return res.status(200).json(result);
     }
+    catch (error) {
+      return next(error);
+    }
+  }
 
-    return res.json({ ...city.dataValues });
+  async test(req, res, next) {
+    const { inProgress, canceled, zamkniete, search, country } = req.body;
+    try {
+      let result = await CityService.GetFiltered(inProgress, canceled, zamkniete, "test", country);
+      return res.status(200).json(result);
+    }
+    catch (error) {
+      return next(error);
+    }
   }
 }
 
