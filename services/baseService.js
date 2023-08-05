@@ -50,7 +50,7 @@ class BaseService {
   }
 
   async getByIdForBase(id_for_base, country) {
-    return await this.models[country].bases.findOne({ where: { id_for_base } });
+    return await this.models[country].bases.findAll({ where: { id_for_base } });
   }
 
   async DeleteById(id, country) {
