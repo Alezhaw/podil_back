@@ -10,6 +10,6 @@ router.post("/changeCheck", auth, citiesController.changeCheck);
 router.post("/changeStatus", auth, citiesController.changeStatus);
 router.post("/deleteOne", auth, citiesController.deleteCity);
 router.post("/deleteTime", auth, citiesController.deleteTime);
-router.get("/get", auth, citiesController.getAll);
+router.post("/get", auth, citiesController.getAll);
 router.post("/test", citiesController.test);
 module.exports = router;

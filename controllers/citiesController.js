@@ -9,7 +9,7 @@ class CitiesController {
     return res.json(result);
   }
 
-  async getAll(req, res) {
+  async getAll(req, res, next) {
     const { country } = req.body;
     if (!country) {
       return next(ApiError.badRequest("Укажите country"));

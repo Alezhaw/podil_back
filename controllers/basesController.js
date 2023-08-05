@@ -1,4 +1,5 @@
 const ApiError = require("../error/ApiError");
+const BaseService = require("../services/baseService");
 const ObjectHelper = require("../utils/objectHelper");
 const { Bases } = require("../models/models");
 const { Cities } = require("../models/models");
@@ -103,17 +104,24 @@ class BasesController {
   }
 
   async getAll(req, res) {
-    const bases = await Bases.findAll();
-    return res.json(bases);
+    const { country } = req.body;
+    if (!country) {
+      return next(ApiError.badRequest("Укажите country"));
+    }
+
+    return res.json(await BaseService.GetAll(country));
   }
 
   async getOneBase(req, res, next) {
-    const { id, base_id } = req.body;
+    const { id, base_id, country } = req.body;
 
     if (!id && !base_id) {
       return next(ApiError.badRequest("Укажите id или base_id"));
     }
-    const base = (await Bases.findOne({ where: { id: Number(id) || 0 } })) || (await Bases.findOne({ where: { base_id: base_id } }));
+    if (!country) {
+      return next(ApiError.badRequest("Укажите country"));
+    }
+    const base = id ? await BaseService.getById(id, country) : await BaseService.getByBaseId(base_id, country);
     if (!base) {
       return next(ApiError.internal("База не найдена"));
     }
@@ -121,12 +129,16 @@ class BasesController {
   }
 
   async getBasesForCity(req, res, next) {
-    const { id_for_base } = req.body;
+    const { id_for_base, country } = req.body;
 
     if (!id_for_base) {
       return next(ApiError.badRequest("Укажите id_for_base"));
     }
-    const bases = await Bases.findAll({ where: { id_for_base: Number(id_for_base) } });
+    if (!country) {
+      return next(ApiError.badRequest("Укажите country"));
+    }
+
+    const bases = await BaseService.getByIdForBase(id_for_base, country);
     if (!bases) {
       return next(ApiError.internal("Базы не найдены"));
     }
@@ -158,29 +170,17 @@ class BasesController {
   }
 
   async deleteBase(req, res, next) {
-    const { id, base_id } = req.body;
+    const { id, base_id, country } = req.body;
     let user = req.user;
     if (!id && !base_id) {
       return next(ApiError.badRequest("Укажите id или base_id"));
     }
-    const base = (await Bases.findOne({ where: { id: Number(id) || null } })) || (await Bases.findOne({ where: { base_id: base_id } }));
-    if (!base) {
-      return next(ApiError.internal("База не найдена"));
-    }
-    const result = ObjectHelper.sendDifferencesToDatabase(base, base.dataValues, "russia", "delete", user, "base");
-    if (!result) {
-      return next(ApiError.internal("Failed to write log"));
+    if (!country) {
+      return next(ApiError.badRequest("Укажите country"));
     }
 
-    await Bases.destroy({
-      where: { id: base.id },
-    });
-
-    global.io.to("1").emit("deleteBaseRu", {
-      data: { deleteBase: base.id },
-    });
-
-    return res.json({ ...base.dataValues });
+    const result = CityService.DeleteBase({ id, base_id, user, country });
+    return res.json(result);
   }
 }
 
