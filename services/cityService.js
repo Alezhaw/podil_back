@@ -70,7 +70,7 @@ class CityService {
     const time = await this.models[country].create(item);
 
     global.io.to("1").emit("updateCities", {
-      data: { cities: city.dataValues },
+      data: { cities: city.dataValues, country },
     });
 
     return time.id;
@@ -91,7 +91,7 @@ class CityService {
         await this.Update(item, { id: time.id });
         updated = `${updated}/${item.id_for_base}`;
         global.io.to("1").emit("updateCities", {
-          data: { cities: item },
+          data: { cities: item, country },
         });
       } catch (e) {
         return {
