@@ -64,7 +64,7 @@ class LogsController {
 
     let filteredLogs = base
       ?.filter((el) => (country ? country === el.country : true))
-      ?.filter((el) => (search ? el?.base_id?.toLowerCase()?.includes(search.toLowerCase()) : true))
+      ?.filter((el) => (search ? el?.podzial_id?.toLowerCase()?.includes(search.toLowerCase()) : true))
       ?.filter((checkbox) => (checkbox?.action === "update" && updateFilter) || (checkbox?.action === "create" && createFilter) || (checkbox?.action === "delete" && deleteFilter))
       ?.sort((a, b) => Number(b.id) - Number(a.id));
     const count = Math.ceil(filteredLogs?.length / pageSize);

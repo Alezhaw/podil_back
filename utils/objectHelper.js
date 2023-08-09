@@ -37,7 +37,9 @@ class ObjectHelper {
       action === "update"
         ? this.getObjectDifferences(city1.dataValues, city2).filter((x) => x[0] != "createdAt" && x[0] != "updatedAt")
         : Object.keys(city1.dataValues)?.map((item) => [item, city1.dataValues[item], null]);
-    if (!differences[0]) return console.log("Нет отличий");
+    if (!differences[0]) {
+      return "Нет отличий";
+    }
     let date = new Date();
     date = date.setHours(date.getHours() + 3);
     try {
@@ -49,7 +51,7 @@ class ObjectHelper {
           user_email: user.email,
           differences: JSON.stringify(differences),
           id_for_base: city1.dataValues?.id_for_base,
-          godzina: differences.filter((dif) => dif[0] === "godzina")[0] ? null : city1.dataValues?.godzina,
+          godzina: differences.filter((dif) => dif[0] === "godzina")[0] ? null : city1.dataValues?.time,
           miasto_lokal: city1.dataValues?.miasto_lokal,
           time: date,
         });
@@ -61,7 +63,7 @@ class ObjectHelper {
           user_email: user.email,
           differences: JSON.stringify(differences),
           id_base: city1.dataValues?.id,
-          base_id: city1.dataValues?.base_id,
+          base_id: city1.dataValues?.podzial_id,
           time: date,
         });
       }

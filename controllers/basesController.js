@@ -6,7 +6,7 @@ class BasesController {
     const { data, country } = req.body;
     let user = req.user;
 
-    const result = BaseService.CreateOrUpdate({ data, user, country });
+    const result = await BaseService.CreateOrUpdate({ data, user, country });
 
     return res.json({
       result,
@@ -23,15 +23,15 @@ class BasesController {
   }
 
   async getOneBase(req, res, next) {
-    const { id, base_id, country } = req.body;
+    const { id, podzial_id, country } = req.body;
 
-    if (!id && !base_id) {
-      return next(ApiError.badRequest("Укажите id или base_id"));
+    if (!id && !podzial_id) {
+      return next(ApiError.badRequest("Укажите id или podzial_id"));
     }
     if (!country) {
       return next(ApiError.badRequest("Укажите country"));
     }
-    const base = id ? await BaseService.getById(id, country) : await BaseService.getByBaseId(base_id, country);
+    const base = id ? await BaseService.getById(id, country) : await BaseService.getByBaseId(podzial_id, country);
     if (!base) {
       return next(ApiError.internal("База не найдена"));
     }
@@ -62,22 +62,22 @@ class BasesController {
       return next(ApiError.badRequest("Укажите запрос"));
     }
 
-    const bases = BaseService.getFilteredBases({ search, country });
+    const bases = await BaseService.getFilteredBases({ search, country });
 
     return res.json(bases);
   }
 
   async deleteBase(req, res, next) {
-    const { id, base_id, country } = req.body;
+    const { id, podzial_id, country } = req.body;
     let user = req.user;
-    if (!id && !base_id) {
-      return next(ApiError.badRequest("Укажите id или base_id"));
+    if (!id && !podzial_id) {
+      return next(ApiError.badRequest("Укажите id или podzial_id"));
     }
     if (!country) {
       return next(ApiError.badRequest("Укажите country"));
     }
 
-    const result = BaseService.DeleteBase({ id, base_id, user, country });
+    const result = await BaseService.DeleteBase({ id, podzial_id, user, country });
     return res.json(result);
   }
 }

@@ -5,7 +5,7 @@ class CitiesController {
   async create(req, res, next) {
     let user = req.user;
     const { data, country } = req.body;
-    let result = CityService.UpdateOrCreate(data, user, country);
+    let result = await CityService.UpdateOrCreate(data, user, country);
     return res.json(result);
   }
 
@@ -42,13 +42,15 @@ class CitiesController {
     if (!pageSize || !page) {
       return next(ApiError.badRequest("Укажите page и pageSize"));
     }
+    console.log(1);
     const city = await CityService.GetAll(country);
+    console.log(2);
     if (!city) {
       return next(ApiError.internal("Нет городов в базе данных"));
     }
 
     let filteredCities = city
-      ?.filter((el) => (search ? el?.miasto_lokal?.toLowerCase()?.includes(search.toLowerCase()) : true))
+      ?.filter((el) => (search ? el?.city_lokal?.toLowerCase()?.includes(search.toLowerCase()) : true))
       ?.filter((item, i, ar) => {
         return ar.map((el) => el.id_for_base).indexOf(item.id_for_base) === i;
       })

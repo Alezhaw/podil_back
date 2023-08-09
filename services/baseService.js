@@ -23,45 +23,49 @@ class BaseService {
     let basesForWebSocket = [];
     await Promise.all(
       data.map(async (item, index) => {
-        const checkUnique = item.id ? await this.getById(item.id, country) : await this.getByBaseId(item.base_id, country);
+        const checkUnique = item.id ? await this.getById(item.id, country) : await this.getByBaseId(item.podzial_id, country);
         if (checkUnique) {
           try {
-            const result = ObjectHelper.sendDifferencesToDatabase(checkUnique, item, country, "update", user, "base");
+            const result = await ObjectHelper.sendDifferencesToDatabase(checkUnique, item, country, "update", user, "base");
+            console.log(1, result);
             if (!result) {
               error.push({
-                base_id: item.base_id,
+                podzial_id: item.podzial_id,
                 error: "Failed to write log",
               });
             }
+            if (result === "Нет отличий") {
+              return;
+            }
             await this.updateBase(item, checkUnique, country);
             basesForWebSocket.push(item);
-            update = `${update}/${item.base_id}`;
+            update = `${update}/${item.podzial_id}`;
             return;
           } catch (e) {
             return error.push({
-              base_id: item.base_id,
+              podzial_id: item.podzial_id,
               error: e.message,
             });
           }
         }
         if (!item.id_for_base) {
-          notIdForBase = `${notIdForBase}/${item.base_id}`;
+          notIdForBase = `${notIdForBase}/${item.podzial_id}`;
           return;
         }
         try {
           const base = await this.createBase(item, country);
           bases.push(base.dataValues);
           basesForWebSocket.push(base.dataValues);
-          const result = ObjectHelper.sendDifferencesToDatabase(base, item, country, "create", user, "base");
+          const result = await ObjectHelper.sendDifferencesToDatabase(base, item, country, "create", user, "base");
           if (!result) {
             error.push({
-              base_id: item.base_id,
+              podzial_id: item.podzial_id,
               error: "Failed to write log",
             });
           }
         } catch (e) {
           return error.push({
-            base_id: item.base_id,
+            podzial_id: item.podzial_id,
             error: e.message,
           });
         }
@@ -96,17 +100,17 @@ class BaseService {
       ?.map((el) => el.id_for_base);
     const allBases = await this.getAll(country);
     let bases = filteredCities?.map((cityBaseId) => allBases.filter((base) => base.id_for_base === cityBaseId))?.flat();
-    bases = bases[0] ? bases : allBases.filter((base) => String(base.base_id).toLowerCase().includes(String(search).toLowerCase()));
+    bases = bases[0] ? bases : allBases.filter((base) => String(base.podzial_id).toLowerCase().includes(String(search).toLowerCase()));
     bases = bases?.map((base) => ({ ...(base.dataValues || base), miasto_lokal: city?.filter((oneCity) => Number(oneCity.id_for_base) === Number(base.id_for_base))[0]?.miasto_lokal }));
     return bases;
   }
 
-  async DeleteBase({ id, base_id, user, country }) {
-    const base = id ? await this.getById(id, country) : await this.getByBaseId(base_id, country);
+  async DeleteBase({ id, podzial_id, user, country }) {
+    const base = id ? await this.getById(id, country) : await this.getByBaseId(podzial_id, country);
     if (!base) {
       throw ApiError.internal("База не найдена");
     }
-    const result = ObjectHelper.sendDifferencesToDatabase(base, base.dataValues, country, "delete", user, "base");
+    const result = await ObjectHelper.sendDifferencesToDatabase(base, base.dataValues, country, "delete", user, "base");
     if (!result) {
       throw ApiError.internal("Failed to write log");
     }
@@ -135,8 +139,8 @@ class BaseService {
     return await this.models[country].bases.findOne({ where: { id } });
   }
 
-  async getByBaseId(base_id, country) {
-    return await this.models[country].bases.findOne({ where: { base_id } });
+  async getByBaseId(podzial_id, country) {
+    return await this.models[country].bases.findOne({ where: { podzial_id } });
   }
 
   async getByIdForBase(id_for_base, country) {

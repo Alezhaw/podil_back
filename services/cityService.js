@@ -27,7 +27,6 @@ class CityService {
           const lastIdForBase = await this.models[country].max("id_for_base");
           item.id_for_base = lastIdForBase + 4;
         }
-
         if (item?.id !== "create") {
           try {
             let result = await this.UpdateTime(item, user, country);
@@ -37,18 +36,19 @@ class CityService {
           } catch (error) {
             return next(error);
           }
-        }
-        try {
-          let result = await this.CreateTime(item, user, country);
-          if (typeof result !== "Number") {
-            errors.push(result);
+        } else {
+          try {
+            let result = await this.CreateTime(item, user, country);
+            if (typeof result !== "Number") {
+              errors.push(result);
+            }
+          } catch (e) {
+            return errors.push({
+              city: item.city_lokal,
+              id_for_base: item.id_for_base,
+              error: e.message,
+            });
           }
-        } catch (e) {
-          return errors.push({
-            miasto: item.miasto_lokal,
-            id_for_base: item.id_for_base,
-            error: e.message,
-          });
         }
       })
     );
@@ -56,46 +56,43 @@ class CityService {
   }
   async CreateTime(item, user, country) {
     delete item.id;
-
-    const result = ObjectHelper.sendDifferencesToDatabase(city, item, country, "create", user, "city");
+    const time = await this.models[country].create(item);
+    const result = ObjectHelper.sendDifferencesToDatabase(time, item, country, "create", user, "city");
 
     if (!result) {
       return {
-        miasto: item.miasto_lokal,
+        city: item.city_lokal,
         id_for_base: item.id_for_base,
         error: "Failed to write log",
       };
     }
 
-    const time = await this.models[country].create(item);
-
     global.io.to("1").emit("updateCities", {
-      data: { cities: city.dataValues, country },
+      data: { cities: time.dataValues, country },
     });
 
     return time.id;
   }
   async UpdateTime(item, user, country) {
-    const time = (await this.GetTimeById(item.id, country)) || (await this.GetTimeByIdForBaseAndTime(item.id_for_base, item.godzina, country));
+    const time = (await this.GetTimeById(item.id, country)) || (await this.GetTimeByIdForBaseAndTime(item.id_for_base, item.time, country));
 
     if (time) {
       try {
         const result = ObjectHelper.sendDifferencesToDatabase(time, item, country, "update", user, "city");
         if (!result) {
           return {
-            miasto: item.miasto_lokal,
+            city: item.city_lokal,
             id_for_base: item.id_for_base,
             error: "Failed to write log",
           };
         }
-        await this.Update(item, { id: time.id });
-        updated = `${updated}/${item.id_for_base}`;
+        await this.Update(item, { id: time.id }, country);
         global.io.to("1").emit("updateCities", {
           data: { cities: item, country },
         });
       } catch (e) {
         return {
-          miasto: item.miasto_lokal,
+          city: item.city_lokal,
           id_for_base: item.id_for_base,
           error: e.message,
         };
@@ -133,7 +130,6 @@ class CityService {
     }
 
     const cities = await this.GetTimes(city.id_for_base, country);
-    console.log(cities);
     const result = cities?.map((city) => ObjectHelper.sendDifferencesToDatabase(city, { ...city.dataValues, status }, country, "update", user, "city"));
     if (!result[0]) {
       throw ApiError.internal("Failed to write log");
@@ -177,7 +173,6 @@ class CityService {
     if (!city) {
       throw ApiError.internal("City not found");
     }
-    console.log(city);
     const result = ObjectHelper.sendDifferencesToDatabase(city, city.dataValues, country, "delete", user, "city");
     if (!result) {
       throw ApiError.internal("Failed to write log");
@@ -244,11 +239,10 @@ class CityService {
     return await this.models[country].findOne({ where: { id_for_base } });
   }
   async GetTimeByIdForBaseAndTime(id_for_base, time, country) {
-    return await this.models[country].findOne({ where: { id_for_base, godzina: time } });
+    return await this.models[country].findOne({ where: { id_for_base, time: time } });
   }
 
   async GetTimes(id_for_base, country) {
-    console.log(country);
     return await this.models[country].findAll({ where: { id_for_base } });
   }
 
