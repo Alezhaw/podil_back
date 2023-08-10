@@ -18,6 +18,11 @@ class CitiesController {
     return res.json(await CityService.GetAll(country));
   }
 
+  async fixDate(req, res) {
+    await CityService.fixDate();
+    return res.json(123);
+  }
+
   async getFilteredCities(req, res, next) {
     const {
       search,
