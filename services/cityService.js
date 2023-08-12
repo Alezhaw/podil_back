@@ -34,7 +34,11 @@ class CityService {
               errors.push(result);
             }
           } catch (error) {
-            return next(error);
+            errors.push({
+              city: item.city_lokal,
+              id_for_base: item.id_for_base,
+              error: error.message,
+            });
           }
         } else {
           try {
@@ -76,6 +80,8 @@ class CityService {
   async UpdateTime(item, user, country) {
     const time = (await this.GetTimeById(item.id, country)) || (await this.GetTimeByIdForBaseAndTime(item.id_for_base, item.time, country));
 
+    console.log(1, time, 2, item);
+
     if (time) {
       try {
         const result = ObjectHelper.sendDifferencesToDatabase(time, item, country, "update", user, "city");
@@ -86,7 +92,7 @@ class CityService {
             error: "Failed to write log",
           };
         }
-        await this.Update(item, { id: time.id }, country);
+        await this.Update(item, { id: time.dataValues.id }, country);
         global.io.to("1").emit("updateCities", {
           data: { cities: item, country },
         });
@@ -97,7 +103,7 @@ class CityService {
           error: e.message,
         };
       }
-      return time.id;
+      return time.dataValues.id;
     }
     throw ApiError.internal("Город не найден");
   }
