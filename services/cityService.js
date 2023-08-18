@@ -27,7 +27,7 @@ class CityService {
           const lastIdForBase = await this.models[country].max("id_for_base");
           item.id_for_base = lastIdForBase + 4;
         }
-        if (item?.id !== "create") {
+        if (item?.id !== "create" && !!item.id) {
           try {
             let result = await this.UpdateTime(item, user, country);
             if (result != item.id) {
@@ -78,7 +78,7 @@ class CityService {
     return time.id;
   }
   async UpdateTime(item, user, country) {
-    const time = (await this.GetTimeById(item.id, country)) || (await this.GetTimeByIdForBaseAndTime(item.id_for_base, item.time, country));
+    const time = item.id ? await this.GetTimeById(item.id, country) : await this.GetTimeByIdForBaseAndTime(item.id_for_base, item.time, country);
 
     console.log(1, time, 2, item);
 
