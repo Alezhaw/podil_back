@@ -29,7 +29,7 @@ class CityService {
         }
 
         const time = item.id ? await this.GetTimeById(item.id, country) : await this.GetTimeByIdForBaseAndTime(item.id_for_base, item.time, country);
-        if (item?.id !== "create" && !!time.id) {
+        if (item?.id !== "create" && !!time) {
           try {
             let result = await this.UpdateTime(item, user, country);
             if (result != item.id) {
