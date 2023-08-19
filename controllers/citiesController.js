@@ -18,6 +18,14 @@ class CitiesController {
     return res.json(await CityService.GetAll(country));
   }
 
+  async getMaxIdForBase(req, res, next) {
+    const { country } = req.body;
+    if (!country) {
+      return next(ApiError.badRequest("Укажите country"));
+    }
+    return res.json(await CityService.getMaxIdForBase(country));
+  }
+
   async fixDate(req, res) {
     await CityService.fixDate();
     return res.json(123);

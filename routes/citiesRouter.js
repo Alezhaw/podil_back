@@ -12,5 +12,6 @@ router.post("/deleteOne", auth, citiesController.deleteCity);
 router.post("/deleteTime", auth, citiesController.deleteTime);
 router.post("/get", auth, citiesController.getAll);
 router.post("/test", citiesController.test);
+router.post("/getMaxIdForBase", citiesController.getMaxIdForBase);
 router.get("/fixDate", citiesController.fixDate);
 module.exports = router;
