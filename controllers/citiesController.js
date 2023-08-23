@@ -51,13 +51,10 @@ class CitiesController {
       page,
       country,
     } = req.body;
-    console.log(req.body);
     if (!pageSize || !page) {
       return next(ApiError.badRequest("Укажите page и pageSize"));
     }
-    console.log(1);
     const city = await CityService.GetAll(country);
-    console.log(2);
     if (!city) {
       return next(ApiError.internal("Нет городов в базе данных"));
     }
@@ -156,17 +153,22 @@ class CitiesController {
   async deleteCity(req, res, next) {
     const { id_for_base, country } = req.body;
     let user = req.user;
-
+    console.log(123);
     if (!id_for_base) {
+      console.log(124);
       return next(ApiError.badRequest("Укажите id_for_base"));
     }
-
+    console.log(125);
     if (!country) {
+      console.log(126);
       return next(ApiError.badRequest("Укажите country"));
     }
-
+    console.log(127);
     try {
+      console.log(128);
       let result = await CityService.DeleteCity(id_for_base, user, country);
+      console.log(129);
+      console.log(130, result);
       return res.status(200).json(result);
     } catch (error) {
       return next(error);

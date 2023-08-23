@@ -1,6 +1,6 @@
 const ApiError = require("../error/ApiError");
 const ObjectHelper = require("../utils/objectHelper");
-const { Cities, Bases, KzCities, KzBases } = require("../models/models");
+const { Cities, Bases, KzCities, KzBases, PlCities, PlBases } = require("../models/models");
 const { Sequelize, Op } = require("sequelize");
 
 class BaseService {
@@ -12,6 +12,10 @@ class BaseService {
     KZ: {
       cities: KzCities,
       bases: KzBases,
+    },
+    PL: {
+      cities: PlCities,
+      bases: PlBases,
     },
   };
 

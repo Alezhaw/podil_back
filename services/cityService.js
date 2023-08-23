@@ -1,6 +1,6 @@
 const ApiError = require("../error/ApiError");
 const ObjectHelper = require("../utils/objectHelper");
-const { Cities, KzCities } = require("../models/models");
+const { Cities, KzCities, PlCities } = require("../models/models");
 const { Sequelize, Op } = require("sequelize");
 
 class CityService {
@@ -17,6 +17,7 @@ class CityService {
   models = {
     RU: Cities,
     KZ: KzCities,
+    PL: PlCities,
   };
   async Search() {}
   async UpdateOrCreate(data, user, country) {
@@ -81,8 +82,6 @@ class CityService {
   }
   async UpdateTime(item, user, country) {
     const time = item.id ? await this.GetTimeById(item.id, country) : await this.GetTimeByIdForBaseAndTime(item.id_for_base, item.time, country);
-
-    console.log(1, time, 2, item);
 
     if (time) {
       try {
@@ -154,7 +153,7 @@ class CityService {
   }
 
   async DeleteCity(id_for_base, user, country) {
-    const times = await GetTimes(id_for_base, country);
+    const times = await this.GetTimes(id_for_base, country);
     if (!times) {
       throw ApiError.internal("Город не найден");
     }
@@ -169,7 +168,6 @@ class CityService {
       global.io.to("1").emit("deleteCity", {
         data: { deleteCity: id_for_base, country },
       });
-
       return res.json(id_for_base);
     } catch (e) {
       throw ApiError.internal("Delete failed");
@@ -240,12 +238,10 @@ class CityService {
   }
 
   async fixDate() {
-    console.log(123);
     let cities = await this.models["KZ"].findAll();
     cities = cities.map((el) => el.dataValues);
     Promise.all(
       cities.map(async (item, index) => {
-        console.log(index, item);
         let daysDate = [
           item.day_1_date ? item.day_1_date.split("T")[0] || null : null,
           item.day_2_date ? item.day_2_date.split("T")[0] || null : null,
