@@ -270,7 +270,7 @@ class CityService {
 
   async getMaxIdForBase(country) {
     return await this.models[country].findAll({
-      attributes: [Sequelize.fn("max", Sequelize.col("id_for_base"))],
+      attributes: [Sequelize.fn("max", Sequelize.col("id_for_base"))], //Sequelize.query() еще можно
       raw: true,
     });
   }
