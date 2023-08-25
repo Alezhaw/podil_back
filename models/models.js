@@ -134,6 +134,8 @@ const Cities = sequelize.define("city", {
   check_speaker: { type: DataTypes.BOOLEAN },
   check_scenario: { type: DataTypes.BOOLEAN },
   status: { type: DataTypes.INTEGER },
+  l_p_for_pl: { type: DataTypes.STRING },
+  explains_for_pl: { type: DataTypes.STRING },
 });
 
 const KzCities = sequelize.define("kzcity", {
@@ -196,6 +198,8 @@ const KzCities = sequelize.define("kzcity", {
   check_speaker: { type: DataTypes.BOOLEAN },
   check_scenario: { type: DataTypes.BOOLEAN },
   status: { type: DataTypes.INTEGER },
+  l_p_for_pl: { type: DataTypes.STRING },
+  explains_for_pl: { type: DataTypes.STRING },
 });
 
 const PlCities = sequelize.define("plcity", {
@@ -258,6 +262,8 @@ const PlCities = sequelize.define("plcity", {
   check_speaker: { type: DataTypes.BOOLEAN },
   check_scenario: { type: DataTypes.BOOLEAN },
   status: { type: DataTypes.INTEGER },
+  l_p_for_pl: { type: DataTypes.STRING },
+  explains_for_pl: { type: DataTypes.STRING },
 });
 
 const Formularz = sequelize.define("formularz", {
