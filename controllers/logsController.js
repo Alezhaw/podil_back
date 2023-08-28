@@ -47,8 +47,14 @@ class LogsController {
     }
     const logs = await Logs.findAll({
       where,
-      attributes: ["country"],
+      limit: 100,
+      // order: [["miasto_lokal", "DESC"]],
+    });
+    const testCount = await Logs.count({
+      // include: ...,
+      // where: ...,
       distinct: true,
+      col: "log.time",
     });
     if (!logs) {
       return next(ApiError.internal("Нет логов по городам"));
@@ -62,7 +68,7 @@ class LogsController {
 
     const count = Math.ceil(filteredLogs?.length / pageSize);
     filteredLogs = filteredLogs
-      ?.sort((a, b) => Number(b.id) - Number(a.id))
+      ?.sort((a, b) => b.id - a.id)
       ?.slice(page * pageSize - pageSize, page * pageSize)
       ?.map((el) => logs?.filter((log) => log.miasto_lokal === el.miasto_lokal && getCorrectTime(log) === getCorrectTime(el)))
       ?.flat();
@@ -78,7 +84,7 @@ class LogsController {
     // });
     // return res.json({ test });
 
-    return res.json({ logs: filteredLogs, count, countries });
+    return res.json({ logs: filteredLogs, count, countries, testCount }); //Если поиск по стране то список стран не возвращает
   }
 
   async getAllBasesLog(req, res) {
