@@ -225,6 +225,7 @@ class CityService {
     const city = await this.models[country].findAll({ where });
     return city;
   }
+
   async Update(newData, where, country) {
     const updated = await this.models[country].update(newData, { where });
   }
