@@ -39,6 +39,7 @@ const Bases = sequelize.define("base", {
   sogl_1: { type: DataTypes.INTEGER },
   sogl_2: { type: DataTypes.INTEGER },
   sogl_3: { type: DataTypes.INTEGER },
+  sogl_4: { type: DataTypes.INTEGER },
   comment: { type: DataTypes.STRING },
 });
 
@@ -55,6 +56,7 @@ const KzBases = sequelize.define("kzbase", {
   sogl_1: { type: DataTypes.INTEGER },
   sogl_2: { type: DataTypes.INTEGER },
   sogl_3: { type: DataTypes.INTEGER },
+  sogl_4: { type: DataTypes.INTEGER },
   comment: { type: DataTypes.STRING },
 });
 
@@ -71,6 +73,7 @@ const PlBases = sequelize.define("plbase", {
   sogl_1: { type: DataTypes.INTEGER },
   sogl_2: { type: DataTypes.INTEGER },
   sogl_3: { type: DataTypes.INTEGER },
+  sogl_4: { type: DataTypes.INTEGER },
   comment: { type: DataTypes.STRING },
 });
 
