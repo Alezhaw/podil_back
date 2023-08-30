@@ -63,11 +63,11 @@ class LogsController {
       attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("country")), "country"]],
     });
     countries = countries?.map((el) => el.dataValues.country);
-    const LogsForCount = await Logs.findAll({
+    const logsForCount = await Logs.findAll({
       where,
       attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("time"), Sequelize.col("miasto_lokal"), Sequelize.col("user_id")), "all"]],
     });
-    if (!logs || !LogsForCount) {
+    if (!logs || !logsForCount) {
       return next(ApiError.internal("Нет логов по городам"));
     }
     let optionsForLogs = [];
@@ -95,26 +95,8 @@ class LogsController {
     if (!logsWitgProperties) {
       return next(ApiError.internal("Логи не найдены"));
     }
-    //let filteredLogs = logs?.map((item) => item.dataValues);
-    // ?.filter((item, i, ar) => {
-    //   return ar.map((el) => `${el.miasto_lokal} ${getCorrectTime(el)}`).indexOf(`${item.miasto_lokal} ${getCorrectTime(item)}`) === i;
-    // });
 
-    const count = Math.ceil(LogsForCount?.length / pageSize);
-    // filteredLogs = filteredLogs?.sort((a, b) => b.id - a.id)?.slice(page * pageSize - pageSize, page * pageSize);
-    // ?.map((el) => logs?.filter((log) => log.miasto_lokal === el.miasto_lokal && getCorrectTime(log) === getCorrectTime(el)))
-    // ?.flat();
-
-    // const countries = logs
-    //   ?.filter((item, i, ar) => {
-    //     return ar.map((el) => el.country).indexOf(item.country) === i;
-    //   })
-    //   ?.map((log) => log.country);
-
-    // const test = await Logs.findAll({
-    //   where,
-    // });
-    // return res.json({ test });
+    const count = Math.ceil(logsForCount?.length / pageSize);
 
     return res.json({ logs: logsWitgProperties, count, countries });
   }
