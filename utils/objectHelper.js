@@ -2,9 +2,7 @@
 const { Logs, LogsForBase } = require("../models/models");
 const ApiError = require("../error/ApiError");
 function getCorrectTime(time) {
-  console.log(12334, new Date(time));
   time = new Date(time);
-  console.log(2, String(time).split(".")[0]?.replace("T", " "));
   return String(time).split(".")[0] || time;
 }
 
@@ -58,7 +56,7 @@ class ObjectHelper {
           differences: JSON.stringify(differences),
           id_for_base: city1.dataValues?.id_for_base,
           godzina: differences.filter((dif) => dif[0] === "godzina")[0] ? null : city1.dataValues?.time,
-          miasto_lokal: `${city1.dataValues?.city_lokal} ${city1.dataValues?.hall} ${city1.dataValues?.date}`,
+          miasto_lokal: `${city1.dataValues?.city_lokal || ""} ${city1.dataValues?.hall || ""} ${city1.dataValues?.date || ""}`,
           time: getCorrectTime(date),
         });
       } else {
