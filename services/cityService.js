@@ -19,6 +19,51 @@ class CityService {
     KZ: KzCities,
     PL: PlCities,
   };
+
+  filterProperties = {
+    zamkniete: {
+      status: 2,
+    },
+    inProgress: [
+      {
+        status: 1,
+      },
+      {
+        status: 3,
+      },
+    ],
+    canceled: {
+      status: 0,
+    },
+    baseCanceled: {
+      status: 0,
+    },
+    baseZamkniete: {
+      [Op.and]: [{ check_base: true }, { status: { [Op.ne]: 0 } }],
+    },
+    baseInProgress: {
+      [Op.and]: [{ check_base: false }, { status: { [Op.ne]: 0 } }],
+    },
+    scenarioCanceled: {
+      status: 0,
+    },
+    scenarioZamkniete: {
+      [Op.and]: [{ check_scenario: true }, { status: { [Op.ne]: 0 } }],
+    },
+    scenarioInProgress: {
+      [Op.and]: [{ check_scenario: false }, { status: { [Op.ne]: 0 } }],
+    },
+    speakerCanceled: {
+      status: 0,
+    },
+    speakerZamkniete: {
+      [Op.and]: [{ check_speaker: true }, { status: { [Op.ne]: 0 } }],
+    },
+    speakerInProgress: {
+      [Op.and]: [{ check_speaker: false }, { status: { [Op.ne]: 0 } }],
+    },
+  };
+
   async Search() {}
   async UpdateOrCreate(data, user, country) {
     let errors = [];
@@ -196,34 +241,58 @@ class CityService {
     return id;
   }
 
-  async GetFiltered(inProgress, canceled, zamkniete, search, country) {
+  async GetFiltered({ search, filter, sort, pageSize, page, country }) {
     let statuses = [];
-    if (zamkniete) {
-      statuses.push({
-        status: 2,
+    const filterProperties = this.filterProperties;
+    if (filter) {
+      const keys = Object.keys(filter);
+      keys.map((el) => {
+        if (filter[el]) {
+          if (filterProperties[el].length) {
+            statuses.push(...filterProperties[el]);
+          } else {
+            statuses.push(filterProperties[el]);
+          }
+        }
       });
     }
-    if (inProgress) {
-      statuses.push({
-        status: 1,
-      });
-    }
-    if (canceled) {
-      statuses.push({
-        status: 0,
-      });
-    }
+
     let where = {
       [Op.or]: statuses,
     };
     if (search) {
-      where.miasto_lokal = {
+      where.city_lokal = {
         [Op.iLike]: `%${search}%`,
       };
     }
+    const cities = await this.GetDistinctFiltered(country, where, page, pageSize, sort);
+    const cityForCount = await this.GetDistinctFilteredForCount(country, where);
+    if (!cities || !cityForCount) {
+      throw ApiError.internal("Города не найдены");
+    }
 
-    const city = await this.models[country].findAll({ where });
-    return city;
+    let options = [];
+
+    cities.map((el) => {
+      el = el.dataValues;
+      options.push({
+        id_for_base: el.id_for_base,
+      });
+    });
+
+    let whereWithProperties = {
+      [Op.or]: options,
+    };
+
+    let citiesWithProperties = await this.GetTimesByManyIdForBase(country, whereWithProperties, sort);
+    if (!citiesWithProperties) {
+      return next(ApiError.internal("Города не найдены"));
+    }
+
+    const count = Math.ceil(cityForCount?.length / pageSize);
+
+    const result = { cities: citiesWithProperties, count };
+    return result;
   }
 
   async Update(newData, where, country) {
@@ -277,6 +346,27 @@ class CityService {
 
   async Get(id, country) {
     return await this.models[country].findOne({ where: { id } });
+  }
+
+  async GetDistinctFiltered(country, where, page, pageSize, sort) {
+    return await this.models[country].findAll({
+      where,
+      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("id_for_base")), "id_for_base"]],
+      order: [["id_for_base", sort ? "ASC" : "DESC"]],
+      offset: (page - 1) * pageSize,
+      limit: pageSize,
+    });
+  }
+
+  async GetDistinctFilteredForCount(country, where) {
+    return await this.models[country].findAll({
+      where,
+      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("id_for_base")), "id_for_base"]],
+    });
+  }
+
+  async GetTimesByManyIdForBase(country, where, sort) {
+    return await this.models[country].findAll({ where, order: [["id_for_base", sort ? "ASC" : "DESC"]] });
   }
 
   async GetTimeByIdForBase(id_for_base, country) {
