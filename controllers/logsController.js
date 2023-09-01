@@ -74,12 +74,12 @@ class LogsController {
 
     logs.map((el) => {
       el = el.dataValues;
-      let time = new Date(el.time);
-      const hours = time.getHours();
-      const timezone = time.getTimezoneOffset();
-      time.setHours(hours - timezone / 60);
+      // let time = new Date(el.time);
+      // const hours = time.getHours();
+      // const timezone = time.getTimezoneOffset();
+      //time.setHours(hours - timezone / 60);
       optionsForLogs.push({
-        time: time,
+        time: el.time,
         miasto_lokal: el.miasto_lokal,
         user_id: el.user_id,
       });
