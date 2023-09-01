@@ -238,36 +238,35 @@ class CityService {
     return await this.models[country].findAll();
   }
 
-  async fixDate() {
-    let cities = await this.models["KZ"].findAll();
-    cities = cities.map((el) => el.dataValues);
-    Promise.all(
-      cities.map(async (item, index) => {
-        let daysDate = [
-          item.day_1_date ? item.day_1_date.split("T")[0] || null : null,
-          item.day_2_date ? item.day_2_date.split("T")[0] || null : null,
-          item.day_3_date ? item.day_3_date.split("T")[0] || null : null,
-        ].filter((el) => !!el);
-        let days_numbers_for_consent = [item.day_1_numbers_for_1_consent || null, item.day_2_numbers_for_1_consent || null, item.day_3_numbers_for_1_consent || null].filter((el) => !!el);
-        let days_topical_quantity_invites = [item.day_1_topical_quantity_invites || null, item.day_2_topical_quantity_invites || null, item.day_3_topical_quantity_invites || null].filter(
-          (el) => !!el
-        );
-        daysDate = daysDate.length > 0 ? daysDate : null;
-        days_numbers_for_consent = days_numbers_for_consent.length > 0 ? days_numbers_for_consent : null;
-        days_topical_quantity_invites = days_topical_quantity_invites.length > 0 ? days_topical_quantity_invites : null;
+  // async fixDate() {
+  //   let cities = await this.models["KZ"].findAll();
+  //   cities = cities.map((el) => el.dataValues);
+  //   Promise.all(
+  //     cities.map(async (item, index) => {
+  //       let daysDate = [
+  //         item.day_1_date ? item.day_1_date.split("T")[0] || null : null,
+  //         item.day_2_date ? item.day_2_date.split("T")[0] || null : null,
+  //         item.day_3_date ? item.day_3_date.split("T")[0] || null : null,
+  //       ].filter((el) => !!el);
+  //       let days_numbers_for_consent = [item.day_1_numbers_for_1_consent || null, item.day_2_numbers_for_1_consent || null, item.day_3_numbers_for_1_consent || null].filter((el) => !!el);
+  //       let days_topical_quantity_invites = [item.day_1_topical_quantity_invites || null, item.day_2_topical_quantity_invites || null, item.day_3_topical_quantity_invites || null].filter(
+  //         (el) => !!el
+  //       );
+  //       daysDate = daysDate.length > 0 ? daysDate : null;
+  //       days_numbers_for_consent = days_numbers_for_consent.length > 0 ? days_numbers_for_consent : null;
+  //       days_topical_quantity_invites = days_topical_quantity_invites.length > 0 ? days_topical_quantity_invites : null;
 
-        this.models["KZ"].update(
-          {
-            days_date: daysDate,
-            days_numbers_for_consent: days_numbers_for_consent,
-            days_topical_quantity_invites: days_topical_quantity_invites,
-          },
-          { where: { id: item.id } }
-        );
-      })
-    );
-    // return await this.models[RU].findAll();
-  }
+  //       this.models["KZ"].update(
+  //         {
+  //           days_date: daysDate,
+  //           days_numbers_for_consent: days_numbers_for_consent,
+  //           days_topical_quantity_invites: days_topical_quantity_invites,
+  //         },
+  //         { where: { id: item.id } }
+  //       );
+  //     })
+  //   );
+  // }
 
   async getMaxIdForBase(country) {
     return await this.models[country].findAll({

@@ -91,21 +91,14 @@ class BaseService {
   }
 
   async getFilteredBases({ search, country }) {
-    const city = await this.getAllCities(country);
+    const city = await this.getDistinctFilteredCitiesIdForBase(country, search);
     if (!city) {
-      throw ApiError.internal("Нет городов в базе данных");
+      throw ApiError.internal("Города не найдены");
     }
 
-    const filteredCities = city
-      ?.filter((el) => (search ? el?.miasto_lokal?.toLowerCase()?.includes(search.toLowerCase()) : true))
-      ?.filter((item, i, ar) => {
-        return ar.map((el) => el.id_for_base).indexOf(item.id_for_base) === i;
-      })
-      ?.map((el) => el.id_for_base);
-    const allBases = await this.getAll(country);
-    let bases = filteredCities?.map((cityBaseId) => allBases.filter((base) => base.id_for_base === cityBaseId))?.flat();
-    bases = bases[0] ? bases : allBases.filter((base) => String(base.podzial_id).toLowerCase().includes(String(search).toLowerCase()));
-    bases = bases?.map((base) => ({ ...(base.dataValues || base), miasto_lokal: city?.filter((oneCity) => Number(oneCity.id_for_base) === Number(base.id_for_base))[0]?.miasto_lokal }));
+    let bases = await this.getByManyIdForBase(country, city);
+    bases = bases[0] ? bases : await this.getBySearch(country, search);
+    bases = bases?.map((base) => ({ ...(base.dataValues || base), city_lokal: city?.filter((oneCity) => Number(oneCity.id_for_base) === Number(base.id_for_base))[0]?.city_lokal }));
     return bases;
   }
 
@@ -139,6 +132,19 @@ class BaseService {
     return await this.models[country].cities.findAll();
   }
 
+  async getDistinctFilteredCitiesIdForBase(country, search) {
+    let where = {};
+    if (search) {
+      where.city_lokal = {
+        [Op.iLike]: `%${search}%`,
+      };
+    }
+    return await this.models[country].cities.findAll({
+      where,
+      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("id_for_base")), "id_for_base"], "city_lokal"],
+    });
+  }
+
   async getById(id, country) {
     return await this.models[country].bases.findOne({ where: { id } });
   }
@@ -149,6 +155,30 @@ class BaseService {
 
   async getByIdForBase(id_for_base, country) {
     return await this.models[country].bases.findAll({ where: { id_for_base } });
+  }
+
+  async getByManyIdForBase(country, cityWithIdForBase) {
+    let options = [];
+    cityWithIdForBase.map((el) => {
+      el = el.dataValues;
+      options.push({
+        id_for_base: el.id_for_base,
+      });
+    });
+    let where = {
+      [Op.or]: options,
+    };
+    return await this.models[country].bases.findAll({ where });
+  }
+
+  async getBySearch(country, search) {
+    let where = {};
+    if (search) {
+      where.podzial_id = {
+        [Op.iLike]: `%${search}%`,
+      };
+    }
+    return await this.models[country].bases.findAll({ where });
   }
 
   async updateBase(item, checkUnique, country) {
