@@ -62,6 +62,8 @@ class CityService {
     speakerInProgress: {
       [Op.and]: [{ check_speaker: false }, { status: { [Op.ne]: 0 } }],
     },
+    dateTo: {},
+    dateFrom: {},
   };
 
   async Search() {}
@@ -260,6 +262,19 @@ class CityService {
     let where = {
       [Op.or]: statuses,
     };
+
+    let dateFilter = [];
+    if (filter.dateTo) {
+      dateFilter.push({ [Op.lte]: filter.dateTo });
+    }
+    if (filter.dateFrom) {
+      dateFilter.push({ [Op.gte]: filter.dateFrom });
+    }
+    if (dateFilter[0]) {
+      where.date = {
+        [Op.and]: dateFilter,
+      };
+    }
     if (search) {
       where.city_lokal = {
         [Op.iLike]: `%${search}%`,
