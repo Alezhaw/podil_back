@@ -319,6 +319,53 @@ const User = sequelize.define("user", {
   nickname: { type: DataTypes.STRING, unique: true },
 });
 
+const Region = sequelize.define("region", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  region: { type: DataTypes.STRING },
+});
+
+const KzRegion = sequelize.define("kzregion", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  region: { type: DataTypes.STRING },
+});
+
+const PlRegion = sequelize.define("plregion", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  region: { type: DataTypes.STRING },
+});
+
+const CitiesWithReg = sequelize.define("cities_with_region", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  region_id: { type: DataTypes.INTEGER },
+  city_name: { type: DataTypes.STRING },
+  additional_city_name: { type: DataTypes.STRING },
+  county: { type: DataTypes.STRING },
+  city_type: { type: DataTypes.STRING },
+  population: { type: DataTypes.INTEGER },
+  autozonning: { type: DataTypes.STRING },
+});
+const KzCitiesWithReg = sequelize.define("kzcities_with_region", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  region_id: { type: DataTypes.INTEGER },
+  city_name: { type: DataTypes.STRING },
+  additional_city_name: { type: DataTypes.STRING },
+  county: { type: DataTypes.STRING },
+  city_type: { type: DataTypes.STRING },
+  population: { type: DataTypes.INTEGER },
+  autozonning: { type: DataTypes.STRING },
+});
+
+const PlCitiesWithReg = sequelize.define("plcities_with_region", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  region_id: { type: DataTypes.INTEGER },
+  city_name: { type: DataTypes.STRING },
+  additional_city_name: { type: DataTypes.STRING },
+  county: { type: DataTypes.STRING },
+  city_type: { type: DataTypes.STRING },
+  population: { type: DataTypes.INTEGER },
+  autozonning: { type: DataTypes.STRING },
+});
+
 module.exports = {
   User,
   Bases,
@@ -331,4 +378,10 @@ module.exports = {
   Logs,
   LogsForBase,
   SpeakerTemplate,
+  Region,
+  KzRegion,
+  PlRegion,
+  CitiesWithReg,
+  KzCitiesWithReg,
+  PlCitiesWithReg,
 };
