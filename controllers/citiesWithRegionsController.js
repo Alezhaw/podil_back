@@ -39,20 +39,38 @@ class CitiesWithRegController {
 
   async create(req, res, next) {
     //проверить записывается ли регион ид
-    const { country, region, city_name, additional_city_name, county, city_type, population, autozonning } = req.body;
-    if (!country || !region || city_name) {
-      return next(ApiError.badRequest("Укажите все данные"));
-    }
-    const checkRegion = await RegionService.getByName(country, region);
-    if (!checkRegion) {
-      return next(ApiError.badRequest("Такого региона нет"));
-    }
-    try {
-      const newCity = await CitiesWithRegService.create({ country, region_id: checkRegion.dataValues.id, city_name, additional_city_name, county, city_type, population, autozonning });
-      return res.json(newCity);
-    } catch (e) {
-      return next(ApiError.badRequest("Непредвиденная ошибка"));
-    }
+    const { country, region, city_name, additional_city_name, county, city_type, population, autozonning, values } = req.body;
+
+    const result = await Promise.all(
+      values?.map(async (item) => {
+        const checkRegion = await RegionService.getByName(country, item.region);
+        if (!checkRegion) {
+          return next(ApiError.badRequest("Такого региона нет"));
+        }
+        try {
+          const newCity = await CitiesWithRegService.create({ country, region_id: checkRegion.dataValues.id, city_name, additional_city_name, county, city_type, population, autozonning });
+          return 1;
+        } catch (e) {
+          return 2;
+        }
+      })
+    );
+
+    return res.json(result);
+
+    // if (!country || !region || city_name) {
+    //   return next(ApiError.badRequest("Укажите все данные"));
+    // }
+    // const checkRegion = await RegionService.getByName(country, region);
+    // if (!checkRegion) {
+    //   return next(ApiError.badRequest("Такого региона нет"));
+    // }
+    // try {
+    //   const newCity = await CitiesWithRegService.create({ country, region_id: checkRegion.dataValues.id, city_name, additional_city_name, county, city_type, population, autozonning });
+    //   return res.json(newCity);
+    // } catch (e) {
+    //   return next(ApiError.badRequest("Непредвиденная ошибка"));
+    // }
   }
 
   async update(req, res, next) {
