@@ -366,6 +366,69 @@ const PlCitiesWithReg = sequelize.define("plcities_with_region", {
   autozonning: { type: DataTypes.STRING },
 });
 
+const ProjectConcent = sequelize.define("project_concent", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  name: { type: DataTypes.STRING },
+});
+
+const KzProjectConcent = sequelize.define("kzproject_concent", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  name: { type: DataTypes.STRING },
+});
+
+const PlProjectConcent = sequelize.define("plproject_concent", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  name: { type: DataTypes.STRING },
+});
+
+const PresentationTime = sequelize.define("presentation_time", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  presentation_hour: { type: DataTypes.ARRAY(DataTypes.STRING) },
+  rental_hours: { type: DataTypes.STRING },
+});
+
+const KzPresentationTime = sequelize.define("kzpresentation_time", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  presentation_hour: { type: DataTypes.ARRAY(DataTypes.STRING) },
+  rental_hours: { type: DataTypes.STRING },
+});
+
+const PlPresentationTime = sequelize.define("plpresentation_time", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  presentation_hour: { type: DataTypes.ARRAY(DataTypes.STRING) },
+  rental_hours: { type: DataTypes.STRING },
+});
+
+const PlanningPerson = sequelize.define("planning_person", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  name: { type: DataTypes.STRING },
+});
+
+const KzPlanningPerson = sequelize.define("kzplanning_person", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  name: { type: DataTypes.STRING },
+});
+
+const PlPlanningPerson = sequelize.define("plplanning_person", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  name: { type: DataTypes.STRING },
+});
+
+const CallTemplate = sequelize.define("call_template", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  name: { type: DataTypes.STRING },
+});
+
+const KzCallTemplate = sequelize.define("kzcall_template", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  name: { type: DataTypes.STRING },
+});
+
+const PlCallTemplate = sequelize.define("plcall_template", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  name: { type: DataTypes.STRING },
+});
+
 module.exports = {
   User,
   Bases,
@@ -384,4 +447,16 @@ module.exports = {
   CitiesWithReg,
   KzCitiesWithReg,
   PlCitiesWithReg,
+  ProjectConcent,
+  KzProjectConcent,
+  PlProjectConcent,
+  PresentationTime,
+  KzPresentationTime,
+  PlPresentationTime,
+  PlanningPerson,
+  KzPlanningPerson,
+  PlPlanningPerson,
+  CallTemplate,
+  KzCallTemplate,
+  PlCallTemplate,
 };
