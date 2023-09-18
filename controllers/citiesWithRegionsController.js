@@ -53,7 +53,7 @@ class CitiesWithRegController {
 
         const checkCity = await CitiesWithRegService.getByName(country, where);
         console.log(1, checkCity);
-        if (checkCity) {
+        if (checkCity[0]) {
           return `Уже есть`;
         }
         try {
