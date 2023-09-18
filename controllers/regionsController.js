@@ -1,5 +1,4 @@
 const ApiError = require("../error/ApiError");
-const sequelize = require("../db");
 const RegionService = require("../services/regionService");
 
 class RegionsController {

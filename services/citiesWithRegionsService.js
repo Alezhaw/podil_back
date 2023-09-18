@@ -1,6 +1,6 @@
 const ApiError = require("../error/ApiError");
 const ObjectHelper = require("../utils/objectHelper");
-const { CitiesWithReg, KzCitiesWithReg, PlCitiesWithReg } = require("../models/models");
+const { CitiesWithReg, KzCitiesWithReg, PlCitiesWithReg } = require("../models/trails/citiesWithRegModels");
 const { Sequelize, Op } = require("sequelize");
 
 class CitiesWithRegService {

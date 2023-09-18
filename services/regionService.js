@@ -1,6 +1,6 @@
 const ApiError = require("../error/ApiError");
 const ObjectHelper = require("../utils/objectHelper");
-const { Region, KzRegion, PlRegion } = require("../models/models");
+const { Region, KzRegion, PlRegion } = require("../models/trails/regionModels");
 const { Sequelize, Op } = require("sequelize");
 
 class RegionService {

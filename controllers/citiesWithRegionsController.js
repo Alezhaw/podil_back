@@ -1,6 +1,4 @@
 const ApiError = require("../error/ApiError");
-const { Region } = require("../models/models");
-const sequelize = require("../db");
 const CitiesWithRegService = require("../services/citiesWithRegionsService");
 const RegionService = require("../services/regionService");
 
