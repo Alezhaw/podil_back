@@ -88,7 +88,7 @@ class CitiesWithRegController {
     };
 
     const checkCity = await CitiesWithRegService.getByName(country, where);
-    if (checkCity) {
+    if (checkCity[0]) {
       return next(ApiError.badRequest("Такого автозонинг уже есть"));
     }
     try {
