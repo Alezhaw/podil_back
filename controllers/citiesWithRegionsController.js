@@ -47,6 +47,14 @@ class CitiesWithRegController {
         if (!checkRegion) {
           return `такого региона нет ${item.region}/${item.city_name}`;
         }
+        let where = {
+          autozonning: item.autozonning,
+        };
+
+        const checkCity = await CitiesWithRegService.getByName(country, where);
+        if (checkCity) {
+          return `Такой автозонинг уже есть`;
+        }
         try {
           const newCity = await CitiesWithRegService.create({
             country,
@@ -67,19 +75,27 @@ class CitiesWithRegController {
 
     return res.json(result);
 
-    // if (!country || !region || city_name) {
-    //   return next(ApiError.badRequest("Укажите все данные"));
-    // }
-    // const checkRegion = await RegionService.getByName(country, region);
-    // if (!checkRegion) {
-    //   return next(ApiError.badRequest("Такого региона нет"));
-    // }
-    // try {
-    //   const newCity = await CitiesWithRegService.create({ country, region_id: checkRegion.dataValues.id, city_name, additional_city_name, county, city_type, population, autozonning });
-    //   return res.json(newCity);
-    // } catch (e) {
-    //   return next(ApiError.badRequest("Непредвиденная ошибка"));
-    // }
+    if (!country || !region || city_name) {
+      return next(ApiError.badRequest("Укажите все данные"));
+    }
+    const checkRegion = await RegionService.getByName(country, region);
+    if (!checkRegion) {
+      return next(ApiError.badRequest("Такого региона нет"));
+    }
+    let where = {
+      autozonning: item.autozonning,
+    };
+
+    const checkCity = await CitiesWithRegService.getByName(country, where);
+    if (checkCity) {
+      return next(ApiError.badRequest("Такого автозонинг уже есть"));
+    }
+    try {
+      const newCity = await CitiesWithRegService.create({ country, region_id: checkRegion.dataValues.id, city_name, additional_city_name, county, city_type, population, autozonning });
+      return res.json(newCity);
+    } catch (e) {
+      return next(ApiError.badRequest("Непредвиденная ошибка"));
+    }
   }
 
   async update(req, res, next) {
