@@ -49,12 +49,13 @@ class CitiesWithRegController {
         }
         let where = {
           autozonning: item.autozonning,
+          city_name: item.city_name,
         };
 
         const checkCity = await CitiesWithRegService.getByName(country, where);
         console.log(1, checkCity);
         if (checkCity[0]) {
-          return `Уже есть`;
+          return `+`;
         }
         try {
           const newCity = await CitiesWithRegService.create({
@@ -67,7 +68,7 @@ class CitiesWithRegController {
             population: item.population,
             autozonning: item.autozonning,
           });
-          return "Успешнр";
+          return "";
         } catch (e) {
           return "ошибка";
         }
