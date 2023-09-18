@@ -52,8 +52,9 @@ class CitiesWithRegController {
         };
 
         const checkCity = await CitiesWithRegService.getByName(country, where);
+        console.log(1, checkCity);
         if (checkCity) {
-          return `Такой автозонинг уже есть`;
+          return `Уже есть`;
         }
         try {
           const newCity = await CitiesWithRegService.create({
