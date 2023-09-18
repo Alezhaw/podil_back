@@ -48,7 +48,16 @@ class CitiesWithRegController {
           return next(ApiError.badRequest("Такого региона нет"));
         }
         try {
-          const newCity = await CitiesWithRegService.create({ country, region_id: checkRegion.dataValues.id, city_name, additional_city_name, county, city_type, population, autozonning });
+          const newCity = await CitiesWithRegService.create({
+            country,
+            region_id: checkRegion.dataValues.id,
+            city_name: item.city_name,
+            additional_city_name: item.additional_city_name,
+            county: item.county,
+            city_type: item.city_type,
+            population: item.population,
+            autozonning: item.autozonning,
+          });
           return 1;
         } catch (e) {
           return 2;
