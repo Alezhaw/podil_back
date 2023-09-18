@@ -9,7 +9,7 @@ class RegionsController {
       return next(ApiError.badRequest("Укажите country"));
     }
 
-    return res.json(await RegionService.GetAll(country));
+    return res.json(await RegionService.getAll(country));
   }
 
   async getByIds(req, res, next) {

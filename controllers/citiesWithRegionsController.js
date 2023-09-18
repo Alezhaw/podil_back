@@ -11,7 +11,7 @@ class CitiesWithRegController {
       return next(ApiError.badRequest("Укажите country"));
     }
 
-    return res.json(await CitiesWithRegService.GetAll(country));
+    return res.json(await CitiesWithRegService.getAll(country));
   }
 
   async getByName(req, res, next) {
