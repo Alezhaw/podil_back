@@ -1,6 +1,6 @@
 const ApiError = require("../error/ApiError");
 const ObjectHelper = require("../utils/objectHelper");
-const { Formularz } = require("../models/models");
+const { Formularz } = require("../models/formularzModels");
 
 class FormularzController {
   async create(req, res, next) {

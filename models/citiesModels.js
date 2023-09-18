@@ -1,89 +1,6 @@
 const sequelize = require("../db");
 const { DataTypes } = require("sequelize");
 
-const SpeakerTemplate = sequelize.define("speaker_template", {
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  text: { type: DataTypes.STRING },
-  type: { type: DataTypes.INTEGER },
-  name: { type: DataTypes.STRING, unique: true },
-  country: { type: DataTypes.STRING },
-});
-const Logs = sequelize.define("log", {
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  country: { type: DataTypes.STRING },
-  action: { type: DataTypes.STRING },
-  user_id: { type: DataTypes.INTEGER },
-  user_email: { type: DataTypes.STRING },
-  differences: { type: DataTypes.JSON },
-  id_for_base: { type: DataTypes.INTEGER },
-  godzina: { type: DataTypes.STRING },
-  miasto_lokal: { type: DataTypes.STRING },
-  time: { type: DataTypes.DATE },
-});
-
-const LogsForBase = sequelize.define("logs_for_base", {
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  country: { type: DataTypes.STRING },
-  action: { type: DataTypes.STRING },
-  user_id: { type: DataTypes.INTEGER },
-  user_email: { type: DataTypes.STRING },
-  differences: { type: DataTypes.JSON },
-  id_base: { type: DataTypes.INTEGER },
-  base_id: { type: DataTypes.STRING },
-  time: { type: DataTypes.DATE },
-});
-
-const Bases = sequelize.define("base", {
-  id_for_base: { type: DataTypes.INTEGER },
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  podzial_id: { type: DataTypes.STRING, unique: true },
-  stat_1: { type: DataTypes.STRING },
-  stat_2: { type: DataTypes.STRING },
-  stat_3: { type: DataTypes.STRING },
-  stat_4: { type: DataTypes.STRING },
-  type: { type: DataTypes.STRING },
-  sort: { type: DataTypes.STRING },
-  sogl_1: { type: DataTypes.INTEGER },
-  sogl_2: { type: DataTypes.INTEGER },
-  sogl_3: { type: DataTypes.INTEGER },
-  sogl_4: { type: DataTypes.INTEGER },
-  comment: { type: DataTypes.STRING },
-});
-
-const KzBases = sequelize.define("kzbase", {
-  id_for_base: { type: DataTypes.INTEGER },
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  podzial_id: { type: DataTypes.STRING, unique: true },
-  stat_1: { type: DataTypes.STRING },
-  stat_2: { type: DataTypes.STRING },
-  stat_3: { type: DataTypes.STRING },
-  stat_4: { type: DataTypes.STRING },
-  type: { type: DataTypes.STRING },
-  sort: { type: DataTypes.STRING },
-  sogl_1: { type: DataTypes.INTEGER },
-  sogl_2: { type: DataTypes.INTEGER },
-  sogl_3: { type: DataTypes.INTEGER },
-  sogl_4: { type: DataTypes.INTEGER },
-  comment: { type: DataTypes.STRING },
-});
-
-const PlBases = sequelize.define("plbase", {
-  id_for_base: { type: DataTypes.INTEGER },
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  podzial_id: { type: DataTypes.STRING, unique: true },
-  stat_1: { type: DataTypes.STRING },
-  stat_2: { type: DataTypes.STRING },
-  stat_3: { type: DataTypes.STRING },
-  stat_4: { type: DataTypes.STRING },
-  type: { type: DataTypes.STRING },
-  sort: { type: DataTypes.STRING },
-  sogl_1: { type: DataTypes.INTEGER },
-  sogl_2: { type: DataTypes.INTEGER },
-  sogl_3: { type: DataTypes.INTEGER },
-  sogl_4: { type: DataTypes.INTEGER },
-  comment: { type: DataTypes.STRING },
-});
-
 const Cities = sequelize.define("city", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
   l_p: { type: DataTypes.INTEGER },
@@ -279,57 +196,8 @@ const PlCities = sequelize.define("plcity", {
   explains_for_pl: { type: DataTypes.STRING },
 });
 
-const Formularz = sequelize.define("formularz", {
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  miasto: { type: DataTypes.STRING },
-  lokal_wybrany: { type: DataTypes.STRING },
-  wojewodztwo: { type: DataTypes.STRING },
-  checkbox: { type: DataTypes.BOOLEAN },
-  data: { type: DataTypes.STRING },
-  analiza: { type: DataTypes.STRING },
-  lokal: { type: DataTypes.STRING },
-  numeracja: { type: DataTypes.STRING },
-  status: { type: DataTypes.STRING },
-  poprzednia_opinia: { type: DataTypes.STRING },
-  informacje_o_lokalu: { type: DataTypes.STRING },
-  cena_za_sale: { type: DataTypes.STRING },
-  link_strona: { type: DataTypes.STRING },
-  link_sali: { type: DataTypes.STRING },
-  link_lokal: { type: DataTypes.STRING },
-  telefon1: { type: DataTypes.STRING },
-  telefon2: { type: DataTypes.STRING },
-  telefon3: { type: DataTypes.STRING },
-  adres_email: { type: DataTypes.STRING },
-  nazwa_sali_i_metraz1: { type: DataTypes.STRING },
-  nazwa_sali_i_metraz2: { type: DataTypes.STRING },
-  nazwa_sali_i_metraz3: { type: DataTypes.STRING },
-  adres_loklau: { type: DataTypes.STRING },
-  ogrzewanie: { type: DataTypes.STRING },
-  klimatyzacja: { type: DataTypes.STRING },
-  informacje_dot_terminow: { type: DataTypes.STRING },
-  kolumna_techniczna: { type: DataTypes.INTEGER, unique: true },
-  statusForDatabase: { type: DataTypes.INTEGER },
-  newScript: { type: DataTypes.BOOLEAN },
-});
-
-const User = sequelize.define("user", {
-  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-  email: { type: DataTypes.STRING, unique: true },
-  password: { type: DataTypes.STRING },
-  role: { type: DataTypes.STRING, defaultValue: "USER" },
-  nickname: { type: DataTypes.STRING, unique: true },
-});
-
 module.exports = {
-  User,
-  Bases,
   Cities,
-  KzBases,
   KzCities,
   PlCities,
-  PlBases,
-  Formularz,
-  Logs,
-  LogsForBase,
-  SpeakerTemplate,
 };

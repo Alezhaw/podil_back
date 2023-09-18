@@ -1,5 +1,5 @@
 const ApiError = require("../error/ApiError");
-const { SpeakerTemplate } = require("../models/models");
+const { SpeakerTemplate } = require("../models/speakerTemplateModels");
 const sequelize = require("../db");
 
 class SpeakerTemplateController {

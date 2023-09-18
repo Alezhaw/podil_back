@@ -1,5 +1,5 @@
 //const { Logs } = require("../models/models");
-const { Logs, LogsForBase } = require("../models/models");
+const { Logs, LogsForBase } = require("../models/logsModels");
 const ApiError = require("../error/ApiError");
 function getCorrectTime(time) {
   time = new Date(time);
