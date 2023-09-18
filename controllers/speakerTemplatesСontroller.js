@@ -76,13 +76,13 @@ class SpeakerTemplateController {
   }
 
   async getByType(req, res, next) {
-    const { type } = req.body;
+    const { type, country } = req.body;
 
-    if (!type) {
-      return next(ApiError.badRequest("Укажите type"));
+    if (!type || !country) {
+      return next(ApiError.badRequest("Укажите type и country"));
     }
 
-    const templates = await SpeakerTemplate.findAll({ where: { type } });
+    const templates = await SpeakerTemplate.findAll({ where: { type, country } });
     if (!templates) {
       return next(ApiError.badRequest("Шаблоны не найдены"));
     }

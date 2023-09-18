@@ -1,13 +1,13 @@
 const Router = require("express");
 const router = new Router();
 const auth = require("../middleware/authMiddleware");
-const speakerTemplatesontroller = require("../controllers/speakerTemplatesontroller");
+const SpeakerTemplateController = require("../controllers/speakerTemplatesСontroller");
 
-router.get("/getAll", auth, speakerTemplatesontroller.getAllTemplates);
-router.get("/getTypes", auth, speakerTemplatesontroller.getTypes);
-router.post("/create", auth, speakerTemplatesontroller.create);
-router.post("/update", auth, speakerTemplatesontroller.update);
-router.post("/getByType", auth, speakerTemplatesontroller.getByType);
-router.post("/delete", auth, speakerTemplatesontroller.delete);
+router.get("/getAll", auth, SpeakerTemplateController.getAllTemplates);
+router.get("/getTypes", auth, SpeakerTemplateController.getTypes);
+router.post("/create", auth, SpeakerTemplateController.create);
+router.post("/update", auth, SpeakerTemplateController.update);
+router.post("/getByType", auth, SpeakerTemplateController.getByType);
+router.post("/delete", auth, SpeakerTemplateController.delete);
 
 module.exports = router;
