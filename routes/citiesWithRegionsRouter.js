@@ -1,7 +1,7 @@
 const Router = require("express");
 const router = new Router();
 const auth = require("../middleware/authMiddleware");
-const citiesWithRegionsController = require("../controllers/citiesWithRegionsController");
+const citiesWithRegionsController = require("../controllers/trails/citiesWithRegionsController");
 
 router.post("/getAll", auth, citiesWithRegionsController.getAll);
 router.post("/getByName", auth, citiesWithRegionsController.getByName);

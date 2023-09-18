@@ -1,6 +1,6 @@
-const ApiError = require("../error/ApiError");
-const CitiesWithRegService = require("../services/citiesWithRegionsService");
-const RegionService = require("../services/regionService");
+const ApiError = require("../../error/ApiError");
+const CitiesWithRegService = require("../../services/citiesWithRegionsService");
+const RegionService = require("../../services/regionService");
 
 class CitiesWithRegController {
   async getAll(req, res, next) {
