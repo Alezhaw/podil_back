@@ -1,5 +1,5 @@
 const ApiError = require("../../error/ApiError");
-const RegionService = require("../../services/regionService");
+const RegionService = require("../../services/trails/regionService");
 
 class RegionsController {
   async getAll(req, res, next) {
