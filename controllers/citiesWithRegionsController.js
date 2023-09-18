@@ -45,7 +45,7 @@ class CitiesWithRegController {
       values?.map(async (item) => {
         const checkRegion = await RegionService.getByName(country, item.region);
         if (!checkRegion) {
-          return next(ApiError.badRequest("Такого региона нет"));
+          return `такого региона нет ${item.region}/${item.city_name}`;
         }
         try {
           const newCity = await CitiesWithRegService.create({
@@ -58,9 +58,9 @@ class CitiesWithRegController {
             population: item.population,
             autozonning: item.autozonning,
           });
-          return 1;
+          return "Успешнр";
         } catch (e) {
-          return 2;
+          return "ошибка";
         }
       })
     );
