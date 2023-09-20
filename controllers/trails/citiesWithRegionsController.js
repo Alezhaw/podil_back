@@ -58,7 +58,7 @@ class CitiesWithRegController {
   }
 
   async create(req, res, next) {
-    const { country, region, city_name, additional_city_name, county, city_type, population, autozonning } = req.body;
+    const { country, region, city_name, additional_city_name, county, city_type, population, autozonning, values } = req.body;
 
     // if (!country || !region || city_name) {
     //   return next(ApiError.badRequest("Укажите все данные"));
