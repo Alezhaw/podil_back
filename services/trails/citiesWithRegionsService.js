@@ -25,7 +25,7 @@ class CitiesWithRegService {
     return await this.models[country].findAll();
   }
 
-  async getByName(country, where) {
+  async getByWhere(country, where) {
     return await this.models[country].findAll({ where });
   }
 

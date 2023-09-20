@@ -1,7 +1,7 @@
 const Router = require("express");
 const router = new Router();
-const auth = require("../middleware/authMiddleware");
-const regionsController = require("../controllers/trails/regionsController");
+const auth = require("../../middleware/authMiddleware");
+const regionsController = require("../../controllers/trails/regionsController");
 
 router.post("/getAll", auth, regionsController.getAll);
 router.post("/getByIds", auth, regionsController.getByIds);

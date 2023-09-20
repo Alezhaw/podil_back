@@ -1,7 +1,7 @@
 const Router = require("express");
 const router = new Router();
-const auth = require("../middleware/authMiddleware");
-const reservationStatusController = require("../controllers/trails/reservationStatusController");
+const auth = require("../../middleware/authMiddleware");
+const reservationStatusController = require("../../controllers/trails/reservationStatusController");
 
 router.post("/getAll", auth, reservationStatusController.getAll);
 router.post("/create", auth, reservationStatusController.create);

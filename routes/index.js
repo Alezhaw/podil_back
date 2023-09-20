@@ -6,8 +6,8 @@ const citiesRouter = require("./citiesRouter");
 const formularzRouter = require("./formularzRouter");
 const logsRouter = require("./logsRouter");
 const speakerTemplateRouter = require("./speakerTemplateRouter");
-const regionsRouter = require("./regionsRouter");
-const citiesWithRegionsRouter = require("./citiesWithRegionsRouter");
+const regionsRouter = require("./trails/regionsRouter");
+const citiesWithRegionsRouter = require("./trails/citiesWithRegionsRouter");
 
 router.use("/user", userRouter);
 router.use("/base", basesRouter);

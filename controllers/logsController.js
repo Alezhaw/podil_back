@@ -1,5 +1,6 @@
 const ApiError = require("../error/ApiError");
 const { Logs, LogsForBase } = require("../models/logsModels");
+const { Form } = require("../models/trails/formModels");
 const { Sequelize, Op } = require("sequelize");
 
 // function getCorrectTime(element) {
