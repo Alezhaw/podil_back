@@ -68,7 +68,7 @@ class CitiesWithRegController {
       return next(ApiError.badRequest("Такого региона нет"));
     }
     let where = {
-      autozonning: item.autozonning,
+      autozonning: autozonning,
     };
 
     const checkCity = await CitiesWithRegService.getByWhere(country, where);

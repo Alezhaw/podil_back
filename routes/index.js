@@ -8,6 +8,7 @@ const logsRouter = require("./logsRouter");
 const speakerTemplateRouter = require("./speakerTemplateRouter");
 const regionsRouter = require("./trails/regionsRouter");
 const citiesWithRegionsRouter = require("./trails/citiesWithRegionsRouter");
+const formRouter = require("./trails/formRouter");
 
 router.use("/user", userRouter);
 router.use("/base", basesRouter);
@@ -17,5 +18,6 @@ router.use("/log", logsRouter);
 router.use("/speakerTemplate", speakerTemplateRouter);
 router.use("/region", regionsRouter);
 router.use("/cityWithReg", citiesWithRegionsRouter);
+router.use("/form", formRouter);
 
 module.exports = router;
