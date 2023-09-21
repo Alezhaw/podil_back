@@ -1,5 +1,5 @@
 const ApiError = require("../../error/ApiError");
-const CallTemplateService = require("../../services/trails/callTemplatesService");
+const CallTemplateService = require("../../services/trails/сallTemplatesService");
 
 class CallTemplatesController {
   async getAll(req, res, next) {
