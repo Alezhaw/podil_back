@@ -10,6 +10,7 @@ const CitiesWithReg = sequelize.define("cities_with_region", {
   city_type: { type: DataTypes.STRING },
   population: { type: DataTypes.INTEGER },
   autozonning: { type: DataTypes.STRING },
+  relevance_status: { type: DataTypes.BOOLEAN },
 });
 const KzCitiesWithReg = sequelize.define("kzcities_with_region", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -20,6 +21,7 @@ const KzCitiesWithReg = sequelize.define("kzcities_with_region", {
   city_type: { type: DataTypes.STRING },
   population: { type: DataTypes.INTEGER },
   autozonning: { type: DataTypes.STRING },
+  relevance_status: { type: DataTypes.BOOLEAN },
 });
 
 const PlCitiesWithReg = sequelize.define("plcities_with_region", {
@@ -31,6 +33,7 @@ const PlCitiesWithReg = sequelize.define("plcities_with_region", {
   city_type: { type: DataTypes.STRING },
   population: { type: DataTypes.INTEGER },
   autozonning: { type: DataTypes.STRING },
+  relevance_status: { type: DataTypes.BOOLEAN },
 });
 
 module.exports = {

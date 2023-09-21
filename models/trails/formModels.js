@@ -25,6 +25,7 @@ const Form = sequelize.define("form", {
   starting_price: { type: DataTypes.ARRAY(DataTypes.STRING) },
   trade_group: { type: DataTypes.STRING },
   company: { type: DataTypes.STRING },
+  relevance_status: { type: DataTypes.BOOLEAN },
 });
 
 const KzForm = sequelize.define("kzform", {
@@ -51,6 +52,7 @@ const KzForm = sequelize.define("kzform", {
   starting_price: { type: DataTypes.ARRAY(DataTypes.STRING) },
   trade_group: { type: DataTypes.STRING },
   company: { type: DataTypes.STRING },
+  relevance_status: { type: DataTypes.BOOLEAN },
 });
 
 const PlForm = sequelize.define("plform", {
@@ -77,6 +79,7 @@ const PlForm = sequelize.define("plform", {
   starting_price: { type: DataTypes.ARRAY(DataTypes.STRING) },
   trade_group: { type: DataTypes.STRING },
   company: { type: DataTypes.STRING },
+  relevance_status: { type: DataTypes.BOOLEAN },
 });
 
 module.exports = {
