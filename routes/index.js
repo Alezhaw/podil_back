@@ -17,6 +17,7 @@ const projectSalesRouter = require("./trails/projectSalesRouter");
 const regimentRouter = require("./trails/regimentRouter");
 const reservationStatusRouter = require("./trails/reservationStatusRouter");
 const formRouter = require("./trails/formRouter");
+const trailsRouter = require("./trails/trailsRouter");
 
 router.use("/user", userRouter);
 router.use("/base", basesRouter);
@@ -32,8 +33,9 @@ router.use("/planningPerson", planningPersonRouter);
 router.use("/presentationTime", presentationTimeRouter);
 router.use("/projectConcent", projectConcentRouter);
 router.use("/projectSales", projectSalesRouter);
-router.use("/projectSales", formRouter);
 router.use("/regiment", regimentRouter);
 router.use("/reservationStatus", reservationStatusRouter);
+router.use("/form", formRouter);
+router.use("/trail", trailsRouter);
 
 module.exports = router;

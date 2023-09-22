@@ -26,12 +26,12 @@ class CitiesWithRegController {
       [Op.or]: actions,
     };
 
-    const regions = await CitiesWithRegService.getByWhere(country, where);
+    const cities = await CitiesWithRegService.getByWhere(country, where);
 
-    if (!regions) {
+    if (!cities) {
       return next(ApiError.internal("Города не найдены"));
     }
-    return res.json({ regions });
+    return res.json({ cities });
   }
 
   async getByName(req, res, next) {
@@ -49,7 +49,7 @@ class CitiesWithRegController {
       [Op.or]: actions,
     };
 
-    const cities = await CitiesWithRegService.getByWhere(country, where);
+    const cities = await CitiesWithRegService.getByWhereWithLimit(country, where, 20);
 
     if (!cities) {
       return next(ApiError.internal("Города не найдены"));
@@ -73,7 +73,7 @@ class CitiesWithRegController {
 
     const checkCity = await CitiesWithRegService.getByWhere(country, where);
     if (checkCity[0]) {
-      return next(ApiError.badRequest("Такого автозонинг уже есть"));
+      return next(ApiError.badRequest("Такой автозонинг уже есть"));
     }
     try {
       const newCity = await CitiesWithRegService.create({ country, region_id: checkRegion.dataValues.id, city_name, additional_city_name, county, city_type, population, autozonning });

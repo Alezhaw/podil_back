@@ -29,6 +29,10 @@ class CitiesWithRegService {
     return await this.models[country].findAll({ where });
   }
 
+  async getByWhereWithLimit(country, where, limit) {
+    return await this.models[country].findAll({ where, limit });
+  }
+
   async getById(country, id) {
     return await this.models[country].findOne({ where: { id } });
   }
