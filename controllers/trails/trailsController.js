@@ -24,8 +24,25 @@ class TrailsController {
 
   async create(req, res, next) {
     const { country, trail } = req.body;
-    if (!country || !trail || !trail.planning_person_id || !trail.date_scheduled || !trail.presentation_date || !trail.contract_status_id) {
-      return next(ApiError.badRequest("Укажите все данные"));
+    if (
+      !country ||
+      !trail ||
+      !trail.planning_person_id ||
+      !trail.date_scheduled ||
+      !trail.company_id ||
+      !trail.route_number ||
+      !trail.departure_dates ||
+      !trail.presentation_date ||
+      !trail.presentation_time_id ||
+      !trail.regionId ||
+      !trail.city_id ||
+      !trail.autozonning ||
+      !trail.reservation_status_id ||
+      !trail.project_sales_id ||
+      !trail.project_concent_id ||
+      !trail.call_template_id
+    ) {
+      return next(ApiError.badRequest("Заполните все поля"));
     }
     if (trail.id) {
       return next(ApiError.badRequest("Презентация уже есть"));
@@ -35,16 +52,38 @@ class TrailsController {
     if (!checkPlanningPerson) {
       throw ApiError.internal("Planning person не найден");
     }
-    const checkContractStatus = await ContactStatusService.getById(country, trail.contract_status_id);
-    if (!checkContractStatus) {
-      throw ApiError.internal("Статус не найден");
+    const checkCompany = await RegimentService.getById(country, trail.company_id);
+    if (!checkCompany) {
+      throw ApiError.internal("Company не найдена");
     }
-    // if (!trail.regionId) {
-    //   return next(ApiError.badRequest("Укажите область"));
-    // }
-    // if (!trail.city_id) {
-    //   return next(ApiError.badRequest("Укажите город"));
-    // }
+    const checkPresentationTime = await PresentationTimeService.getById(country, trail.presentation_time_id);
+    if (!checkPresentationTime) {
+      throw ApiError.internal("Presentation time не найден");
+    }
+    const checkRegion = await RegionService.getById(country, trail.regionId);
+    if (!checkRegion) {
+      throw ApiError.internal("Область не найдена");
+    }
+    const checkCity = await CitiesWithRegService.getById(country, trail.city_id);
+    if (!checkCity) {
+      throw ApiError.internal("Город не найден");
+    }
+    const checkReservationStatus = await ReservationStatusService.getById(country, trail.reservation_status_id);
+    if (!checkReservationStatus) {
+      throw ApiError.internal("Статус резервирования не найден");
+    }
+    const checkProjectSales = await ProjectSalesService.getById(country, trail.project_sales_id);
+    if (!checkProjectSales) {
+      throw ApiError.internal("Project sales не найден");
+    }
+    const checkProjectConcent = await ProjectConcentService.getById(country, trail.project_concent_id);
+    if (!checkProjectConcent) {
+      throw ApiError.internal("Project concent не найден");
+    }
+    const checkCallTemplate = await CallTemplateService.getById(country, trail.call_template_id);
+    if (!checkCallTemplate) {
+      throw ApiError.internal("Call template не найден");
+    }
 
     try {
       const newTrail = await TrailsService.create({ country, trail });
@@ -56,7 +95,24 @@ class TrailsController {
 
   async update(req, res, next) {
     const { country, trail } = req.body;
-    if (!country || !trail || !trail.planning_person_id || !trail.date_scheduled || !trail.presentation_date || !trail.contract_status_id) {
+    if (
+      !country ||
+      !trail ||
+      !trail.planning_person_id ||
+      !trail.date_scheduled ||
+      !trail.company_id ||
+      !trail.route_number ||
+      !trail.departure_dates ||
+      !trail.presentation_date ||
+      !trail.presentation_time_id ||
+      !trail.regionId ||
+      !trail.city_id ||
+      !trail.autozonning ||
+      !trail.reservation_status_id ||
+      !trail.project_sales_id ||
+      !trail.project_concent_id ||
+      !trail.call_template_id
+    ) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
     const checkTrail = await TrailsService.getById(country, trail.id);
@@ -67,33 +123,37 @@ class TrailsController {
     if (!checkPlanningPerson) {
       throw ApiError.internal("Planning person не найден");
     }
-    const checkContractStatus = await ContactStatusService.getById(country, trail.contract_status_id);
-    if (!checkContractStatus) {
-      throw ApiError.internal("Статус не найден");
+    const checkCompany = await RegimentService.getById(country, trail.company_id);
+    if (!checkCompany) {
+      throw ApiError.internal("Company не найдена");
     }
-    if (trail.company_id) {
-      const checkCompany = await RegimentService.getById(country, trail.company_id);
-      if (!checkCompany) {
-        throw ApiError.internal("Company не найдена");
-      }
+    const checkPresentationTime = await PresentationTimeService.getById(country, trail.presentation_time_id);
+    if (!checkPresentationTime) {
+      throw ApiError.internal("Presentation time не найден");
     }
-    if (trail.presentation_time_id) {
-      const checkPresentationTime = await PresentationTimeService.getById(country, trail.presentation_time_id);
-      if (!checkPresentationTime) {
-        throw ApiError.internal("Presentation time не найден");
-      }
+    const checkRegion = await RegionService.getById(country, trail.regionId);
+    if (!checkRegion) {
+      throw ApiError.internal("Область не найдена");
     }
-    if (trail.regionId) {
-      const checkRegion = await RegionService.getById(country, trail.regionId);
-      if (!checkRegion) {
-        throw ApiError.internal("Область не найдена");
-      }
+    const checkCity = await CitiesWithRegService.getById(country, trail.city_id);
+    if (!checkCity) {
+      throw ApiError.internal("Город не найден");
     }
-    if (trail.city_id) {
-      const checkCity = await CitiesWithRegService.getById(country, trail.city_id);
-      if (!checkCity) {
-        throw ApiError.internal("Город не найден");
-      }
+    const checkReservationStatus = await ReservationStatusService.getById(country, trail.reservation_status_id);
+    if (!checkReservationStatus) {
+      throw ApiError.internal("Статус резервирования не найден");
+    }
+    const checkProjectSales = await ProjectSalesService.getById(country, trail.project_sales_id);
+    if (!checkProjectSales) {
+      throw ApiError.internal("Project sales не найден");
+    }
+    const checkProjectConcent = await ProjectConcentService.getById(country, trail.project_concent_id);
+    if (!checkProjectConcent) {
+      throw ApiError.internal("Project concent не найден");
+    }
+    const checkCallTemplate = await CallTemplateService.getById(country, trail.call_template_id);
+    if (!checkCallTemplate) {
+      throw ApiError.internal("Call template не найден");
     }
     if (trail.form_id) {
       const checkForm = await FormService.getById(country, trail.form_id);
@@ -101,37 +161,12 @@ class TrailsController {
         throw ApiError.internal("Город не найден");
       }
     }
-    if (trail.reservation_status_id) {
-      const checkReservationStatus = await ReservationStatusService.getById(country, trail.reservation_status_id);
-      if (!checkReservationStatus) {
-        throw ApiError.internal("Статус резервирования не найден");
+    if (trail.contract_status_id) {
+      const checkContractStatus = await ContactStatusService.getById(country, trail.contract_status_id);
+      if (!checkContractStatus) {
+        throw ApiError.internal("Статус не найден");
       }
     }
-    if (trail.project_sales_id) {
-      const checkProjectSales = await ProjectSalesService.getById(country, trail.project_sales_id);
-      if (!checkProjectSales) {
-        throw ApiError.internal("Project sales не найден");
-      }
-    }
-    if (trail.project_concent_id) {
-      const checkProjectConcent = await ProjectConcentService.getById(country, trail.project_concent_id);
-      if (!checkProjectConcent) {
-        throw ApiError.internal("Project concent не найден");
-      }
-    }
-    if (trail.call_template_id) {
-      const checkCallTemplate = await CallTemplateService.getById(country, trail.call_template_id);
-      if (!checkProjectConcent) {
-        throw ApiError.internal("Call template не найден");
-      }
-    }
-    // if (!trail.regionId) {
-    //   return next(ApiError.badRequest("Укажите область"));
-    // }
-    // if (!trail.city_id) {
-    //   return next(ApiError.badRequest("Укажите город"));
-    // }
-
     try {
       const updatedTrail = await TrailsService.update({ country, trail });
       return res.json("success");
@@ -141,7 +176,7 @@ class TrailsController {
   }
 
   async getFiltered(req, res, next) {
-    const { search, dateTo, dateFrom, sort, pageSize, page, country } = req.body;
+    const { search, searchRoute, planningPersonIds, dateTo, dateFrom, sort, pageSize, page, country } = req.body;
 
     if (!country) {
       return next(ApiError.badRequest("Укажите country"));
@@ -166,12 +201,31 @@ class TrailsController {
         [Op.and]: dateFilter,
       };
     }
+    if (planningPersonIds) {
+      where.planning_person_id = {
+        [Op.or]: planningPersonIds,
+      };
+    }
+    if (searchRoute) {
+      where.route_number = {
+        [Op.iLike]: `%${searchRoute}%`,
+      };
+    }
 
-    //   if (search) {
-    //     where.city_lokal = {
-    //       [Op.iLike]: `%${search}%`,
-    //     };
-    //   }
+    if (search) {
+      const whereForCity = {
+        city_name: { [Op.iLike]: `%${search}%` },
+      };
+      const cities = await CitiesWithRegService.getByWhere(country, whereForCity);
+      let citiesId = [];
+      cities.map((city) => {
+        city = city.dataValues;
+        citiesId.push(city.id);
+      });
+      where.city_id = {
+        [Op.or]: citiesId,
+      };
+    }
 
     const trails = await TrailsService.GetFiltered(country, where, page, pageSize, sort);
     const trailsForCount = await TrailsService.GetFilteredForCount(country, where);
