@@ -11,6 +11,7 @@ const ContactStatusService = require("../../services/trails/contactStatusService
 const ProjectSalesService = require("../../services/trails/projectSalesService");
 const ProjectConcentService = require("../../services/trails/projectConcentService");
 const CallTemplateService = require("../../services/trails/callTemplatesService");
+const { Op } = require("sequelize");
 
 class TrailsController {
   async getAll(req, res, next) {
