@@ -15,6 +15,10 @@ class FormService {
     return await this.models[country].update({ ...form }, { where: { id: form.id } });
   }
 
+  async remove(country, relevance_status, id) {
+    return await this.models[country].update({ relevance_status }, { where: { id } });
+  }
+
   //   async delete(country, id) {
   //     return await this.models[country].destroy({
   //       where: { id },

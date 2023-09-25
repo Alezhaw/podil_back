@@ -21,6 +21,10 @@ class TrailsService {
   //     });
   //   }
 
+  async remove(country, relevance_status, id) {
+    return await this.models[country].update({ relevance_status }, { where: { id } });
+  }
+
   async GetFiltered(country, where, page, pageSize, sort) {
     return await this.models[country].findAll({
       where,

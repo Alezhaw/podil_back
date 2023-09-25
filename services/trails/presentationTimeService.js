@@ -21,6 +21,10 @@ class PresentationTimeService {
     });
   }
 
+  async remove(country, relevance_status, id) {
+    return await this.models[country].update({ relevance_status }, { where: { id } });
+  }
+
   async getAll(country) {
     return await this.models[country].findAll();
   }

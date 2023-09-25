@@ -128,14 +128,14 @@ class FormController {
     if (!country || !id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const item = await CallTemplateService.getById(country, id);
+    const item = await FormService.getById(country, id);
 
     if (!item) {
       return next(ApiError.badRequest("Элемент не найден"));
     }
 
     try {
-      const updatedCallTemplate = await CallTemplateService.remove(country, !!relevance_status, id);
+      const updatedCallTemplate = await FormService.remove(country, !!relevance_status, id);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));
