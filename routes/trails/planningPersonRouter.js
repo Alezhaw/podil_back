@@ -7,5 +7,6 @@ router.post("/getAll", auth, planningPersonController.getAll);
 router.post("/create", auth, planningPersonController.create);
 router.post("/update", auth, planningPersonController.update);
 router.post("/delete", auth, planningPersonController.delete);
+router.post("/remove", auth, planningPersonController.remove);
 
 module.exports = router;

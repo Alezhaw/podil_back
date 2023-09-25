@@ -7,5 +7,6 @@ router.post("/getAll", auth, reservationStatusController.getAll);
 router.post("/create", auth, reservationStatusController.create);
 router.post("/update", auth, reservationStatusController.update);
 router.post("/delete", auth, reservationStatusController.delete);
+router.post("/remove", auth, reservationStatusController.remove);
 
 module.exports = router;

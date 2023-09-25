@@ -9,5 +9,6 @@ router.post("/getByName", auth, formController.getByName);
 router.post("/create", auth, formController.create);
 router.post("/update", auth, formController.update);
 //router.post("/delete", auth, formController.delete);
+router.post("/remove", auth, formController.remove);
 
 module.exports = router;

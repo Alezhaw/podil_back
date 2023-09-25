@@ -7,5 +7,6 @@ router.post("/getAll", auth, callTemplatesController.getAll);
 router.post("/create", auth, callTemplatesController.create);
 router.post("/update", auth, callTemplatesController.update);
 router.post("/delete", auth, callTemplatesController.delete);
+router.post("/remove", auth, callTemplatesController.remove);
 
 module.exports = router;

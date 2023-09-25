@@ -7,5 +7,6 @@ router.post("/getAll", auth, presentationTimeController.getAll);
 router.post("/create", auth, presentationTimeController.create);
 router.post("/update", auth, presentationTimeController.update);
 router.post("/delete", auth, presentationTimeController.delete);
+router.post("/remove", auth, presentationTimeController.remove);
 
 module.exports = router;

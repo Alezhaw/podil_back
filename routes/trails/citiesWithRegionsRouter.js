@@ -9,5 +9,6 @@ router.post("/getByIds", auth, citiesWithRegionsController.getByIds);
 router.post("/create", auth, citiesWithRegionsController.create);
 router.post("/update", auth, citiesWithRegionsController.update);
 router.post("/delete", auth, citiesWithRegionsController.delete);
+router.post("/remove", auth, citiesWithRegionsController.remove);
 
 module.exports = router;

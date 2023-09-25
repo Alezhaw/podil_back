@@ -7,5 +7,6 @@ router.post("/getAll", auth, projectConcentController.getAll);
 router.post("/create", auth, projectConcentController.create);
 router.post("/update", auth, projectConcentController.update);
 router.post("/delete", auth, projectConcentController.delete);
+router.post("/remove", auth, projectConcentController.remove);
 
 module.exports = router;

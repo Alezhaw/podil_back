@@ -7,5 +7,6 @@ router.post("/getAll", auth, contactStatusController.getAll);
 router.post("/create", auth, contactStatusController.create);
 router.post("/update", auth, contactStatusController.update);
 router.post("/delete", auth, contactStatusController.delete);
+router.post("/remove", auth, contactStatusController.remove);
 
 module.exports = router;

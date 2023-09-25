@@ -8,5 +8,6 @@ router.post("/getByIds", auth, regionsController.getByIds);
 router.post("/create", auth, regionsController.create);
 router.post("/update", auth, regionsController.update);
 router.post("/delete", auth, regionsController.delete);
+router.post("/remove", auth, regionsController.remove);
 
 module.exports = router;
