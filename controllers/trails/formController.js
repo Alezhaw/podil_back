@@ -59,7 +59,7 @@ class FormController {
   async create(req, res, next) {
     const { country, form } = req.body;
 
-    if (!country || !form) {
+    if (!country || !form || !form.city_id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
     if (!!form.id) {
@@ -93,7 +93,7 @@ class FormController {
   async update(req, res, next) {
     const { country, form } = req.body;
 
-    if (!country || !form.id) {
+    if (!country || !form.id || !form.city_id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
 
