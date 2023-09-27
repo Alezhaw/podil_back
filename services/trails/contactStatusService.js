@@ -31,6 +31,10 @@ class ContactStatusService {
     });
   }
 
+  async getByWhere(country, where) {
+    return await this.models[country].findAll({ where });
+  }
+
   async getById(country, id) {
     return await this.models[country].findOne({ where: { id } });
   }

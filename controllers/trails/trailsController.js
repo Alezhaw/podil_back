@@ -257,45 +257,54 @@ class TrailsController {
   async getDictionaryByTrails(req, res, next) {
     const { trails, country } = req.body;
 
+    console.log(1, trails, country);
+
     if (!country || !trails[0]) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
 
     let dictionaryIds = [
-      { ids: [], key: "call_template_id" },
-      { ids: [], key: "city_id" },
-      { ids: [], key: "contract_status_id" },
-      { ids: [], key: "form_id" },
-      { ids: [], key: "planning_person_id" },
-      { ids: [], key: "presentation_time_id" },
-      { ids: [], key: "project_concent_id" },
-      { ids: [], key: "project_sales_id" },
-      { ids: [], key: "company_id" },
-      { ids: [], key: "regionId" },
-      { ids: [], key: "reservation_status_id" },
+      { ids: [], key: "call_template_id", service: CallTemplateService, array: "callTamplates" },
+      { ids: [], key: "city_id", service: CitiesWithRegService, array: "citiesWithRegions" },
+      { ids: [], key: "contract_status_id", service: ContactStatusService, array: "contractStatuses" },
+      { ids: [], key: "form_id", service: FormService, array: "forms" },
+      { ids: [], key: "planning_person_id", service: PlanningPersonService, array: "planningPeople" },
+      { ids: [], key: "presentation_time_id", service: PresentationTimeService, array: "presentationTimes" },
+      { ids: [], key: "project_concent_id", service: ProjectConcentService, array: "projectConcent" },
+      { ids: [], key: "project_sales_id", service: ProjectSalesService, array: "projectSales" },
+      { ids: [], key: "company_id", service: RegimentService, array: "regiments" },
+      { ids: [], key: "regionId", service: RegionService, array: "regions" },
+      { ids: [], key: "reservation_status_id", service: ReservationStatusService, array: "reservationStatuses" },
     ];
 
-    let callTamplatesIds = [];
-    let citiesWithRegionsIds = [];
-    let contractStatusesIds = [];
-    let formsIds = [];
-    let planningPeopleIds = [];
-    let presentationTimesIds = [];
-    let projectConcentIds = [];
-    let projectSalesIds = [];
-    let regimentsIds = [];
-    let regionsIds = [];
-    let reservationStatusesIds = [];
+    const dictionary = {};
+
     trails.map((item) => {
-      //callTamplatesIds.includes(item.call_template_id) || callTamplatesIds.push(item.call_template_id);
       dictionaryIds?.map((el) => {
         el.ids.includes(item[el.key]) || el.ids.push(item[el.key]);
       });
     });
 
-    console.log(1, dictionaryIds);
+    try {
+      await Promise.all(
+        dictionaryIds
+          ?.filter((item) => !!item.ids[0])
+          ?.map(async (el) => {
+            let actions = [];
+            el.ids.map((id) => actions.push({ id: Number(id) }));
 
-    return res.json("success");
+            let where = {
+              [Op.or]: actions,
+            };
+            const data = await el.service.getByWhere(country, where);
+            dictionary[el.array] = data;
+          })
+      );
+    } catch (e) {
+      console.log(e);
+    }
+
+    return res.json({ ...dictionary });
   }
 
   async remove(req, res) {

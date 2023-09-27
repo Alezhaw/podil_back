@@ -1,4 +1,4 @@
-const { PresentationTime, KzPresentationTime, PlPresentationTime } = require("../../models/trails/planningPersonModels");
+const { PresentationTime, KzPresentationTime, PlPresentationTime } = require("../../models/trails/presentationTimeModels");
 
 class PresentationTimeService {
   models = {
@@ -29,6 +29,10 @@ class PresentationTimeService {
     return await this.models[country].findAll({
       order: [["id", "ASC"]],
     });
+  }
+
+  async getByWhere(country, where) {
+    return await this.models[country].findAll({ where });
   }
 
   async getById(country, id) {
