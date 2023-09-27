@@ -1,6 +1,6 @@
 const ApiError = require("../../error/ApiError");
 const FormService = require("../../services/trails/formService");
-
+const CitiesWithRegService = require("../../services/trails/citiesWithRegionsService");
 class FormController {
   async getAll(req, res, next) {
     const { country } = req.body;
@@ -69,6 +69,11 @@ class FormController {
       }
     }
 
+    const checkCityId = await CitiesWithRegService.getById(country, form.city_id);
+    if (!checkCityId) {
+      return next(ApiError.badRequest("Такого города нет"));
+    }
+
     let where = {
       local: form.local,
     };
@@ -95,6 +100,12 @@ class FormController {
     const checkFormId = await FormService.getById(country, form.id);
     if (!checkFormId) {
       return next(ApiError.badRequest("Такого зала нет"));
+    }
+
+    const checkCityId = await CitiesWithRegService.getById(country, form.city_id);
+
+    if (!checkCityId) {
+      return next(ApiError.badRequest("Такого города нет"));
     }
     try {
       const updatedForm = await FormService.update({ country, form });
