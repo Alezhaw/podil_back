@@ -44,9 +44,12 @@ class FormController {
     if (search) {
       actions.push({ town: { [Op.iLike]: `%${search}%` } }, { local: { [Op.iLike]: `%${search}%` } });
     }
-    let where = {
-      [Op.or]: actions,
-    };
+    let where = {};
+    if (!!actions[0]) {
+      where = {
+        [Op.or]: actions,
+      };
+    }
 
     const cities = await FormService.getByWhere(country, where);
 

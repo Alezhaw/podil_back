@@ -186,10 +186,7 @@ class TrailsController {
       return next(ApiError.badRequest("Укажите page и pageSize"));
     }
 
-    let statuses = [];
-    let where = {
-      [Op.or]: statuses,
-    };
+    let where = {};
     let dateFilter = [];
     if (dateTo) {
       dateFilter.push({ [Op.lte]: dateTo });
@@ -202,7 +199,7 @@ class TrailsController {
         [Op.and]: dateFilter,
       };
     }
-    if (planningPersonIds) {
+    if (!!planningPersonIds[0]) {
       where.planning_person_id = {
         [Op.or]: planningPersonIds,
       };
@@ -225,7 +222,6 @@ class TrailsController {
         [Op.or]: citiesId,
       };
     }
-
     const trails = await TrailsService.GetFiltered(country, where, page, pageSize, sort);
     const trailsForCount = await TrailsService.GetFilteredForCount(country, where);
     if (!trails || !trailsForCount) {

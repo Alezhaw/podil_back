@@ -45,9 +45,12 @@ class CitiesWithRegController {
     if (search) {
       actions.push({ city_name: { [Op.iLike]: `%${search}%` } }, { additional_city_name: { [Op.iLike]: `%${search}%` } });
     }
-    let where = {
-      [Op.or]: actions,
-    };
+    let where = {};
+    if (!!actions[0]) {
+      where = {
+        [Op.or]: actions,
+      };
+    }
     where.relevance_status = true;
 
     const cities = await CitiesWithRegService.getByWhereWithLimit(country, where, 20);
