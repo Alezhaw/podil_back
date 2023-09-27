@@ -172,22 +172,22 @@ class TrailsController {
     }
     const checkProjectConcent = await ProjectConcentService.getById(country, trail.project_concent_id);
     if (!checkProjectConcent) {
-      throw ApiError.internal("Project concent не найден");
+      return next(ApiError.badRequest("Project concent не найден"));
     }
     const checkCallTemplate = await CallTemplateService.getById(country, trail.call_template_id);
     if (!checkCallTemplate) {
-      throw ApiError.internal("Call template не найден");
+      return next(ApiError.badRequest("Call template не найден"));
     }
     if (trail.form_id) {
       const checkForm = await FormService.getById(country, trail.form_id);
       if (!checkForm) {
-        throw ApiError.internal("Город не найден");
+        return next(ApiError.badRequest("Город не найден"));
       }
     }
     if (trail.contract_status_id) {
       const checkContractStatus = await ContactStatusService.getById(country, trail.contract_status_id);
       if (!checkContractStatus) {
-        throw ApiError.internal("Статус не найден");
+        return next(ApiError.badRequest("Статус не найден"));
       }
     }
     try {
@@ -240,6 +240,9 @@ class TrailsController {
         city = city.dataValues;
         citiesId.push(city.id);
       });
+      if (!citiesId[0]) {
+        return next(ApiError.badRequest("Город не найден"));
+      }
       where.city_id = {
         [Op.or]: citiesId,
       };
@@ -247,7 +250,7 @@ class TrailsController {
     const trails = await TrailsService.GetFiltered(country, where, page, pageSize, sort);
     const trailsForCount = await TrailsService.GetFilteredForCount(country, where);
     if (!trails || !trailsForCount) {
-      throw ApiError.internal("Трасы не найдены");
+      return next(ApiError.badRequest("Трасы не найдены"));
     }
     const count = Math.ceil(trailsForCount?.length / pageSize);
 
