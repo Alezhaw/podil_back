@@ -26,7 +26,9 @@ class FormService {
   //   }
 
   async getAll(country) {
-    return await this.models[country].findAll();
+    return await this.models[country].findAll({
+      order: [["id", "ASC"]],
+    });
   }
 
   async getByWhere(country, where) {
