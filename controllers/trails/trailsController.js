@@ -232,6 +232,50 @@ class TrailsController {
     return res.json({ trails, count });
   }
 
+  async getDictionaryByTrails(req, res, next) {
+    const { trails, country } = req.body;
+
+    if (!country || !trails[0]) {
+      return next(ApiError.badRequest("Укажите все данные"));
+    }
+
+    let dictionaryIds = [
+      { ids: [], key: "call_template_id" },
+      { ids: [], key: "city_id" },
+      { ids: [], key: "contract_status_id" },
+      { ids: [], key: "form_id" },
+      { ids: [], key: "planning_person_id" },
+      { ids: [], key: "presentation_time_id" },
+      { ids: [], key: "project_concent_id" },
+      { ids: [], key: "project_sales_id" },
+      { ids: [], key: "company_id" },
+      { ids: [], key: "regionId" },
+      { ids: [], key: "reservation_status_id" },
+    ];
+
+    let callTamplatesIds = [];
+    let citiesWithRegionsIds = [];
+    let contractStatusesIds = [];
+    let formsIds = [];
+    let planningPeopleIds = [];
+    let presentationTimesIds = [];
+    let projectConcentIds = [];
+    let projectSalesIds = [];
+    let regimentsIds = [];
+    let regionsIds = [];
+    let reservationStatusesIds = [];
+    trails.map((item) => {
+      //callTamplatesIds.includes(item.call_template_id) || callTamplatesIds.push(item.call_template_id);
+      dictionaryIds?.map((el) => {
+        el.ids.includes(item[el.key]) || el.ids.push(item[el.key]);
+      });
+    });
+
+    console.log(1, dictionaryIds);
+
+    return res.json("success");
+  }
+
   async remove(req, res) {
     const { id, country, relevance_status } = req.body;
     if (!country || !id) {
