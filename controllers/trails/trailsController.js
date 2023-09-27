@@ -208,9 +208,7 @@ class TrailsController {
       };
     }
     if (searchRoute) {
-      where.route_number = {
-        [Op.iLike]: `%${searchRoute}%`,
-      };
+      where.route_number = searchRoute;
     }
 
     if (search) {

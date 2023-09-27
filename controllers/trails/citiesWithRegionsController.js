@@ -48,6 +48,7 @@ class CitiesWithRegController {
     let where = {
       [Op.or]: actions,
     };
+    where.relevance_status = true;
 
     const cities = await CitiesWithRegService.getByWhereWithLimit(country, where, 20);
 

@@ -26,7 +26,7 @@ class CitiesWithRegService {
   }
 
   async getAll(country) {
-    return await this.models[country].findAll();
+    return await this.models[country].findAll({ where: { relevance_status: true } });
   }
 
   async getByWhere(country, where) {
