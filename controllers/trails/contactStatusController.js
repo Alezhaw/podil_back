@@ -11,6 +11,28 @@ class ContactStatusController {
     return res.json(await ContactStatusService.getAll(country));
   }
 
+  async getByIds(req, res, next) {
+    const { country, ids } = req.body;
+    if (!country || !ids[0]) {
+      return next(ApiError.badRequest("Укажите все данные"));
+    }
+
+    let actions = [];
+
+    ids.map((id) => actions.push({ id }));
+
+    let where = {
+      [Op.or]: actions,
+    };
+
+    const cities = await ContactStatusService.getByWhere(country, where);
+
+    if (!cities) {
+      return next(ApiError.internal("Города не найдены"));
+    }
+    return res.json({ cities });
+  }
+
   async create(req, res, next) {
     const { contactStatus, country } = req.body;
     if (!contactStatus || !country) {

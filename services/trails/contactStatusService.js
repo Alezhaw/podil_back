@@ -38,6 +38,10 @@ class ContactStatusService {
   async getByName(country, contactStatus) {
     return await this.models[country].findOne({ where: { contactStatus } });
   }
+
+  async getByIds(country, where) {
+    return await this.models[country].findAll({ where });
+  }
 }
 
 module.exports = new ContactStatusService();

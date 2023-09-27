@@ -38,6 +38,10 @@ class PresentationTimeService {
   async getByName(country, presentationTime) {
     return await this.models[country].findOne({ where: { presentationTime } });
   }
+
+  async getByIds(country, where) {
+    return await this.models[country].findAll({ where });
+  }
 }
 
 module.exports = new PresentationTimeService();

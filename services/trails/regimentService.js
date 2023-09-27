@@ -38,6 +38,10 @@ class RegimentService {
   async getByName(country, regiment) {
     return await this.models[country].findOne({ where: { regiment } });
   }
+
+  async getByIds(country, where) {
+    return await this.models[country].findAll({ where });
+  }
 }
 
 module.exports = new RegimentService();

@@ -38,6 +38,10 @@ class FormService {
   async getById(country, id) {
     return await this.models[country].findOne({ where: { id } });
   }
+
+  async getByIds(country, where) {
+    return await this.models[country].findAll({ where });
+  }
 }
 
 module.exports = new FormService();

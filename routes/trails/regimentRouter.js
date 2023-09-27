@@ -4,6 +4,7 @@ const auth = require("../../middleware/authMiddleware");
 const regimentController = require("../../controllers/trails/regimentController");
 
 router.post("/getAll", auth, regimentController.getAll);
+router.post("/getByIds", auth, regionsController.getByIds);
 router.post("/create", auth, regimentController.create);
 router.post("/update", auth, regimentController.update);
 router.post("/delete", auth, regimentController.delete);

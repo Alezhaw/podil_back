@@ -38,6 +38,9 @@ class CallTemplateService {
   async getByName(country, callTemplate) {
     return await this.models[country].findOne({ where: { callTemplate } });
   }
+  async getByIds(country, where) {
+    return await this.models[country].findAll({ where });
+  }
 }
 
 module.exports = new CallTemplateService();

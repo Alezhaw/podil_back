@@ -38,6 +38,10 @@ class ProjectSalesService {
   async getByName(country, projectSales) {
     return await this.models[country].findOne({ where: { projectSales } });
   }
+
+  async getByIds(country, where) {
+    return await this.models[country].findAll({ where });
+  }
 }
 
 module.exports = new ProjectSalesService();

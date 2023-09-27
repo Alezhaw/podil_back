@@ -38,6 +38,10 @@ class ReservationStatusService {
   async getByName(country, reservationStatus) {
     return await this.models[country].findOne({ where: { reservationStatus } });
   }
+
+  async getByIds(country, where) {
+    return await this.models[country].findAll({ where });
+  }
 }
 
 module.exports = new ReservationStatusService();

@@ -38,6 +38,10 @@ class ProjectConcentService {
   async getByName(country, projectConcent) {
     return await this.models[country].findOne({ where: { projectConcent } });
   }
+
+  async getByIds(country, where) {
+    return await this.models[country].findAll({ where });
+  }
 }
 
 module.exports = new ProjectConcentService();

@@ -4,6 +4,7 @@ const auth = require("../../middleware/authMiddleware");
 const trailsController = require("../../controllers/trails/trailsController");
 
 router.post("/getAll", auth, trailsController.getAll);
+router.post("/getByIds", auth, trailsController.getByIds);
 router.post("/search", auth, trailsController.getFiltered);
 router.post("/create", auth, trailsController.create);
 router.post("/update", auth, trailsController.update);

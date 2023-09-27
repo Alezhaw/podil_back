@@ -38,6 +38,10 @@ class PlanningPersonService {
   async getByName(country, planningPerson) {
     return await this.models[country].findOne({ where: { planningPerson } });
   }
+
+  async getByIds(country, where) {
+    return await this.models[country].findAll({ where });
+  }
 }
 
 module.exports = new PlanningPersonService();
