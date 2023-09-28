@@ -37,12 +37,12 @@ class TrailsController {
       [Op.or]: actions,
     };
 
-    const cities = await TrailsService.getByWhere(country, where);
+    const trails = await TrailsService.getByWhere(country, where);
 
-    if (!cities) {
+    if (!trails) {
       return next(ApiError.internal("Города не найдены"));
     }
-    return res.json({ cities });
+    return res.json({ trails });
   }
 
   async create(req, res, next) {

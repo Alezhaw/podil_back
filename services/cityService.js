@@ -122,7 +122,7 @@ class CityService {
     }
 
     global.io.to("1").emit("updateCities", {
-      data: { cities: time.dataValues, country },
+      data: { cities: [time.dataValues], country },
     });
 
     return time.id;
@@ -142,7 +142,7 @@ class CityService {
         }
         await this.Update(item, { id: time.dataValues.id }, country);
         global.io.to("1").emit("updateCities", {
-          data: { cities: item, country },
+          data: { cities: [item], country },
         });
       } catch (e) {
         return {
