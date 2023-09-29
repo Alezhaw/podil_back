@@ -26,7 +26,7 @@ class RegionService {
   }
 
   async getAll(country) {
-    return await this.models[country].findAll({ where: { relevance_status: true }, order: [["id", "ASC"]] });
+    return await this.models[country].findAll({ where: { relevance_status: true }, order: [["region", "ASC"]] });
   }
 
   async getByWhere(country, where) {

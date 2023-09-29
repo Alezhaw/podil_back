@@ -42,6 +42,7 @@ class TrailsService {
 
   async getAll(country) {
     return await this.models[country].findAll({
+      where: { relevance_status: true },
       order: [["id", "ASC"]],
     });
   }

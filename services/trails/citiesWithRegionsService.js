@@ -30,7 +30,7 @@ class CitiesWithRegService {
   }
 
   async getByWhere(country, where) {
-    return await this.models[country].findAll({ where });
+    return await this.models[country].findAll({ where, order: [["city_name", "ASC"]] });
   }
 
   async getByWhereWithLimit(country, where, limit) {

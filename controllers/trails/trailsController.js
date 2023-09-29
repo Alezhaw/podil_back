@@ -260,8 +260,6 @@ class TrailsController {
   async getDictionaryByTrails(req, res, next) {
     const { trails, country } = req.body;
 
-    console.log(1, trails, country);
-
     if (!country || !trails[0]) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
@@ -308,6 +306,39 @@ class TrailsController {
     }
 
     return res.json({ ...dictionary });
+  }
+
+  async getAllDictionary(req, res, next) {
+    const { country } = req.body;
+
+    if (!country) {
+      return next(ApiError.badRequest("Укажите country"));
+    }
+    let dictionary = [
+      { service: CallTemplateService, array: "callTamplates" },
+      { service: ContactStatusService, array: "contractStatuses" },
+      { service: PlanningPersonService, array: "planningPeople" },
+      { service: PresentationTimeService, array: "presentationTimes" },
+      { service: ProjectConcentService, array: "projectConcent" },
+      { service: ProjectSalesService, array: "projectSales" },
+      { service: RegimentService, array: "regiments" },
+      { service: RegionService, array: "regions" },
+      { service: ReservationStatusService, array: "reservationStatuses" },
+    ];
+    const allDictionary = {};
+
+    try {
+      await Promise.all(
+        dictionary?.map(async (el) => {
+          const data = await el.service.getAll(country);
+          allDictionary[el.array] = data;
+        })
+      );
+    } catch (e) {
+      console.log(e);
+    }
+
+    return res.json(allDictionary);
   }
 
   async remove(req, res) {

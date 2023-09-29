@@ -34,6 +34,24 @@ class CitiesWithRegController {
     return res.json({ cities });
   }
 
+  async getByRegion(req, res, next) {
+    const { country, region_id } = req.body;
+    if (!country || !region_id) {
+      return next(ApiError.badRequest("Укажите все данные"));
+    }
+
+    let where = {
+      region_id,
+    };
+
+    const allCitiesWithRegions = await CitiesWithRegService.getByWhere(country, where);
+
+    if (!allCitiesWithRegions) {
+      return next(ApiError.internal("Города не найдены"));
+    }
+    return res.json(allCitiesWithRegions);
+  }
+
   async getByName(req, res, next) {
     const { country, search } = req.body;
     if (!country) {
