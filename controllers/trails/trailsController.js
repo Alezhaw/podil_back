@@ -112,7 +112,7 @@ class TrailsController {
       const newTrail = await TrailsService.create({ country, trail });
       return res.json(newTrail);
     } catch (e) {
-      return next(ApiError.badRequest("Непредвиденная ошибка"));
+      return next(ApiError.badRequest("Непредвиденная ошибка", e));
     }
   }
 
@@ -247,6 +247,7 @@ class TrailsController {
         [Op.or]: citiesId,
       };
     }
+    where.relevance_status = true;
     const trails = await TrailsService.GetFiltered(country, where, page, pageSize, sort);
     const trailsForCount = await TrailsService.GetFilteredForCount(country, where);
     if (!trails || !trailsForCount) {
