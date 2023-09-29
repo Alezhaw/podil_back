@@ -1,5 +1,6 @@
 const ApiError = require("../../error/ApiError");
 const CallTemplateService = require("../../services/trails/callTemplatesService");
+const { Op } = require("sequelize");
 
 class CallTemplatesController {
   async getAll(req, res, next) {

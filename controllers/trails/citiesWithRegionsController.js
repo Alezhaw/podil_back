@@ -1,6 +1,7 @@
 const ApiError = require("../../error/ApiError");
 const CitiesWithRegService = require("../../services/trails/citiesWithRegionsService");
 const RegionService = require("../../services/trails/regionService");
+const { Op } = require("sequelize");
 
 class CitiesWithRegController {
   async getAll(req, res, next) {

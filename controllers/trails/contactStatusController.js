@@ -1,5 +1,6 @@
 const ApiError = require("../../error/ApiError");
 const ContactStatusService = require("../../services/trails/contactStatusService");
+const { Op } = require("sequelize");
 
 class ContactStatusController {
   async getAll(req, res, next) {

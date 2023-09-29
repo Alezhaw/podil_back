@@ -1,5 +1,6 @@
 const ApiError = require("../../error/ApiError");
 const PresentationTimeService = require("../../services/trails/presentationTimeService");
+const { Op } = require("sequelize");
 
 class PresentationTimeController {
   async getAll(req, res, next) {

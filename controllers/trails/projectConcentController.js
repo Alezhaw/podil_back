@@ -1,5 +1,6 @@
 const ApiError = require("../../error/ApiError");
 const ProjectConcentService = require("../../services/trails/projectConcentService");
+const { Op } = require("sequelize");
 
 class ProjectConcentController {
   async getAll(req, res, next) {

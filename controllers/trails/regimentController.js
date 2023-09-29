@@ -1,5 +1,6 @@
 const ApiError = require("../../error/ApiError");
 const RegimentService = require("../../services/trails/regimentService");
+const { Op } = require("sequelize");
 
 class RegimentController {
   async getAll(req, res, next) {

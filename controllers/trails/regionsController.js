@@ -1,5 +1,6 @@
 const ApiError = require("../../error/ApiError");
 const RegionService = require("../../services/trails/regionService");
+const { Op } = require("sequelize");
 
 class RegionsController {
   async getAll(req, res, next) {

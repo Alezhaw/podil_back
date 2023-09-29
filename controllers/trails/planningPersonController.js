@@ -1,5 +1,6 @@
 const ApiError = require("../../error/ApiError");
 const PlanningPersonService = require("../../services/trails/planningPersonService");
+const { Op } = require("sequelize");
 
 class PlanningPersonController {
   async getAll(req, res, next) {
