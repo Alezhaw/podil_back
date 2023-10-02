@@ -286,11 +286,10 @@ class TrailsController {
         el.ids.includes(item[el.key]) || el.ids.push(item[el.key]);
       });
     });
-
     try {
       await Promise.all(
         dictionaryIds
-          ?.filter((item) => !!item.ids[0])
+          ?.filter((item) => !!item.ids?.filter((el) => !!el)[0])
           ?.map(async (el) => {
             let actions = [];
             el.ids.map((id) => actions.push({ id: Number(id) }));

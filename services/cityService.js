@@ -64,6 +64,10 @@ class CityService {
     },
     dateTo: {},
     dateFrom: {},
+    visibleInPodil: {},
+    visibleInBases: {},
+    visibleInSpeaker: {},
+    visibleInScenario: {},
   };
 
   async Search() {}
@@ -274,6 +278,18 @@ class CityService {
       where.date = {
         [Op.and]: dateFilter,
       };
+    }
+    if (filter.visibleInPodil) {
+      where.visible_in_podil = true;
+    }
+    if (filter.visibleInBases) {
+      where.visible_in_bases = true;
+    }
+    if (filter.visibleInSpeaker) {
+      where.visible_in_speaker = true;
+    }
+    if (filter.visibleInScenario) {
+      where.visible_in_scenario = true;
     }
     if (search) {
       where.city_lokal = {

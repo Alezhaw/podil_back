@@ -64,6 +64,11 @@ const Cities = sequelize.define("city", {
   status: { type: DataTypes.INTEGER },
   l_p_for_pl: { type: DataTypes.STRING },
   explains_for_pl: { type: DataTypes.STRING },
+  trailId: { type: DataTypes.INTEGER },
+  visible_in_podil: { type: DataTypes.BOOLEAN },
+  visible_in_bases: { type: DataTypes.BOOLEAN },
+  visible_in_speaker: { type: DataTypes.BOOLEAN },
+  visible_in_scenario: { type: DataTypes.BOOLEAN },
 });
 
 const KzCities = sequelize.define("kzcity", {
@@ -129,6 +134,11 @@ const KzCities = sequelize.define("kzcity", {
   status: { type: DataTypes.INTEGER },
   l_p_for_pl: { type: DataTypes.STRING },
   explains_for_pl: { type: DataTypes.STRING },
+  trailId: { type: DataTypes.INTEGER },
+  visible_in_podil: { type: DataTypes.BOOLEAN },
+  visible_in_bases: { type: DataTypes.BOOLEAN },
+  visible_in_speaker: { type: DataTypes.BOOLEAN },
+  visible_in_scenario: { type: DataTypes.BOOLEAN },
 });
 
 const PlCities = sequelize.define("plcity", {
@@ -194,6 +204,11 @@ const PlCities = sequelize.define("plcity", {
   status: { type: DataTypes.INTEGER },
   l_p_for_pl: { type: DataTypes.STRING },
   explains_for_pl: { type: DataTypes.STRING },
+  trailId: { type: DataTypes.INTEGER },
+  visible_in_podil: { type: DataTypes.BOOLEAN },
+  visible_in_bases: { type: DataTypes.BOOLEAN },
+  visible_in_speaker: { type: DataTypes.BOOLEAN },
+  visible_in_scenario: { type: DataTypes.BOOLEAN },
 });
 
 module.exports = {
