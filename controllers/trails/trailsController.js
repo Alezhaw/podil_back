@@ -192,6 +192,9 @@ class TrailsController {
     }
     try {
       const updatedTrail = await TrailsService.update({ country, trail });
+      global.io.to("1").emit("updateTrails", {
+        data: { trails: [trail], country },
+      });
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));
@@ -354,6 +357,9 @@ class TrailsController {
 
     try {
       const updatedCallTemplate = await TrailsService.remove(country, !!relevance_status, id);
+      global.io.to("1").emit("deleteTrails", {
+        data: { id, country },
+      });
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));
