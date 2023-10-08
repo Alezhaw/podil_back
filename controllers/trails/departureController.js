@@ -49,25 +49,36 @@ class DepartureController {
 
     // ids.map((id) => actions.push({ id }));
 
-    let where = {
-      //'SELECT "id", "dates", "range", "relevance_status", "createdAt", "updatedAt" FROM "departures" AS "departure" WHERE "departure"."test" >> ARRAY[1682899200000];'
-      range: {
-        //[Op.strictRight]: [targetDate],
-      },
-    };
-    const query = `SELECT "id", "dates", "range", "relevance_status", "createdAt", "updatedAt" FROM ${models[country]} AS "departure" ${dateFrom || dateTo ? "WHERE" : ""} ${
-      dateFrom ? `"departure"."range" >= ARRAY['${dateFrom}']::DATE[]` : ""
-    } ${dateFrom && dateTo ? "AND" : ""}${dateTo ? `"departure"."range" <= ARRAY['${dateTo}']::DATE[]` : ""};`;
-    console.log(1, query);
-    let departures = await sequelize.query(query);
+    // let where = {
+    //   //'SELECT "id", "dates", "range", "relevance_status", "createdAt", "updatedAt" FROM "departures" AS "departure" WHERE "departure"."test" >> ARRAY[1682899200000];'
+    //   range: {
+    //     //[Op.strictRight]: [targetDate],
+    //   },
+    // };
+    // const query = `SELECT "id", "dates", "range", "relevance_status", "createdAt", "updatedAt" FROM ${models[country]} AS "departure" ${dateFrom || dateTo ? "WHERE" : ""} ${
+    //   dateFrom ? `"departure"."range" >= ARRAY['${dateFrom}']::DATE[]` : ""
+    // } ${dateFrom && dateTo ? "AND" : ""}${dateTo ? `"departure"."range" <= ARRAY['${dateTo}']::DATE[]` : ""};`;
+    // console.log(1, query);
+    // let departures = await sequelize.query(query);
+
+    const departures = await DepartureService.getByWhere(country, {
+      [Op.and]: [
+        sequelize.literal(`EXISTS (
+        SELECT 1
+        FROM unnest("range") AS unnested_date
+        WHERE unnested_date >= '${dateFrom}' 
+          AND unnested_date <= '${dateTo}'
+      )`),
+      ],
+    });
     //console.log(1, types);
 
     //const departures = await DepartureService.getByWhere(country, where);
 
-    if (!departures[0][0]) {
+    if (!departures) {
       return next(ApiError.internal("Выезды не найдены"));
     }
-    return res.json(departures[0]);
+    return res.json(departures);
   }
 
   async create(req, res, next) {
