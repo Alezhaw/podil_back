@@ -40,7 +40,7 @@ class DepartureController {
     // if (!country || !ids[0]) {
     //   return next(ApiError.badRequest("Укажите все данные"));
     // }
-    models = {
+    const models = {
       RU: '"departures"',
       KZ: '"kzdepartures"',
       PL: '"pldepartures"',
