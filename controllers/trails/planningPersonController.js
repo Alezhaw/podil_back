@@ -52,22 +52,22 @@ class PlanningPersonController {
   }
 
   async update(req, res, next) {
-    const { planningPerson, country, id } = req.body;
+    const { planningPerson, country } = req.body;
 
-    if (!planningPerson || !country || !id) {
+    if (!planningPerson || !country || !planningPerson.id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
 
-    const checkPlanningPersonName = await PlanningPersonService.getByName(country, planningPerson);
+    const checkPlanningPersonName = await PlanningPersonService.getByName(country, planningPerson.name);
     if (checkPlanningPersonName) {
       return next(ApiError.badRequest("PlanningPerson с таким именем уже существует"));
     }
-    const checkPlanningPersonId = await PlanningPersonService.getById(country, id);
+    const checkPlanningPersonId = await PlanningPersonService.getById(country, planningPerson.id);
     if (!checkPlanningPersonId) {
       return next(ApiError.badRequest("PlanningPerson с таким id не существует"));
     }
     try {
-      const updatedPlanningPerson = await PlanningPersonService.update(country, planningPerson, id);
+      const updatedPlanningPerson = await PlanningPersonService.update(country, planningPerson);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));

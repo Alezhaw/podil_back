@@ -8,11 +8,11 @@ class PlanningPersonService {
   };
 
   async create(country, planningPerson) {
-    return await this.models[country].create({ planningPerson });
+    return await this.models[country].create({ ...planningPerson });
   }
 
-  async update(country, planningPerson, id) {
-    return await this.models[country].update({ planningPerson }, { where: { id } });
+  async update(country, planningPerson) {
+    return await this.models[country].update({ ...planningPerson }, { where: { id: planningPerson.id } });
   }
 
   async delete(country, id) {
@@ -40,8 +40,8 @@ class PlanningPersonService {
     return await this.models[country].findOne({ where: { id } });
   }
 
-  async getByName(country, planningPerson) {
-    return await this.models[country].findOne({ where: { planningPerson } });
+  async getByName(country, name) {
+    return await this.models[country].findOne({ where: { name } });
   }
 
   async getByIds(country, where) {

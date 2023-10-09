@@ -52,22 +52,21 @@ class CallTemplatesController {
   }
 
   async update(req, res, next) {
-    const { callTemplate, country, id } = req.body;
+    const { callTemplate, country } = req.body;
 
-    if (!callTemplate || !country || !id) {
+    if (!callTemplate || !country || !callTemplate.id || !callTemplate.name) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-
-    const checkCallTemplateName = await CallTemplateService.getByName(country, callTemplate);
+    const checkCallTemplateName = await CallTemplateService.getByName(country, callTemplate.name);
     if (checkCallTemplateName) {
       return next(ApiError.badRequest("Шаблон вызова с таким именем уже существует"));
     }
-    const checkCallTemplateId = await CallTemplateService.getById(country, id);
+    const checkCallTemplateId = await CallTemplateService.getById(country, callTemplate.id);
     if (!checkCallTemplateId) {
       return next(ApiError.badRequest("Шаблон вызова с таким id не существует"));
     }
     try {
-      const updatedCallTemplate = await CallTemplateService.update(country, callTemplate, id);
+      const updatedCallTemplate = await CallTemplateService.update(country, callTemplate);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));

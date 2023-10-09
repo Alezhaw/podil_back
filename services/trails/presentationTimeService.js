@@ -8,11 +8,11 @@ class PresentationTimeService {
   };
 
   async create(country, presentationTime) {
-    return await this.models[country].create({ presentationTime });
+    return await this.models[country].create({ ...presentationTime });
   }
 
-  async update(country, presentationTime, id) {
-    return await this.models[country].update({ presentationTime }, { where: { id } });
+  async update(country, presentationTime) {
+    return await this.models[country].update({ ...presentationTime }, { where: { id: presentationTime.id } });
   }
 
   async delete(country, id) {
@@ -21,7 +21,7 @@ class PresentationTimeService {
     });
   }
 
-  async remove(country, relevance_status, id) {
+  async remove(country, relevance_status) {
     return await this.models[country].update({ relevance_status }, { where: { id } });
   }
 

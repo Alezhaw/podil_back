@@ -52,22 +52,22 @@ class ContactStatusController {
   }
 
   async update(req, res, next) {
-    const { contactStatus, country, id } = req.body;
+    const { contactStatus, country } = req.body;
 
-    if (!contactStatus || !country || !id) {
+    if (!contactStatus || !country || !contactStatus.id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
 
-    const checkContactStatusName = await ContactStatusService.getByName(country, contactStatus);
+    const checkContactStatusName = await ContactStatusService.getByName(country, contactStatus.name);
     if (checkContactStatusName) {
       return next(ApiError.badRequest("ContactStatus с таким именем уже существует"));
     }
-    const checkContactStatusId = await ContactStatusService.getById(country, id);
+    const checkContactStatusId = await ContactStatusService.getById(country, contactStatus.id);
     if (!checkContactStatusId) {
       return next(ApiError.badRequest("ContactStatus с таким id не существует"));
     }
     try {
-      const updatedContactStatus = await ContactStatusService.update(country, contactStatus, id);
+      const updatedContactStatus = await ContactStatusService.update(country, contactStatus);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));

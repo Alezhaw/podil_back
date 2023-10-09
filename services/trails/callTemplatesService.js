@@ -8,11 +8,11 @@ class CallTemplateService {
   };
 
   async create(country, callTemplate) {
-    return await this.models[country].create({ callTemplate });
+    return await this.models[country].create({ ...callTemplate });
   }
 
-  async update(country, callTemplate, id) {
-    return await this.models[country].update({ callTemplate }, { where: { id } });
+  async update(country, callTemplate) {
+    return await this.models[country].update({ ...callTemplate }, { where: { id: callTemplate.id } });
   }
 
   async remove(country, relevance_status, id) {
@@ -40,9 +40,10 @@ class CallTemplateService {
     return await this.models[country].findOne({ where: { id } });
   }
 
-  async getByName(country, callTemplate) {
-    return await this.models[country].findOne({ where: { callTemplate } });
+  async getByName(country, name) {
+    return await this.models[country].findOne({ where: { name } });
   }
+
   async getByIds(country, where) {
     return await this.models[country].findAll({ where });
   }
