@@ -18,6 +18,8 @@ const regimentRouter = require("./trails/regimentRouter");
 const reservationStatusRouter = require("./trails/reservationStatusRouter");
 const formRouter = require("./trails/formRouter");
 const trailsRouter = require("./trails/trailsRouter");
+const departureRouter = require("./trails/departureRouter");
+const departureDateRouter = require("./trails/departureDateRouter");
 
 router.use("/user", userRouter);
 router.use("/base", basesRouter);
@@ -37,5 +39,7 @@ router.use("/regiment", regimentRouter);
 router.use("/reservationStatus", reservationStatusRouter);
 router.use("/form", formRouter);
 router.use("/trail", trailsRouter);
+router.use("/departure", departureRouter);
+router.use("/departureDate", departureDateRouter);
 
 module.exports = router;
