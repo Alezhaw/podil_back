@@ -83,7 +83,7 @@ class CitiesWithRegController {
   async create(req, res, next) {
     const { country, region, city_name, additional_city_name, county, city_type, population, autozonning } = req.body;
 
-    if (!country || !region || city_name) {
+    if (!country || !region || !city_name) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
     const checkRegion = await RegionService.getByName(country, region);
@@ -104,42 +104,6 @@ class CitiesWithRegController {
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));
     }
-
-    // const result = await Promise.all(
-    //   values?.map(async (item) => {
-    //     const checkRegion = await RegionService.getByName(country, item.region);
-    //     if (!checkRegion) {
-    //       return `такого региона нет ${item.region}/${item.city_name}`;
-    //     }
-    //     let where = {
-    //       autozonning: item.autozonning,
-    //       city_name: item.city_name,
-    //     };
-
-    //     const checkCity = await CitiesWithRegService.getByWhere(country, where);
-    //     console.log(1, checkCity);
-    //     if (checkCity[0]) {
-    //       return `+`;
-    //     }
-    //     try {
-    //       const newCity = await CitiesWithRegService.create({
-    //         country,
-    //         region_id: checkRegion.dataValues.id,
-    //         city_name: item.city_name,
-    //         additional_city_name: item.additional_city_name,
-    //         county: item.county,
-    //         city_type: item.city_type,
-    //         population: item.population,
-    //         autozonning: item.autozonning,
-    //       });
-    //       return "";
-    //     } catch (e) {
-    //       return "ошибка";
-    //     }
-    //   })
-    // );
-
-    // return res.json(result);
   }
 
   async update(req, res, next) {
