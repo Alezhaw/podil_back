@@ -1,4 +1,5 @@
 const { Departure, KzDeparture, PlDeparture } = require("../../models/trails/departureModels");
+const sequelize = require("../../db");
 
 class DepartureService {
   models = {
@@ -22,7 +23,7 @@ class DepartureService {
   async GetFiltered(country, where, page, pageSize, sort) {
     return await this.models[country].findAll({
       where,
-      order: [["id", sort ? "ASC" : "DESC"]],
+      order: [["range", sort ? "ASC" : "DESC"]],
       offset: (page - 1) * pageSize,
       limit: pageSize,
     });
@@ -37,6 +38,10 @@ class DepartureService {
 
   async getByWhere(country, where) {
     return await this.models[country].findAll({ where });
+  }
+
+  async getByWhereWithSort(country, where, sort) {
+    return await this.models[country].findAll({ where, order: [["range", sort ? "ASC" : "DESC"]] });
   }
 
   async getById(country, id) {

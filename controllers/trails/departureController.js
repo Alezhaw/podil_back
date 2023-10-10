@@ -1,5 +1,8 @@
 const ApiError = require("../../error/ApiError");
 const DepartureService = require("../../services/trails/departureService");
+const DepartureDateService = require("../../services/trails/departureDateService");
+const CitiesWithRegService = require("../../services/trails/citiesWithRegionsService");
+const TrailsService = require("../../services/trails/trailsService");
 const { Op } = require("sequelize");
 const sequelize = require("../../db");
 
@@ -36,49 +39,120 @@ class DepartureController {
   }
 
   async getFiltered(req, res, next) {
-    const { country, ids, dateFrom, dateTo } = req.body;
-    // if (!country || !ids[0]) {
-    //   return next(ApiError.badRequest("Укажите все данные"));
-    // }
-    const models = {
-      RU: '"departures"',
-      KZ: '"kzdepartures"',
-      PL: '"pldepartures"',
-    };
-    //  let actions = [];
+    const { country, dateFrom, dateTo, search, planningPersonIds, sort, pageSize, page } = req.body;
+    if (!country) {
+      return next(ApiError.badRequest("Укажите country"));
+    }
+    if (!pageSize || !page) {
+      return next(ApiError.badRequest("Укажите page и pageSize"));
+    }
 
-    // ids.map((id) => actions.push({ id }));
-
-    // let where = {
-    //   //'SELECT "id", "dates", "range", "relevance_status", "createdAt", "updatedAt" FROM "departures" AS "departure" WHERE "departure"."test" >> ARRAY[1682899200000];'
-    //   range: {
-    //     //[Op.strictRight]: [targetDate],
-    //   },
-    // };
-    // const query = `SELECT "id", "dates", "range", "relevance_status", "createdAt", "updatedAt" FROM ${models[country]} AS "departure" ${dateFrom || dateTo ? "WHERE" : ""} ${
-    //   dateFrom ? `"departure"."range" >= ARRAY['${dateFrom}']::DATE[]` : ""
-    // } ${dateFrom && dateTo ? "AND" : ""}${dateTo ? `"departure"."range" <= ARRAY['${dateTo}']::DATE[]` : ""};`;
-    // console.log(1, query);
-    // let departures = await sequelize.query(query);
-
-    const departures = await DepartureService.getByWhere(country, {
-      [Op.and]: [
-        sequelize.literal(`EXISTS (
-        SELECT 1
-        FROM unnest("range") AS unnested_date
-        WHERE unnested_date >= '${dateFrom}' 
-          AND unnested_date <= '${dateTo}'
-      )`),
-      ],
-    });
-    //console.log(1, types);
-
-    //const departures = await DepartureService.getByWhere(country, where);
+    let departures = await DepartureService.GetFiltered(country, {}, page, pageSize, sort);
 
     if (!departures) {
       return next(ApiError.internal("Выезды не найдены"));
     }
-    return res.json(departures);
+    let idsForDates = (departures || [])?.map((item) => item.dataValues.id);
+
+    let whereForDate = {};
+
+    let dateFilter = [];
+    if (dateTo) {
+      dateFilter.push({ [Op.lte]: dateTo });
+    }
+    if (dateFrom) {
+      dateFilter.push({ [Op.gte]: dateFrom });
+    }
+    if (dateFilter[0]) {
+      whereForDate.data = {
+        [Op.and]: dateFilter,
+      };
+    } else {
+      whereForDate.departure_id = {
+        [Op.or]: idsForDates,
+      };
+    }
+
+    let departureDates = await DepartureDateService.getByWhere(country, whereForDate);
+    let trails_id = (departureDates || []).map((item) => item.dataValues.trails_id).flat();
+
+    let whereForTrails = {};
+    if (!!planningPersonIds[0]) {
+      whereForTrails.planning_person_id = {
+        [Op.or]: planningPersonIds,
+      };
+    }
+    let citiesId = [];
+    if (search) {
+      const whereForCity = {
+        city_name: { [Op.iLike]: `%${search}%` },
+      };
+      const cities = await CitiesWithRegService.getByWhere(country, whereForCity);
+      cities.map((city) => {
+        city = city.dataValues;
+        citiesId.push(city.id);
+      });
+      if (!citiesId[0]) {
+        return next(ApiError.badRequest("Город не найден"));
+      }
+      whereForTrails.city_id = {
+        [Op.or]: citiesId,
+      };
+    } else {
+      whereForTrails.id = {
+        [Op.or]: trails_id,
+      };
+    }
+    if (dateFilter[0]) {
+      whereForTrails.id = {
+        [Op.or]: trails_id,
+      };
+    }
+    if (!dateFilter[0] && !search) {
+    }
+    whereForTrails.relevance_status = true;
+
+    const finalDepartureIds = await TrailsService.GetDistinctFiltered(country, whereForTrails, page, pageSize, sort);
+    const finalDepartureIdsForCount = await TrailsService.GetDistinctFilteredForCount(country, whereForTrails);
+    if (!finalDepartureIds[0]) {
+      return next(ApiError.badRequest("Трасы не найдены"));
+    }
+
+    const idsForDepartures = finalDepartureIds.map((el) => el.departure_id);
+    let whereForDeparture = {};
+    whereForDeparture.id = {
+      [Op.or]: idsForDepartures,
+    };
+    departures = await DepartureService.getByWhereWithSort(country, whereForDeparture, sort);
+    if (!departures[0] || !finalDepartureIdsForCount) {
+      return next(ApiError.badRequest("Выезды не найдены"));
+    }
+    const count = Math.ceil(finalDepartureIdsForCount?.length / pageSize);
+    whereForDate.departure_id = {
+      [Op.or]: departures.map((item) => item.dataValues.id),
+    };
+    departureDates = await DepartureDateService.getByWhere(country, whereForDate);
+    if (!departureDates[0]) {
+      return next(ApiError.badRequest("Departure date не найдены"));
+    }
+    whereForTrails = {
+      relevance_status: true,
+      id: {
+        [Op.or]: departureDates.map((item) => item.dataValues.trails_id).flat(),
+      },
+    };
+    if (citiesId[0]) {
+      whereForTrails.city_id = {
+        [Op.or]: citiesId,
+      };
+    }
+    const trails = await TrailsService.getByWhere(country, whereForTrails);
+    if (!trails[0]) {
+      return next(ApiError.badRequest("Трассы не найдены"));
+    }
+    // distinct используется если есть только search, получаем departure dates с фильтром по датам, потом грузим все трассы по ид departure dates которые соответствуют cityId если есть search, без лимита
+
+    return res.json({ trails, departure: departures, departureDate: departureDates, count });
   }
 
   async create(req, res, next) {

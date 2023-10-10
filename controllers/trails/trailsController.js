@@ -11,6 +11,8 @@ const ContactStatusService = require("../../services/trails/contactStatusService
 const ProjectSalesService = require("../../services/trails/projectSalesService");
 const ProjectConcentService = require("../../services/trails/projectConcentService");
 const CallTemplateService = require("../../services/trails/callTemplatesService");
+const DepartureService = require("../../services/trails/departureService");
+const DepartureDateService = require("../../services/trails/departureDateService");
 const { Op } = require("sequelize");
 
 class TrailsController {
@@ -280,6 +282,8 @@ class TrailsController {
       { ids: [], key: "company_id", service: RegimentService, array: "regiments" },
       { ids: [], key: "regionId", service: RegionService, array: "regions" },
       { ids: [], key: "reservation_status_id", service: ReservationStatusService, array: "reservationStatuses" },
+      { ids: [], key: "departure_id", service: DepartureService, array: "departure" },
+      { ids: [], key: "departure_date_id", service: DepartureDateService, array: "departureDate" },
     ];
 
     const dictionary = {};
