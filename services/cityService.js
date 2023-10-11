@@ -433,7 +433,8 @@ class CityService {
   async GetDistinctFilteredForCount(country, where) {
     return await this.models[country].findAll({
       where,
-      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("id_for_base")), "id_for_base"]],
+      distinct: true,
+      col: id_for_base,
     });
   }
 

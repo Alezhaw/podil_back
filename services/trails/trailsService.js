@@ -60,7 +60,7 @@ class TrailsService {
     return await this.models[country].findAll({
       include,
       where,
-      //attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("departure_id")), "departure_id"]],
+      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("departure_id")), "departure_id"]],
       offset: (page - 1) * pageSize,
       limit: pageSize,
     });
@@ -73,15 +73,16 @@ class TrailsService {
 
   async GetDistinctFilteredForCount(country, where, search) {
     const include = this.getIncludeBySearch(search, country);
-    return await this.models[country].findAll({
+    return await this.models[country].count({
       include,
       where,
-      //attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("departure_id")), "departure_id"]],
+      distinct: true,
+      col: departure_id,
     });
   }
 
   async GetFilteredForCount(country, where) {
-    return await this.models[country].findAll({
+    return await this.models[country].count({
       where,
     });
   }
