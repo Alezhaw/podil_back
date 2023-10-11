@@ -1,5 +1,6 @@
 const ApiError = require("../../error/ApiError");
 const RegimentService = require("../../services/trails/regimentService");
+const { Op } = require("sequelize");
 
 class RegimentController {
   async getAll(req, res, next) {
@@ -51,22 +52,22 @@ class RegimentController {
   }
 
   async update(req, res, next) {
-    const { regiment, country, id } = req.body;
+    const { regiment, country } = req.body;
 
-    if (!regiment || !country || !id) {
+    if (!regiment || !country || !regiment.id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
 
-    const checkRegimentName = await RegimentService.getByName(country, regiment);
+    const checkRegimentName = await RegimentService.getByName(country, regiment.name);
     if (checkRegimentName) {
       return next(ApiError.badRequest("Regiment с таким именем уже существует"));
     }
-    const checkRegimentId = await RegimentService.getById(country, id);
+    const checkRegimentId = await RegimentService.getById(country, regiment.id);
     if (!checkRegimentId) {
       return next(ApiError.badRequest("Regiment с таким id не существует"));
     }
     try {
-      const updatedRegiment = await RegimentService.update(country, regiment, id);
+      const updatedRegiment = await RegimentService.update(country, regiment);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));
@@ -92,19 +93,19 @@ class RegimentController {
     }
   }
 
-  async remove(req, res) {
-    const { id, country, relevance_status } = req.body;
-    if (!country || !id) {
+  async remove(req, res, next) {
+    const { regiment, country } = req.body;
+    if (!country || !regiment.id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const item = await RegimentService.getById(country, id);
+    const item = await RegimentService.getById(country, regiment.id);
 
     if (!item) {
       return next(ApiError.badRequest("Элемент не найден"));
     }
 
     try {
-      const updatedCallTemplate = await RegimentService.remove(country, !!relevance_status, id);
+      const updatedRegiment = await RegimentService.remove(country, !!regiment.relevance_status, regiment.id);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));

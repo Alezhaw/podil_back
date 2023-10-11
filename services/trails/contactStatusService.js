@@ -8,11 +8,15 @@ class ContactStatusService {
   };
 
   async create(country, contactStatus) {
-    return await this.models[country].create({ contactStatus });
+    return await this.models[country].create({ ...contactStatus });
   }
 
-  async update(country, contactStatus, id) {
-    return await this.models[country].update({ contactStatus }, { where: { id } });
+  async update(country, contactStatus) {
+    return await this.models[country].update({ ...contactStatus }, { where: { id: contactStatus.id } });
+  }
+
+  async remove(country, relevance_status, id) {
+    return await this.models[country].update({ relevance_status }, { where: { id } });
   }
 
   async delete(country, id) {
@@ -21,12 +25,9 @@ class ContactStatusService {
     });
   }
 
-  async remove(country, relevance_status, id) {
-    return await this.models[country].update({ relevance_status }, { where: { id } });
-  }
-
   async getAll(country) {
     return await this.models[country].findAll({
+      where: { relevance_status: true },
       order: [["id", "ASC"]],
     });
   }
@@ -39,8 +40,8 @@ class ContactStatusService {
     return await this.models[country].findOne({ where: { id } });
   }
 
-  async getByName(country, contactStatus) {
-    return await this.models[country].findOne({ where: { contactStatus } });
+  async getByName(country, name) {
+    return await this.models[country].findOne({ where: { name } });
   }
 
   async getByIds(country, where) {

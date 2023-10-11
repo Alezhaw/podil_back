@@ -1,6 +1,7 @@
 const ApiError = require("../error/ApiError");
 const ObjectHelper = require("../utils/objectHelper");
 const { Cities, KzCities, PlCities } = require("../models/citiesModels");
+const TrailsService = require("./trails/trailsService");
 const { Sequelize, Op } = require("sequelize");
 
 class CityService {
@@ -64,6 +65,10 @@ class CityService {
     },
     dateTo: {},
     dateFrom: {},
+    visibleInPodil: {},
+    visibleInBases: {},
+    visibleInSpeaker: {},
+    visibleInScenario: {},
   };
 
   async Search() {}
@@ -108,7 +113,50 @@ class CityService {
     );
     return errors;
   }
-  async CreateTime(item, user, country) {
+
+  async UpdateOrCreateByTrails({ country, data, user, status }) {
+    let errors = [];
+    await Promise.all(
+      data.map(async (item) => {
+        const time = await this.GetTimeByTrailIdAndTime(item.trailId, item.time, country);
+        if (!time) {
+          const lastIdForBase = await this.models[country].max("id_for_base");
+          item.id_for_base = lastIdForBase + 4;
+        }
+
+        if (time) {
+          try {
+            let result = await this.UpdateTime(item, user, country, status);
+            if (result != item.id) {
+              errors.push(result);
+            }
+          } catch (error) {
+            errors.push({
+              city: item.city_lokal,
+              id_for_base: item.id_for_base,
+              error: error.message,
+            });
+          }
+        } else {
+          try {
+            let result = await this.CreateTime(item, user, country, status);
+            if (typeof result !== "Number") {
+              errors.push(result);
+            }
+          } catch (e) {
+            return errors.push({
+              city: item.city_lokal,
+              id_for_base: item.id_for_base,
+              error: e.message,
+            });
+          }
+        }
+      })
+    );
+    return errors;
+  }
+
+  async CreateTime(item, user, country, status) {
     delete item.id;
     const time = await this.models[country].create(item);
     const result = ObjectHelper.sendDifferencesToDatabase(time, item, country, "create", user, "city");
@@ -122,13 +170,27 @@ class CityService {
     }
 
     global.io.to("1").emit("updateCities", {
-      data: { cities: time.dataValues, country },
+      data: { cities: [time.dataValues], country },
     });
+
+    if (status) {
+      await TrailsService.update({ country, trail: { id: item.trailId, ...status } });
+      const trail = await TrailsService.getById(country, item.trailId);
+      if (trail) {
+        global.io.to("1").emit("updateTrails", {
+          data: { trails: [trail.dataValues], country },
+        });
+      }
+    }
 
     return time.id;
   }
-  async UpdateTime(item, user, country) {
-    const time = item.id ? await this.GetTimeById(item.id, country) : await this.GetTimeByIdForBaseAndTime(item.id_for_base, item.time, country);
+  async UpdateTime(item, user, country, status) {
+    const time = item.id
+      ? await this.GetTimeById(item.id, country)
+      : item.trailId
+      ? await this.GetTimeByTrailIdAndTime(item.trailId, item.time, country)
+      : await this.GetTimeByIdForBaseAndTime(item.id_for_base, item.time, country);
 
     if (time) {
       try {
@@ -142,8 +204,17 @@ class CityService {
         }
         await this.Update(item, { id: time.dataValues.id }, country);
         global.io.to("1").emit("updateCities", {
-          data: { cities: item, country },
+          data: { cities: [item], country },
         });
+        if (status) {
+          await TrailsService.update({ country, trail: { id: item.trailId, ...status } });
+          const trail = await TrailsService.getById(country, item.trailId);
+          if (trail) {
+            global.io.to("1").emit("updateTrails", {
+              data: { trails: [trail.dataValues], country },
+            });
+          }
+        }
       } catch (e) {
         return {
           city: item.city_lokal,
@@ -275,6 +346,18 @@ class CityService {
         [Op.and]: dateFilter,
       };
     }
+    if (filter.visibleInPodil) {
+      where.visible_in_podil = true;
+    }
+    if (filter.visibleInBases) {
+      where.visible_in_bases = true;
+    }
+    if (filter.visibleInSpeaker) {
+      where.visible_in_speaker = true;
+    }
+    if (filter.visibleInScenario) {
+      where.visible_in_scenario = true;
+    }
     if (search) {
       where.city_lokal = {
         [Op.iLike]: `%${search}%`,
@@ -322,6 +405,65 @@ class CityService {
     return await this.models[country].findAll();
   }
 
+  async getMaxIdForBase(country) {
+    return await this.models[country].findAll({
+      attributes: [Sequelize.fn("max", Sequelize.col("id_for_base"))], //Sequelize.query() еще можно
+      raw: true,
+    });
+  }
+
+  async Get(id, country) {
+    return await this.models[country].findOne({ where: { id } });
+  }
+
+  async GetByTrailId(trailId, country) {
+    return await this.models[country].findOne({ where: { trailId } });
+  }
+
+  async GetDistinctFiltered(country, where, page, pageSize, sort) {
+    return await this.models[country].findAll({
+      where,
+      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("id_for_base")), "id_for_base"]],
+      order: [["id_for_base", sort ? "ASC" : "DESC"]],
+      offset: (page - 1) * pageSize,
+      limit: pageSize,
+    });
+  }
+
+  async GetDistinctFilteredForCount(country, where) {
+    return await this.models[country].findAll({
+      where,
+      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("id_for_base")), "id_for_base"]],
+    });
+  }
+
+  async GetTimesByManyIdForBase(country, where, sort) {
+    return await this.models[country].findAll({ where, order: [["id_for_base", sort ? "ASC" : "DESC"]] });
+  }
+
+  async GetTimeByIdForBase(id_for_base, country) {
+    return await this.models[country].findOne({ where: { id_for_base } });
+  }
+  async GetTimeByTrailIdAndTime(trailId, time, country) {
+    return await this.models[country].findOne({ where: { trailId, time } });
+  }
+
+  async GetTimeByIdForBaseAndTime(id_for_base, time, country) {
+    return await this.models[country].findOne({ where: { id_for_base, time: time } });
+  }
+
+  async GetTimes(id_for_base, country) {
+    return await this.models[country].findAll({ where: { id_for_base } });
+  }
+
+  async DeleteById(id, country) {
+    return await this.models[country].destroy({ where: { id } });
+  }
+
+  async DeleteByIdForBase(id_for_base, country) {
+    return await this.models[country].destroy({ where: { id_for_base } });
+  }
+
   // async fixDate() {
   //   let cities = await this.models["KZ"].findAll();
   //   cities = cities.map((el) => el.dataValues);
@@ -351,57 +493,6 @@ class CityService {
   //     })
   //   );
   // }
-
-  async getMaxIdForBase(country) {
-    return await this.models[country].findAll({
-      attributes: [Sequelize.fn("max", Sequelize.col("id_for_base"))], //Sequelize.query() еще можно
-      raw: true,
-    });
-  }
-
-  async Get(id, country) {
-    return await this.models[country].findOne({ where: { id } });
-  }
-
-  async GetDistinctFiltered(country, where, page, pageSize, sort) {
-    return await this.models[country].findAll({
-      where,
-      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("id_for_base")), "id_for_base"]],
-      order: [["id_for_base", sort ? "ASC" : "DESC"]],
-      offset: (page - 1) * pageSize,
-      limit: pageSize,
-    });
-  }
-
-  async GetDistinctFilteredForCount(country, where) {
-    return await this.models[country].findAll({
-      where,
-      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("id_for_base")), "id_for_base"]],
-    });
-  }
-
-  async GetTimesByManyIdForBase(country, where, sort) {
-    return await this.models[country].findAll({ where, order: [["id_for_base", sort ? "ASC" : "DESC"]] });
-  }
-
-  async GetTimeByIdForBase(id_for_base, country) {
-    return await this.models[country].findOne({ where: { id_for_base } });
-  }
-  async GetTimeByIdForBaseAndTime(id_for_base, time, country) {
-    return await this.models[country].findOne({ where: { id_for_base, time: time } });
-  }
-
-  async GetTimes(id_for_base, country) {
-    return await this.models[country].findAll({ where: { id_for_base } });
-  }
-
-  async DeleteById(id, country) {
-    return await this.models[country].destroy({ where: { id } });
-  }
-
-  async DeleteByIdForBase(id_for_base, country) {
-    return await this.models[country].destroy({ where: { id_for_base } });
-  }
 }
 
 module.exports = new CityService();

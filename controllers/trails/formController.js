@@ -1,6 +1,8 @@
 const ApiError = require("../../error/ApiError");
 const FormService = require("../../services/trails/formService");
 const CitiesWithRegService = require("../../services/trails/citiesWithRegionsService");
+const { Op } = require("sequelize");
+
 class FormController {
   async getAll(req, res, next) {
     const { country } = req.body;
@@ -34,7 +36,7 @@ class FormController {
   }
 
   async getByName(req, res, next) {
-    const { country, search } = req.body;
+    const { country, search, city_id } = req.body;
     if (!country) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
@@ -42,7 +44,7 @@ class FormController {
     let actions = [];
 
     if (search) {
-      actions.push({ town: { [Op.iLike]: `%${search}%` } }, { local: { [Op.iLike]: `%${search}%` } });
+      actions.push({ local: { [Op.iLike]: `%${search}%` } });
     }
     let where = {};
     if (!!actions[0]) {
@@ -50,13 +52,17 @@ class FormController {
         [Op.or]: actions,
       };
     }
+    if (city_id) {
+      where.city_id = city_id;
+    }
+    where.relevance_status = true;
 
-    const cities = await FormService.getByWhere(country, where);
+    const forms = await FormService.getByWhereWithLimit(country, where, 50);
 
-    if (!cities) {
+    if (!forms) {
       return next(ApiError.internal("Города не найдены"));
     }
-    return res.json({ cities });
+    return res.json(forms);
   }
 
   async create(req, res, next) {

@@ -1,5 +1,6 @@
 const ApiError = require("../../error/ApiError");
 const CallTemplateService = require("../../services/trails/callTemplatesService");
+const { Op } = require("sequelize");
 
 class CallTemplatesController {
   async getAll(req, res, next) {
@@ -35,10 +36,10 @@ class CallTemplatesController {
 
   async create(req, res, next) {
     const { callTemplate, country } = req.body;
-    if (!callTemplate || !country) {
+    if (!callTemplate.name || !country) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const checkCallTemplate = await CallTemplateService.getByName(country, callTemplate);
+    const checkCallTemplate = await CallTemplateService.getByName(country, callTemplate.name);
     if (checkCallTemplate) {
       return next(ApiError.badRequest("Шаблон вызова с таким именем уже существует"));
     }
@@ -51,30 +52,23 @@ class CallTemplatesController {
   }
 
   async update(req, res, next) {
-    const { callTemplate, country, id } = req.body;
+    const { callTemplate, country } = req.body;
 
-    if (!callTemplate || !country || !id) {
+    if (!callTemplate || !country || !callTemplate.id || !callTemplate.name) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-
-    const checkCallTemplateName = await CallTemplateService.getByName(country, callTemplate);
-    if (checkCallTemplateName) {
-      return next(ApiError.badRequest("Шаблон вызова с таким именем уже существует"));
-    }
-    const checkCallTemplateId = await CallTemplateService.getById(country, id);
+    // const checkCallTemplateName = await CallTemplateService.getByName(country, callTemplate.name);
+    // if (checkCallTemplateName) {
+    //   return next(ApiError.badRequest("Шаблон вызова с таким именем уже существует"));
+    // }
+    const checkCallTemplateId = await CallTemplateService.getById(country, callTemplate.id);
     if (!checkCallTemplateId) {
       return next(ApiError.badRequest("Шаблон вызова с таким id не существует"));
     }
     try {
-      const updatedCallTemplate = await CallTemplateService.update(country, callTemplate, id);
+      const updatedCallTemplate = await CallTemplateService.update(country, callTemplate);
       return res.json("success");
     } catch (e) {
-<<<<<<< Updated upstream
-=======
-      if (e.name === "SequelizeUniqueConstraintError") {
-        return next(ApiError.badRequest("Шаблон вызова с таким именем уже существует"));
-      }
->>>>>>> Stashed changes
       return next(ApiError.badRequest("Непредвиденная ошибка"));
     }
   }
@@ -98,19 +92,19 @@ class CallTemplatesController {
     }
   }
 
-  async remove(req, res) {
-    const { id, country, relevance_status } = req.body;
-    if (!country || !id) {
+  async remove(req, res, next) {
+    const { callTemplate, country } = req.body;
+    if (!country || !callTemplate.id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const item = await CallTemplateService.getById(country, id);
+    const item = await CallTemplateService.getById(country, callTemplate.id);
 
     if (!item) {
       return next(ApiError.badRequest("Элемент не найден"));
     }
 
     try {
-      const updatedCallTemplate = await CallTemplateService.remove(country, !!relevance_status, id);
+      const updatedCallTemplate = await CallTemplateService.remove(country, !!callTemplate.relevance_status, callTemplate.id);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));

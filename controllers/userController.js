@@ -2,6 +2,8 @@ const ApiError = require("../error/ApiError");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { User, Deal, UserTransfer, UserTransferToUser } = require("../models/userModels");
+const { Departure, PlDeparture, KzDeparture } = require("../models/trails/departureModels");
+const { DepartureDate, PlDepartureDate, KzDepartureDate } = require("../models/trails/departureDateModels");
 
 const generateJwt = (id, email, role, nickname, score, password, systemMessage, checkRu, minimumTransferAmount, sumTransferAmoumt, completed) => {
   return jwt.sign({ id, email, role, nickname, score, password, systemMessage, checkRu, minimumTransferAmount, sumTransferAmoumt, completed }, process.env.SECRET_KEY, { expiresIn: "24h" });

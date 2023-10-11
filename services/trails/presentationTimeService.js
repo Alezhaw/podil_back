@@ -8,11 +8,11 @@ class PresentationTimeService {
   };
 
   async create(country, presentationTime) {
-    return await this.models[country].create({ presentationTime });
+    return await this.models[country].create({ ...presentationTime });
   }
 
-  async update(country, presentationTime, id) {
-    return await this.models[country].update({ presentationTime }, { where: { id } });
+  async update(country, presentationTime) {
+    return await this.models[country].update({ ...presentationTime }, { where: { id: presentationTime.id } });
   }
 
   async delete(country, id) {
@@ -27,12 +27,8 @@ class PresentationTimeService {
 
   async getAll(country) {
     return await this.models[country].findAll({
-<<<<<<< Updated upstream
-      order: [["id", "ASC"]],
-=======
       where: { relevance_status: true },
-      order: [["presentation_hour", "ASC"]],
->>>>>>> Stashed changes
+      order: [["id", "ASC"]],
     });
   }
 
@@ -44,8 +40,8 @@ class PresentationTimeService {
     return await this.models[country].findOne({ where: { id } });
   }
 
-  async getByName(country, presentationTime) {
-    return await this.models[country].findOne({ where: { presentationTime } });
+  async getByName(country, presentation_hour) {
+    return await this.models[country].findOne({ where: { presentation_hour } });
   }
 
   async getByIds(country, where) {

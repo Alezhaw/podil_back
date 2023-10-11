@@ -1,4 +1,5 @@
 const { Trails, KzTrails, PlTrails } = require("../../models/trails/trailsModels");
+const { Sequelize } = require("sequelize");
 
 class TrailsService {
   models = {
@@ -34,6 +35,22 @@ class TrailsService {
     });
   }
 
+  async GetDistinctFiltered(country, where, page, pageSize, sort) {
+    return await this.models[country].findAll({
+      where,
+      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("departure_id")), "departure_id"]],
+      offset: (page - 1) * pageSize,
+      limit: pageSize,
+    });
+  }
+
+  async GetDistinctFilteredForCount(country, where, page, pageSize, sort) {
+    return await this.models[country].findAll({
+      where,
+      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("departure_id")), "departure_id"]],
+    });
+  }
+
   async GetFilteredForCount(country, where) {
     return await this.models[country].findAll({
       where,
@@ -42,6 +59,7 @@ class TrailsService {
 
   async getAll(country) {
     return await this.models[country].findAll({
+      where: { relevance_status: true },
       order: [["id", "ASC"]],
     });
   }

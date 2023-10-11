@@ -11,6 +11,8 @@ const ContactStatusService = require("../../services/trails/contactStatusService
 const ProjectSalesService = require("../../services/trails/projectSalesService");
 const ProjectConcentService = require("../../services/trails/projectConcentService");
 const CallTemplateService = require("../../services/trails/callTemplatesService");
+const DepartureService = require("../../services/trails/departureService");
+const DepartureDateService = require("../../services/trails/departureDateService");
 const { Op } = require("sequelize");
 
 class TrailsController {
@@ -37,12 +39,12 @@ class TrailsController {
       [Op.or]: actions,
     };
 
-    const cities = await TrailsService.getByWhere(country, where);
+    const trails = await TrailsService.getByWhere(country, where);
 
-    if (!cities) {
+    if (!trails) {
       return next(ApiError.internal("Города не найдены"));
     }
-    return res.json({ cities });
+    return res.json({ trails });
   }
 
   async create(req, res, next) {
@@ -63,7 +65,9 @@ class TrailsController {
       !trail.reservation_status_id ||
       !trail.project_sales_id ||
       !trail.project_concent_id ||
-      !trail.call_template_id
+      !trail.call_template_id ||
+      !trail.departure_id ||
+      !trail.departure_date_id
     ) {
       return next(ApiError.badRequest("Заполните все поля"));
     }
@@ -110,9 +114,13 @@ class TrailsController {
 
     try {
       const newTrail = await TrailsService.create({ country, trail });
+      let departureDate = await DepartureDateService.getById(country, trail.departure_date_id);
+      departureDate = departureDate.dataValues;
+      departureDate = { ...departureDate, trails_id: [...departureDate.trails_id, newTrail.dataValues.id] };
+      let updatedDepartureDate = await DepartureDateService.update({ country, departureDate });
       return res.json(newTrail);
     } catch (e) {
-      return next(ApiError.badRequest("Непредвиденная ошибка"));
+      return next(ApiError.badRequest("Непредвиденная ошибка", e));
     }
   }
 
@@ -134,7 +142,9 @@ class TrailsController {
       !trail.reservation_status_id ||
       !trail.project_sales_id ||
       !trail.project_concent_id ||
-      !trail.call_template_id
+      !trail.call_template_id ||
+      !trail.departure_id ||
+      !trail.departure_date_id
     ) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
@@ -192,6 +202,9 @@ class TrailsController {
     }
     try {
       const updatedTrail = await TrailsService.update({ country, trail });
+      global.io.to("1").emit("updateTrails", {
+        data: { trails: [trail], country },
+      });
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));
@@ -247,6 +260,7 @@ class TrailsController {
         [Op.or]: citiesId,
       };
     }
+    where.relevance_status = true;
     const trails = await TrailsService.GetFiltered(country, where, page, pageSize, sort);
     const trailsForCount = await TrailsService.GetFilteredForCount(country, where);
     if (!trails || !trailsForCount) {
@@ -259,8 +273,6 @@ class TrailsController {
 
   async getDictionaryByTrails(req, res, next) {
     const { trails, country } = req.body;
-
-    console.log(1, trails, country);
 
     if (!country || !trails[0]) {
       return next(ApiError.badRequest("Укажите все данные"));
@@ -278,6 +290,8 @@ class TrailsController {
       { ids: [], key: "company_id", service: RegimentService, array: "regiments" },
       { ids: [], key: "regionId", service: RegionService, array: "regions" },
       { ids: [], key: "reservation_status_id", service: ReservationStatusService, array: "reservationStatuses" },
+      { ids: [], key: "departure_id", service: DepartureService, array: "departure" },
+      { ids: [], key: "departure_date_id", service: DepartureDateService, array: "departureDate" },
     ];
 
     const dictionary = {};
@@ -287,11 +301,10 @@ class TrailsController {
         el.ids.includes(item[el.key]) || el.ids.push(item[el.key]);
       });
     });
-
     try {
       await Promise.all(
         dictionaryIds
-          ?.filter((item) => !!item.ids[0])
+          ?.filter((item) => !!item.ids?.filter((el) => !!el)[0])
           ?.map(async (el) => {
             let actions = [];
             el.ids.map((id) => actions.push({ id: Number(id) }));
@@ -310,6 +323,39 @@ class TrailsController {
     return res.json({ ...dictionary });
   }
 
+  async getAllDictionary(req, res, next) {
+    const { country } = req.body;
+
+    if (!country) {
+      return next(ApiError.badRequest("Укажите country"));
+    }
+    let dictionary = [
+      { service: CallTemplateService, array: "callTamplates" },
+      { service: ContactStatusService, array: "contractStatuses" },
+      { service: PlanningPersonService, array: "planningPeople" },
+      { service: PresentationTimeService, array: "presentationTimes" },
+      { service: ProjectConcentService, array: "projectConcent" },
+      { service: ProjectSalesService, array: "projectSales" },
+      { service: RegimentService, array: "regiments" },
+      { service: RegionService, array: "regions" },
+      { service: ReservationStatusService, array: "reservationStatuses" },
+    ];
+    const allDictionary = {};
+
+    try {
+      await Promise.all(
+        dictionary?.map(async (el) => {
+          const data = await el.service.getAll(country);
+          allDictionary[el.array] = data;
+        })
+      );
+    } catch (e) {
+      console.log(e);
+    }
+
+    return res.json(allDictionary);
+  }
+
   async remove(req, res) {
     const { id, country, relevance_status } = req.body;
     if (!country || !id) {
@@ -323,6 +369,9 @@ class TrailsController {
 
     try {
       const updatedCallTemplate = await TrailsService.remove(country, !!relevance_status, id);
+      global.io.to("1").emit("deleteTrails", {
+        data: { id, country },
+      });
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));

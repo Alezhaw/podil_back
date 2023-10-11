@@ -32,9 +32,7 @@ global.io = io;
 io.setMaxListeners(1000);
 
 io.on("connection", (socket) => {
-  socket.on("join", ({ name, room }) => {
-    socket.join(room);
-  });
+  socket.join("1");
 
   socket.on("leftRoom", ({ params }) => {
     console.log("Left room", params);

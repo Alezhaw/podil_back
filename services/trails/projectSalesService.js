@@ -8,11 +8,11 @@ class ProjectSalesService {
   };
 
   async create(country, projectSales) {
-    return await this.models[country].create({ projectSales });
+    return await this.models[country].create({ ...projectSales });
   }
 
-  async update(country, projectSales, id) {
-    return await this.models[country].update({ projectSales }, { where: { id } });
+  async update(country, projectSales) {
+    return await this.models[country].update({ ...projectSales }, { where: { id: projectSales.id } });
   }
 
   async delete(country, id) {
@@ -27,6 +27,7 @@ class ProjectSalesService {
 
   async getAll(country) {
     return await this.models[country].findAll({
+      where: { relevance_status: true },
       order: [["id", "ASC"]],
     });
   }
@@ -39,8 +40,8 @@ class ProjectSalesService {
     return await this.models[country].findOne({ where: { id } });
   }
 
-  async getByName(country, projectSales) {
-    return await this.models[country].findOne({ where: { projectSales } });
+  async getByName(country, name) {
+    return await this.models[country].findOne({ where: { name } });
   }
 
   async getByIds(country, where) {

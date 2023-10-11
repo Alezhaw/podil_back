@@ -6,6 +6,7 @@ const citiesWithRegionsController = require("../../controllers/trails/citiesWith
 router.post("/getAll", auth, citiesWithRegionsController.getAll);
 router.post("/getByName", auth, citiesWithRegionsController.getByName);
 router.post("/getByIds", auth, citiesWithRegionsController.getByIds);
+router.post("/getByRegion", auth, citiesWithRegionsController.getByRegion);
 router.post("/create", auth, citiesWithRegionsController.create);
 router.post("/update", auth, citiesWithRegionsController.update);
 router.post("/delete", auth, citiesWithRegionsController.delete);

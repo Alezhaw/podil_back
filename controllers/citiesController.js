@@ -5,7 +5,22 @@ class CitiesController {
   async create(req, res, next) {
     let user = req.user;
     const { data, country } = req.body;
+    if (!country) {
+      return next(ApiError.badRequest("Укажите country"));
+    }
     let result = await CityService.UpdateOrCreate(data, user, country);
+    return res.json(result);
+  }
+
+  async createByTrails(req, res, next) {
+    let user = req.user;
+    const { country, data, status } = req.body;
+    if (!country) {
+      return next(ApiError.badRequest("Укажите country"));
+    }
+    console.log(1, status);
+    let result = await CityService.UpdateOrCreateByTrails({ country, data, user, status });
+
     return res.json(result);
   }
 

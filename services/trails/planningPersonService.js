@@ -7,12 +7,12 @@ class PlanningPersonService {
     PL: PlPlanningPerson,
   };
 
-  async create(country, planningPerson) {
-    return await this.models[country].create({ planningPerson });
+  async create(country, planningPeople) {
+    return await this.models[country].create({ ...planningPeople });
   }
 
-  async update(country, planningPerson, id) {
-    return await this.models[country].update({ planningPerson }, { where: { id } });
+  async update(country, planningPeople) {
+    return await this.models[country].update({ ...planningPeople }, { where: { id: planningPeople.id } });
   }
 
   async delete(country, id) {
@@ -27,6 +27,7 @@ class PlanningPersonService {
 
   async getAll(country) {
     return await this.models[country].findAll({
+      where: { relevance_status: true },
       order: [["id", "ASC"]],
     });
   }
@@ -39,8 +40,8 @@ class PlanningPersonService {
     return await this.models[country].findOne({ where: { id } });
   }
 
-  async getByName(country, planningPerson) {
-    return await this.models[country].findOne({ where: { planningPerson } });
+  async getByName(country, name) {
+    return await this.models[country].findOne({ where: { name } });
   }
 
   async getByIds(country, where) {

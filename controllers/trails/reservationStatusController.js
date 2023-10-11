@@ -1,5 +1,6 @@
 const ApiError = require("../../error/ApiError");
 const ReservationStatusService = require("../../services/trails/reservationStatusService");
+const { Op } = require("sequelize");
 
 class ReservationStatusController {
   async getAll(req, res, next) {

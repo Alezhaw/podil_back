@@ -27,12 +27,16 @@ class FormService {
 
   async getAll(country) {
     return await this.models[country].findAll({
+      where: { relevance_status: true },
       order: [["id", "ASC"]],
     });
   }
 
   async getByWhere(country, where) {
     return await this.models[country].findAll({ where });
+  }
+  async getByWhereWithLimit(country, where, limit) {
+    return await this.models[country].findAll({ where, limit, order: [["local", "ASC"]] });
   }
 
   async getById(country, id) {

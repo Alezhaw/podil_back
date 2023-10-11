@@ -1,5 +1,6 @@
 const ApiError = require("../../error/ApiError");
 const RegionService = require("../../services/trails/regionService");
+const { Op } = require("sequelize");
 
 class RegionsController {
   async getAll(req, res, next) {
@@ -51,22 +52,22 @@ class RegionsController {
   }
 
   async update(req, res, next) {
-    const { region, country, id } = req.body;
+    const { region, country } = req.body;
 
-    if (!region || !country || !id) {
+    if (!region || !country || !region.id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
 
-    const checkRegionName = await RegionService.getByName(country, region);
+    const checkRegionName = await RegionService.getByName(country, region.region);
     if (checkRegionName) {
       return next(ApiError.badRequest("Регион с таким именем уже существует"));
     }
-    const checkRegionId = await RegionService.getById(country, id);
+    const checkRegionId = await RegionService.getById(country, region.id);
     if (!checkRegionId) {
       return next(ApiError.badRequest("Региона с таким id не существует"));
     }
     try {
-      const updatedRegions = await RegionService.update(country, region, id);
+      const updatedRegions = await RegionService.update(country, region);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));
@@ -92,19 +93,19 @@ class RegionsController {
     }
   }
 
-  async remove(req, res) {
-    const { id, country, relevance_status } = req.body;
-    if (!country || !id) {
+  async remove(req, res, next) {
+    const { region, country } = req.body;
+    if (!country || !region.id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const item = await RegionService.getById(country, id);
+    const item = await RegionService.getById(country, region.id);
 
     if (!item) {
       return next(ApiError.badRequest("Элемент не найден"));
     }
 
     try {
-      const updatedCallTemplate = await RegionService.remove(country, !!relevance_status, id);
+      const updatedRegion = await RegionService.remove(country, !!region.relevance_status, region.id);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));

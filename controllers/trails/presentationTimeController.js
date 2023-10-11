@@ -1,5 +1,6 @@
 const ApiError = require("../../error/ApiError");
 const PresentationTimeService = require("../../services/trails/presentationTimeService");
+const { Op } = require("sequelize");
 
 class PresentationTimeController {
   async getAll(req, res, next) {
@@ -56,22 +57,21 @@ class PresentationTimeController {
   }
 
   async update(req, res, next) {
-    const { presentationTime, country, id } = req.body;
+    const { presentationTime, country } = req.body;
 
-    if (!presentationTime || !country || !id) {
+    if (!presentationTime || !country || !presentationTime.id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-
-    const checkPresentationTimeName = await PresentationTimeService.getByName(country, presentationTime);
+    const checkPresentationTimeName = await PresentationTimeService.getByName(country, presentationTime.presentation_hour);
     if (checkPresentationTimeName) {
       return next(ApiError.badRequest("PresentationTime с таким именем уже существует"));
     }
-    const checkPresentationTimeId = await PresentationTimeService.getById(country, id);
+    const checkPresentationTimeId = await PresentationTimeService.getById(country, presentationTime.id);
     if (!checkPresentationTimeId) {
       return next(ApiError.badRequest("PresentationTime с таким id не существует"));
     }
     try {
-      const updatedPresentationTime = await PresentationTimeService.update(country, presentationTime, id);
+      const updatedPresentationTime = await PresentationTimeService.update(country, presentationTime);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));
@@ -97,19 +97,19 @@ class PresentationTimeController {
     }
   }
 
-  async remove(req, res) {
-    const { id, country, relevance_status } = req.body;
-    if (!country || !id) {
+  async remove(req, res, next) {
+    const { presentationTime, country } = req.body;
+    if (!country || !presentationTime.id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const item = await PresentationTimeService.getById(country, id);
+    const item = await PresentationTimeService.getById(country, presentationTime.id);
 
     if (!item) {
       return next(ApiError.badRequest("Элемент не найден"));
     }
 
     try {
-      const updatedCallTemplate = await PresentationTimeService.remove(country, !!relevance_status, id);
+      const updatedPresentationTime = await PresentationTimeService.remove(country, !!presentationTime.relevance_status, presentationTime.id);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));

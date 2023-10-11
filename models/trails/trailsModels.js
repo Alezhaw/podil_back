@@ -27,6 +27,8 @@ const Trails = sequelize.define("trail", {
   project_concent_id: { type: DataTypes.INTEGER },
   call_template_id: { type: DataTypes.INTEGER },
   relevance_status: { type: DataTypes.BOOLEAN },
+  departure_id: { type: DataTypes.INTEGER },
+  departure_date_id: { type: DataTypes.INTEGER },
 });
 
 const KzTrails = sequelize.define("kstrail", {
@@ -55,6 +57,8 @@ const KzTrails = sequelize.define("kstrail", {
   project_concent_id: { type: DataTypes.INTEGER },
   call_template_id: { type: DataTypes.INTEGER },
   relevance_status: { type: DataTypes.BOOLEAN },
+  departure_id: { type: DataTypes.INTEGER },
+  departure_date_id: { type: DataTypes.INTEGER },
 });
 
 const PlTrails = sequelize.define("pltrail", {
@@ -83,6 +87,8 @@ const PlTrails = sequelize.define("pltrail", {
   project_concent_id: { type: DataTypes.INTEGER },
   call_template_id: { type: DataTypes.INTEGER },
   relevance_status: { type: DataTypes.BOOLEAN },
+  departure_id: { type: DataTypes.INTEGER },
+  departure_date_id: { type: DataTypes.INTEGER },
 });
 
 module.exports = {

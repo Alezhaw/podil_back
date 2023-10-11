@@ -1,5 +1,6 @@
 const ApiError = require("../../error/ApiError");
 const PlanningPersonService = require("../../services/trails/planningPersonService");
+const { Op } = require("sequelize");
 
 class PlanningPersonController {
   async getAll(req, res, next) {
@@ -34,16 +35,16 @@ class PlanningPersonController {
   }
 
   async create(req, res, next) {
-    const { planningPerson, country } = req.body;
-    if (!planningPerson || !country) {
+    const { planningPeople, country } = req.body;
+    if (!planningPeople.name || !country) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const checkPlanningPerson = await PlanningPersonService.getByName(country, planningPerson);
+    const checkPlanningPerson = await PlanningPersonService.getByName(country, planningPeople.name);
     if (checkPlanningPerson) {
       return next(ApiError.badRequest("PlanningPerson с таким именем уже существует"));
     }
     try {
-      const newPlanningPerson = await PlanningPersonService.create(country, planningPerson);
+      const newPlanningPerson = await PlanningPersonService.create(country, planningPeople);
       return res.json(newPlanningPerson);
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));
@@ -51,22 +52,22 @@ class PlanningPersonController {
   }
 
   async update(req, res, next) {
-    const { planningPerson, country, id } = req.body;
+    const { planningPeople, country } = req.body;
 
-    if (!planningPerson || !country || !id) {
+    if (!planningPeople || !country || !planningPeople.id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
 
-    const checkPlanningPersonName = await PlanningPersonService.getByName(country, planningPerson);
+    const checkPlanningPersonName = await PlanningPersonService.getByName(country, planningPeople.name);
     if (checkPlanningPersonName) {
       return next(ApiError.badRequest("PlanningPerson с таким именем уже существует"));
     }
-    const checkPlanningPersonId = await PlanningPersonService.getById(country, id);
+    const checkPlanningPersonId = await PlanningPersonService.getById(country, planningPeople.id);
     if (!checkPlanningPersonId) {
       return next(ApiError.badRequest("PlanningPerson с таким id не существует"));
     }
     try {
-      const updatedPlanningPerson = await PlanningPersonService.update(country, planningPerson, id);
+      const updatedPlanningPerson = await PlanningPersonService.update(country, planningPeople);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));
@@ -92,19 +93,19 @@ class PlanningPersonController {
     }
   }
 
-  async remove(req, res) {
-    const { id, country, relevance_status } = req.body;
-    if (!country || !id) {
+  async remove(req, res, next) {
+    const { planningPeople, country } = req.body;
+    if (!country || !planningPeople.id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const item = await PlanningPersonService.getById(country, id);
+    const item = await PlanningPersonService.getById(country, planningPeople.id);
 
     if (!item) {
       return next(ApiError.badRequest("Элемент не найден"));
     }
 
     try {
-      const updatedCallTemplate = await PlanningPersonService.remove(country, !!relevance_status, id);
+      const updatedPlanningPerson = await PlanningPersonService.remove(country, !!planningPeople.relevance_status, planningPeople.id);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));
