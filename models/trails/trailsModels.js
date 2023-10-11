@@ -131,11 +131,15 @@ CitiesWithReg.hasOne(Trails, {
 });
 Trails.belongsTo(CitiesWithReg);
 
-KzTrails.hasOne(KzCitiesWithReg);
-KzCitiesWithReg.belongsTo(KzTrails);
+KzCitiesWithReg.hasOne(KzTrails, {
+  foreignKey: "city_id",
+});
+KzTrails.belongsTo(KzCitiesWithReg);
 
-PlTrails.hasOne(PlCitiesWithReg);
-PlCitiesWithReg.belongsTo(PlTrails);
+PlCitiesWithReg.hasOne(PlTrails, {
+  foreignKey: "city_id",
+});
+PlTrails.belongsTo(PlCitiesWithReg);
 
 module.exports = {
   Trails,
