@@ -117,7 +117,6 @@ class DepartureController {
     if (!finalDepartureIds[0]) {
       return next(ApiError.badRequest("Трасы не найдены"));
     }
-    console.log(1, finalDepartureIds[0].dataValues);
     const idsForDepartures = finalDepartureIds.map((el) => el.dataValues.departure_id);
     let whereForDeparture = {};
     whereForDeparture.id = {
