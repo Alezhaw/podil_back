@@ -1,5 +1,5 @@
-const { Trails, KzTrails, PlTrails } = require("../../models/trails/trailsModels");
-const { Sequelize } = require("sequelize");
+const { Trails, KzTrails, PlTrails, CitiesWithReg, KzCitiesWithReg, PlCitiesWithReg } = require("../../models/trails/trailsModels");
+const { Sequelize, Op } = require("sequelize");
 
 class TrailsService {
   models = {
@@ -7,6 +7,25 @@ class TrailsService {
     KZ: KzTrails,
     PL: PlTrails,
   };
+
+  cityModels = {
+    RU: CitiesWithReg,
+    KZ: KzCitiesWithReg,
+    PL: PlCitiesWithReg,
+  };
+
+  getIncludeBySearch(search, country) {
+    return search
+      ? [
+          {
+            model: this.cityModels[country],
+            where: {
+              city_name: { [Op.iLike]: `%${search}%` },
+            },
+          },
+        ]
+      : [];
+  }
 
   async create({ country, trail }) {
     return await this.models[country].create({ ...trail });
@@ -35,19 +54,29 @@ class TrailsService {
     });
   }
 
-  async GetDistinctFiltered(country, where, page, pageSize, sort) {
+  async GetDistinctFiltered(country, where, page, pageSize, search) {
+    const include = this.getIncludeBySearch(search, country);
+
     return await this.models[country].findAll({
+      include,
       where,
-      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("departure_id")), "departure_id"]],
+      //attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("departure_id")), "departure_id"]],
       offset: (page - 1) * pageSize,
       limit: pageSize,
     });
   }
 
-  async GetDistinctFilteredForCount(country, where, page, pageSize, sort) {
+  async getByWhereWithSearch(country, where, search) {
+    const include = this.getIncludeBySearch(search, country);
+    return await this.models[country].findAll({ include, where });
+  }
+
+  async GetDistinctFilteredForCount(country, where, search) {
+    const include = this.getIncludeBySearch(search, country);
     return await this.models[country].findAll({
+      include,
       where,
-      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("departure_id")), "departure_id"]],
+      //attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("departure_id")), "departure_id"]],
     });
   }
 

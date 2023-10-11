@@ -84,20 +84,20 @@ class DepartureController {
     }
     let citiesId = [];
     if (search) {
-      const whereForCity = {
-        city_name: { [Op.iLike]: `%${search}%` },
-      };
-      const cities = await CitiesWithRegService.getByWhere(country, whereForCity);
-      cities.map((city) => {
-        city = city.dataValues;
-        citiesId.push(city.id);
-      });
-      if (!citiesId[0]) {
-        return next(ApiError.badRequest("Город не найден"));
-      }
-      whereForTrails.city_id = {
-        [Op.or]: citiesId,
-      };
+      // const whereForCity = {
+      //   city_name: { [Op.iLike]: `%${search}%` },
+      // };
+      // const cities = await CitiesWithRegService.getByWhere(country, whereForCity);
+      // cities.map((city) => {
+      //   city = city.dataValues;
+      //   citiesId.push(city.id);
+      // });
+      // if (!citiesId[0]) {
+      //   return next(ApiError.badRequest("Город не найден"));
+      // }
+      // whereForTrails.city_id = {
+      //   [Op.or]: citiesId,
+      // };
     } else {
       whereForTrails.id = {
         [Op.or]: trails_id,
@@ -110,11 +110,8 @@ class DepartureController {
     }
     whereForTrails.relevance_status = true;
 
-    const finalDepartureIds = await TrailsService.GetDistinctFiltered(country, whereForTrails, page, pageSize, sort);
-    let finalDepartureIdsForCount = await TrailsService.GetDistinctFilteredForCount(country, whereForTrails);
-    if (!finalDepartureIds[0]) {
-      return next(ApiError.badRequest("Трасы не найдены"));
-    }
+    const finalDepartureIds = await TrailsService.GetDistinctFiltered(country, whereForTrails, page, pageSize, search);
+    let finalDepartureIdsForCount = await TrailsService.GetDistinctFilteredForCount(country, whereForTrails, search);
     const idsForDepartures = finalDepartureIds.map((el) => el.dataValues.departure_id);
     let whereForDeparture = {};
     if (!dateFilter[0] && !search) {
@@ -143,17 +140,18 @@ class DepartureController {
         [Op.or]: departureDates.map((item) => item.dataValues.trails_id).flat(),
       },
     };
-    if (citiesId[0]) {
-      whereForTrails.city_id = {
-        [Op.or]: citiesId,
-      };
-    }
+    // if (citiesId[0]) {
+    //   whereForTrails.city_id = {
+    //     [Op.or]: citiesId,
+    //   };
+    // }
     if (!!planningPersonIds[0]) {
       whereForTrails.planning_person_id = {
         [Op.or]: planningPersonIds,
       };
     }
-    const trails = await TrailsService.getByWhere(country, whereForTrails);
+
+    const trails = await TrailsService.getByWhereWithSearch(country, whereForTrails, search);
     if (!trails[0]) {
       return next(ApiError.badRequest("Трассы не найдены"));
     }
