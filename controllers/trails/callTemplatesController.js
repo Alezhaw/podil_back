@@ -57,10 +57,10 @@ class CallTemplatesController {
     if (!callTemplate || !country || !callTemplate.id || !callTemplate.name) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const checkCallTemplateName = await CallTemplateService.getByName(country, callTemplate.name);
-    if (checkCallTemplateName) {
-      return next(ApiError.badRequest("Шаблон вызова с таким именем уже существует"));
-    }
+    // const checkCallTemplateName = await CallTemplateService.getByName(country, callTemplate.name);
+    // if (checkCallTemplateName) {
+    //   return next(ApiError.badRequest("Шаблон вызова с таким именем уже существует"));
+    // }
     const checkCallTemplateId = await CallTemplateService.getById(country, callTemplate.id);
     if (!checkCallTemplateId) {
       return next(ApiError.badRequest("Шаблон вызова с таким id не существует"));
@@ -69,6 +69,10 @@ class CallTemplatesController {
       const updatedCallTemplate = await CallTemplateService.update(country, callTemplate);
       return res.json("success");
     } catch (e) {
+      if (e.name === "SequelizeUniqueConstraintError") {
+        return next(ApiError.badRequest("Шаблон вызова с таким именем уже существует"));
+      }
+      console.log(1, e.name);
       return next(ApiError.badRequest("Непредвиденная ошибка"));
     }
   }

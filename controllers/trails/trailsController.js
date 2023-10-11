@@ -65,7 +65,9 @@ class TrailsController {
       !trail.reservation_status_id ||
       !trail.project_sales_id ||
       !trail.project_concent_id ||
-      !trail.call_template_id
+      !trail.call_template_id ||
+      !trail.departure_id ||
+      !trail.departure_date_id
     ) {
       return next(ApiError.badRequest("Заполните все поля"));
     }
@@ -112,6 +114,10 @@ class TrailsController {
 
     try {
       const newTrail = await TrailsService.create({ country, trail });
+      let departureDate = await DepartureDateService.getById(country, trail.departure_date_id);
+      departureDate = departureDate.dataValues;
+      departureDate = { ...departureDate, trails_id: [...departureDate.trails_id, newTrail.dataValues.id] };
+      let updatedDepartureDate = await DepartureDateService.update({ country, departureDate });
       return res.json(newTrail);
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка", e));
@@ -136,7 +142,9 @@ class TrailsController {
       !trail.reservation_status_id ||
       !trail.project_sales_id ||
       !trail.project_concent_id ||
-      !trail.call_template_id
+      !trail.call_template_id ||
+      !trail.departure_id ||
+      !trail.departure_date_id
     ) {
       return next(ApiError.badRequest("Укажите все данные"));
     }

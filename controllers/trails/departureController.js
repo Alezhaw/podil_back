@@ -117,8 +117,7 @@ class DepartureController {
     if (!finalDepartureIds[0]) {
       return next(ApiError.badRequest("Трасы не найдены"));
     }
-
-    const idsForDepartures = finalDepartureIds.map((el) => el.departure_id);
+    const idsForDepartures = finalDepartureIds.map((el) => el.dataValues.departure_id);
     let whereForDeparture = {};
     whereForDeparture.id = {
       [Op.or]: idsForDepartures,
@@ -144,6 +143,11 @@ class DepartureController {
     if (citiesId[0]) {
       whereForTrails.city_id = {
         [Op.or]: citiesId,
+      };
+    }
+    if (!!planningPersonIds[0]) {
+      whereForTrails.planning_person_id = {
+        [Op.or]: planningPersonIds,
       };
     }
     const trails = await TrailsService.getByWhere(country, whereForTrails);
