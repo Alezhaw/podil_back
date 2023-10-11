@@ -35,10 +35,10 @@ class RegimentController {
 
   async create(req, res, next) {
     const { regiment, country } = req.body;
-    if (!regiment || !country) {
+    if (!regiment.name || !country) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const checkRegiment = await RegimentService.getByName(country, regiment);
+    const checkRegiment = await RegimentService.getByName(country, regiment.name);
     if (checkRegiment) {
       return next(ApiError.badRequest("Regiment с таким именем уже существует"));
     }

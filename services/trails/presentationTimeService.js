@@ -27,7 +27,12 @@ class PresentationTimeService {
 
   async getAll(country) {
     return await this.models[country].findAll({
+<<<<<<< Updated upstream
       order: [["id", "ASC"]],
+=======
+      where: { relevance_status: true },
+      order: [["presentation_hour", "ASC"]],
+>>>>>>> Stashed changes
     });
   }
 

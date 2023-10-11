@@ -69,6 +69,12 @@ class CallTemplatesController {
       const updatedCallTemplate = await CallTemplateService.update(country, callTemplate, id);
       return res.json("success");
     } catch (e) {
+<<<<<<< Updated upstream
+=======
+      if (e.name === "SequelizeUniqueConstraintError") {
+        return next(ApiError.badRequest("Шаблон вызова с таким именем уже существует"));
+      }
+>>>>>>> Stashed changes
       return next(ApiError.badRequest("Непредвиденная ошибка"));
     }
   }

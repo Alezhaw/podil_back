@@ -35,10 +35,10 @@ class RegionsController {
 
   async create(req, res, next) {
     const { region, country } = req.body;
-    if (!region || !country) {
+    if (!region.region || !country) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const checkRegion = await RegionService.getByName(country, region);
+    const checkRegion = await RegionService.getByName(country, region.region);
     if (checkRegion) {
       return next(ApiError.badRequest("Регион с таким именем уже существует"));
     }

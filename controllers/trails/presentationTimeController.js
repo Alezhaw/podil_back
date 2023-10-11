@@ -35,17 +35,22 @@ class PresentationTimeController {
 
   async create(req, res, next) {
     const { presentationTime, country } = req.body;
-    if (!presentationTime || !country) {
+    if (!presentationTime.presentation_hour || !country || !presentationTime.rental_hours) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const checkPresentationTime = await PresentationTimeService.getByName(country, presentationTime);
+    const checkPresentationTime = await PresentationTimeService.getByName(country, presentationTime.presentation_hour);
+
     if (checkPresentationTime) {
       return next(ApiError.badRequest("PresentationTime с таким именем уже существует"));
     }
+
     try {
       const newPresentationTime = await PresentationTimeService.create(country, presentationTime);
       return res.json(newPresentationTime);
     } catch (e) {
+      if (e.name === "SequelizeUniqueConstraintError") {
+        return next(ApiError.badRequest("Шаблон вызова с таким именем уже существует"));
+      }
       return next(ApiError.badRequest("Непредвиденная ошибка"));
     }
   }

@@ -35,10 +35,10 @@ class ProjectConcentController {
 
   async create(req, res, next) {
     const { projectConcent, country } = req.body;
-    if (!projectConcent || !country) {
+    if (!projectConcent.name || !country) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const checkProjectConcent = await ProjectConcentService.getByName(country, projectConcent);
+    const checkProjectConcent = await ProjectConcentService.getByName(country, projectConcent.name);
     if (checkProjectConcent) {
       return next(ApiError.badRequest("ProjectConcent с таким именем уже существует"));
     }

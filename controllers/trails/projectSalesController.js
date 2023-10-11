@@ -35,15 +35,16 @@ class ProjectSalesController {
 
   async create(req, res, next) {
     const { projectSales, country } = req.body;
-    if (!projectSales || !country) {
+    if (!projectSales.name || !country) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const checkProjectSales = await ProjectSalesService.getByName(country, projectSales);
+    const checkProjectSales = await ProjectSalesService.getByName(country, projectSales.name);
     if (checkProjectSales) {
       return next(ApiError.badRequest("ProjectSales с таким именем уже существует"));
     }
     try {
       const newProjectSales = await ProjectSalesService.create(country, projectSales);
+
       return res.json(newProjectSales);
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));
