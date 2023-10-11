@@ -36,10 +36,10 @@ class ContactStatusController {
 
   async create(req, res, next) {
     const { contactStatus, country } = req.body;
-    if (!contactStatus || !country) {
+    if (!contactStatus.name || !country) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const checkContactStatus = await ContactStatusService.getByName(country, contactStatus);
+    const checkContactStatus = await ContactStatusService.getByName(country, contactStatus.name);
     if (checkContactStatus) {
       return next(ApiError.badRequest("ContactStatus с таким именем уже существует"));
     }
@@ -93,19 +93,19 @@ class ContactStatusController {
     }
   }
 
-  async remove(req, res) {
-    const { id, country, relevance_status } = req.body;
-    if (!country || !id) {
+  async remove(req, res, next) {
+    const { contactStatus, country } = req.body;
+    if (!country || !contactStatus.id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const item = await ContactStatusService.getById(country, id);
+    const item = await ContactStatusService.getById(country, contactStatus.id);
 
     if (!item) {
       return next(ApiError.badRequest("Элемент не найден"));
     }
 
     try {
-      const updatedCallTemplate = await ContactStatusService.remove(country, !!relevance_status, id);
+      const updatedContactStatus = await ContactStatusService.remove(country, !!contactStatus.relevance_status, contactStatus.id);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));

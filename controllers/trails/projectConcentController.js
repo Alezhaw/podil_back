@@ -52,22 +52,22 @@ class ProjectConcentController {
   }
 
   async update(req, res, next) {
-    const { projectConcent, country, id } = req.body;
+    const { projectConcent, country } = req.body;
 
-    if (!projectConcent || !country || !id) {
+    if (!projectConcent || !country || !projectConcent.id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
 
-    const checkProjectConcentName = await ProjectConcentService.getByName(country, projectConcent);
+    const checkProjectConcentName = await ProjectConcentService.getByName(country, projectConcent.name);
     if (checkProjectConcentName) {
       return next(ApiError.badRequest("ProjectConcent с таким именем уже существует"));
     }
-    const checkProjectConcentId = await ProjectConcentService.getById(country, id);
+    const checkProjectConcentId = await ProjectConcentService.getById(country, projectConcent.id);
     if (!checkProjectConcentId) {
       return next(ApiError.badRequest("ProjectConcent с таким id не существует"));
     }
     try {
-      const updatedProjectConcent = await ProjectConcentService.update(country, projectConcent, id);
+      const updatedProjectConcent = await ProjectConcentService.update(country, projectConcent);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));
@@ -93,19 +93,19 @@ class ProjectConcentController {
     }
   }
 
-  async remove(req, res) {
-    const { id, country, relevance_status } = req.body;
-    if (!country || !id) {
+  async remove(req, res, next) {
+    const { projectConcent, country } = req.body;
+    if (!country || !projectConcent.id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const item = await ProjectConcentService.getById(country, id);
+    const item = await ProjectConcentService.getById(country, projectConcent.id);
 
     if (!item) {
       return next(ApiError.badRequest("Элемент не найден"));
     }
 
     try {
-      const updatedCallTemplate = await ProjectConcentService.remove(country, !!relevance_status, id);
+      const updatedProjectConcent = await ProjectConcentService.remove(country, !!projectConcent.relevance_status, projectConcent.id);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));

@@ -8,11 +8,11 @@ class RegimentService {
   };
 
   async create(country, regiment) {
-    return await this.models[country].create({ regiment });
+    return await this.models[country].create({ ...regiment });
   }
 
   async update(country, regiment, id) {
-    return await this.models[country].update({ regiment }, { where: { id } });
+    return await this.models[country].update({ ...regiment }, { where: { id: regiment.id } });
   }
 
   async delete(country, id) {
@@ -40,8 +40,8 @@ class RegimentService {
     return await this.models[country].findOne({ where: { id } });
   }
 
-  async getByName(country, regiment) {
-    return await this.models[country].findOne({ where: { regiment } });
+  async getByName(country, name) {
+    return await this.models[country].findOne({ where: { name } });
   }
 
   async getByIds(country, where) {

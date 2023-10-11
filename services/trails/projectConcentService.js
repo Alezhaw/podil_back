@@ -8,11 +8,11 @@ class ProjectConcentService {
   };
 
   async create(country, projectConcent) {
-    return await this.models[country].create({ projectConcent });
+    return await this.models[country].create({ ...projectConcent });
   }
 
-  async update(country, projectConcent, id) {
-    return await this.models[country].update({ projectConcent }, { where: { id } });
+  async update(country, projectConcent) {
+    return await this.models[country].update({ ...projectConcent }, { where: { id: projectConcent.id } });
   }
 
   async delete(country, id) {
@@ -40,8 +40,8 @@ class ProjectConcentService {
     return await this.models[country].findOne({ where: { id } });
   }
 
-  async getByName(country, projectConcent) {
-    return await this.models[country].findOne({ where: { projectConcent } });
+  async getByName(country, name) {
+    return await this.models[country].findOne({ where: { name } });
   }
 
   async getByIds(country, where) {

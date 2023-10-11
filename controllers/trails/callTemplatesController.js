@@ -36,10 +36,10 @@ class CallTemplatesController {
 
   async create(req, res, next) {
     const { callTemplate, country } = req.body;
-    if (!callTemplate || !country) {
+    if (!callTemplate.name || !country) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const checkCallTemplate = await CallTemplateService.getByName(country, callTemplate);
+    const checkCallTemplate = await CallTemplateService.getByName(country, callTemplate.name);
     if (checkCallTemplate) {
       return next(ApiError.badRequest("Шаблон вызова с таким именем уже существует"));
     }
@@ -92,19 +92,19 @@ class CallTemplatesController {
     }
   }
 
-  async remove(req, res) {
-    const { id, country, relevance_status } = req.body;
-    if (!country || !id) {
+  async remove(req, res, next) {
+    const { callTemplate, country } = req.body;
+    if (!country || !callTemplate.id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const item = await CallTemplateService.getById(country, id);
+    const item = await CallTemplateService.getById(country, callTemplate.id);
 
     if (!item) {
       return next(ApiError.badRequest("Элемент не найден"));
     }
 
     try {
-      const updatedCallTemplate = await CallTemplateService.remove(country, !!relevance_status, id);
+      const updatedCallTemplate = await CallTemplateService.remove(country, !!callTemplate.relevance_status, callTemplate.id);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));

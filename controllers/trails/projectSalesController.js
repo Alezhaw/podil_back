@@ -52,22 +52,22 @@ class ProjectSalesController {
   }
 
   async update(req, res, next) {
-    const { projectSales, country, id } = req.body;
+    const { projectSales, country } = req.body;
 
-    if (!projectSales || !country || !id) {
+    if (!projectSales || !country || !projectSales.id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
 
-    const checkProjectSalesName = await ProjectSalesService.getByName(country, projectSales);
+    const checkProjectSalesName = await ProjectSalesService.getByName(country, projectSales.name);
     if (checkProjectSalesName) {
       return next(ApiError.badRequest("ProjectSales с таким именем уже существует"));
     }
-    const checkProjectSalesId = await ProjectSalesService.getById(country, id);
+    const checkProjectSalesId = await ProjectSalesService.getById(country, projectSales.id);
     if (!checkProjectSalesId) {
       return next(ApiError.badRequest("ProjectSales с таким id не существует"));
     }
     try {
-      const updatedProjectSales = await ProjectSalesService.update(country, projectSales, id);
+      const updatedProjectSales = await ProjectSalesService.update(country, projectSales);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));
@@ -93,19 +93,19 @@ class ProjectSalesController {
     }
   }
 
-  async remove(req, res) {
-    const { id, country, relevance_status } = req.body;
-    if (!country || !id) {
+  async remove(req, res, next) {
+    const { projectSales, country } = req.body;
+    if (!country || !projectSales.id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const item = await ProjectSalesService.getById(country, id);
+    const item = await ProjectSalesService.getById(country, projectSales.id);
 
     if (!item) {
       return next(ApiError.badRequest("Элемент не найден"));
     }
 
     try {
-      const updatedCallTemplate = await ProjectSalesService.remove(country, !!relevance_status, id);
+      const updatedSalesService = await ProjectSalesService.remove(country, !!projectSales.relevance_status, projectSales.id);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));

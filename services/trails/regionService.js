@@ -8,11 +8,11 @@ class RegionService {
   };
 
   async create(country, region) {
-    return await this.models[country].create({ region });
+    return await this.models[country].create({ ...region });
   }
 
-  async update(country, region, id) {
-    return await this.models[country].update({ region }, { where: { id } });
+  async update(country, region) {
+    return await this.models[country].update({ ...region }, { where: { id: region.id } });
   }
 
   async delete(country, id) {

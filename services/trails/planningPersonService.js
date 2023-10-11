@@ -7,12 +7,12 @@ class PlanningPersonService {
     PL: PlPlanningPerson,
   };
 
-  async create(country, planningPerson) {
-    return await this.models[country].create({ ...planningPerson });
+  async create(country, planningPeople) {
+    return await this.models[country].create({ ...planningPeople });
   }
 
-  async update(country, planningPerson) {
-    return await this.models[country].update({ ...planningPerson }, { where: { id: planningPerson.id } });
+  async update(country, planningPeople) {
+    return await this.models[country].update({ ...planningPeople }, { where: { id: planningPeople.id } });
   }
 
   async delete(country, id) {

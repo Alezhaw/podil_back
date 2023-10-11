@@ -21,7 +21,7 @@ class PresentationTimeService {
     });
   }
 
-  async remove(country, relevance_status) {
+  async remove(country, relevance_status, id) {
     return await this.models[country].update({ relevance_status }, { where: { id } });
   }
 
@@ -40,8 +40,8 @@ class PresentationTimeService {
     return await this.models[country].findOne({ where: { id } });
   }
 
-  async getByName(country, presentationTime) {
-    return await this.models[country].findOne({ where: { presentationTime } });
+  async getByName(country, presentation_hour) {
+    return await this.models[country].findOne({ where: { presentation_hour } });
   }
 
   async getByIds(country, where) {
