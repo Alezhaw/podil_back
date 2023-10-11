@@ -126,8 +126,10 @@ const PlCitiesWithReg = sequelize.define("plcities_with_region", {
   relevance_status: { type: DataTypes.BOOLEAN },
 });
 
-Trails.hasOne(CitiesWithReg);
-CitiesWithReg.belongsTo(Trails);
+CitiesWithReg.hasOne(Trails, {
+  foreignKey: "city_id",
+});
+Trails.belongsTo(CitiesWithReg);
 
 KzTrails.hasOne(KzCitiesWithReg);
 KzCitiesWithReg.belongsTo(KzTrails);
