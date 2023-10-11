@@ -8,7 +8,7 @@ class DepartureDateService {
   };
 
   async create({ country, departureDate }) {
-    return await this.models[country].create({ ...departureDate });
+    return await this.models[country].create({ ...departureDate, relevance_status: true });
   }
 
   async update({ country, departureDate }) {

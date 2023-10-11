@@ -108,24 +108,27 @@ class DepartureController {
         [Op.or]: trails_id,
       };
     }
-    if (!dateFilter[0] && !search) {
-    }
     whereForTrails.relevance_status = true;
 
     const finalDepartureIds = await TrailsService.GetDistinctFiltered(country, whereForTrails, page, pageSize, sort);
-    const finalDepartureIdsForCount = await TrailsService.GetDistinctFilteredForCount(country, whereForTrails);
+    let finalDepartureIdsForCount = await TrailsService.GetDistinctFilteredForCount(country, whereForTrails);
     if (!finalDepartureIds[0]) {
       return next(ApiError.badRequest("Трасы не найдены"));
     }
     const idsForDepartures = finalDepartureIds.map((el) => el.dataValues.departure_id);
     let whereForDeparture = {};
-    whereForDeparture.id = {
-      [Op.or]: idsForDepartures,
-    };
-    departures = await DepartureService.getByWhereWithSort(country, whereForDeparture, sort);
-    if (!departures[0] || !finalDepartureIdsForCount) {
-      return next(ApiError.badRequest("Выезды не найдены"));
+    if (!dateFilter[0] && !search) {
+      finalDepartureIdsForCount = await DepartureService.getByWhereWithSort(country, {}, sort);
+    } else {
+      whereForDeparture.id = {
+        [Op.or]: idsForDepartures,
+      };
+      departures = await DepartureService.getByWhereWithSort(country, whereForDeparture, sort);
+      if (!departures[0] || !finalDepartureIdsForCount) {
+        return next(ApiError.badRequest("Выезды не найдены"));
+      }
     }
+
     const count = Math.ceil(finalDepartureIdsForCount?.length / pageSize);
     whereForDate.departure_id = {
       [Op.or]: departures.map((item) => item.dataValues.id),
@@ -166,6 +169,17 @@ class DepartureController {
     }
     try {
       const newDeparture = await DepartureService.create({ country, departure });
+      if (newDeparture) {
+        const departureForDates = newDeparture.dataValues;
+        let departureDates = departureForDates.dates.map((item) => ({ data: item, trails_id: [], departure_id: departureForDates.id }));
+        try {
+          console.log(1, departureDates);
+          Promise.all(departureDates.map(async (departureDate) => DepartureDateService.create({ country, departureDate })));
+          console.log(2, departureDates);
+        } catch (e) {
+          return next(ApiError.badRequest("Ошибка создания дат"));
+        }
+      }
       return res.json(newDeparture);
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));

@@ -9,7 +9,7 @@ class DepartureService {
   };
 
   async create({ country, departure }) {
-    return await this.models[country].create({ ...departure });
+    return await this.models[country].create({ ...departure, relevance_status: true });
   }
 
   async update({ country, departure }) {
