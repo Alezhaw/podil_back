@@ -434,7 +434,7 @@ class CityService {
     return await this.models[country].findAll({
       where,
       distinct: true,
-      col: id_for_base,
+      col: "id_for_base",
     });
   }
 

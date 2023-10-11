@@ -77,7 +77,7 @@ class TrailsService {
       include,
       where,
       distinct: true,
-      col: departure_id,
+      col: "departure_id",
     });
   }
 
