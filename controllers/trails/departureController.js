@@ -38,6 +38,30 @@ class DepartureController {
     return res.json({ departures });
   }
 
+  async getForEditing(req, res, next) {
+    const { country, sort, pageSize, page } = req.body;
+    if (!country) {
+      return next(ApiError.badRequest("Укажите country"));
+    }
+    if (!pageSize || !page) {
+      return next(ApiError.badRequest("Укажите page и pageSize"));
+    }
+
+    let departures = await DepartureService.GetFiltered(country, {}, page, pageSize, sort);
+    let departuresForCount = await DepartureService.GetForCount(country);
+    let idsForDates = departures?.map((item) => item.dataValues.id);
+    let whereForDate = {
+      departure_id: {
+        [Op.or]: idsForDates,
+      },
+    };
+    let departureDates = await DepartureDateService.getByWhere(country, whereForDate);
+
+    const count = Math.ceil(departuresForCount / pageSize);
+
+    return res.json({ departure: departures, departureDate: departureDates, count });
+  }
+
   async getFiltered(req, res, next) {
     const { country, dateFrom, dateTo, search, planningPersonIds, sort, pageSize, page } = req.body;
     if (!country) {
@@ -82,7 +106,7 @@ class DepartureController {
         [Op.or]: planningPersonIds,
       };
     }
-    let citiesId = [];
+    // let citiesId = [];
     if (search) {
       // const whereForCity = {
       //   city_name: { [Op.iLike]: `%${search}%` },
@@ -116,6 +140,7 @@ class DepartureController {
     let whereForDeparture = {};
     if (!dateFilter[0] && !search) {
       finalDepartureIdsForCount = await DepartureService.getByWhereWithSort(country, {}, sort);
+      finalDepartureIdsForCount = finalDepartureIdsForCount?.length;
     } else {
       whereForDeparture.id = {
         [Op.or]: idsForDepartures,
@@ -126,7 +151,7 @@ class DepartureController {
       }
     }
 
-    const count = Math.ceil(finalDepartureIdsForCount?.length / pageSize);
+    const count = Math.ceil(finalDepartureIdsForCount / pageSize);
     whereForDate.departure_id = {
       [Op.or]: departures.map((item) => item.dataValues.id),
     };

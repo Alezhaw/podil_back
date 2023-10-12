@@ -5,6 +5,7 @@ const departureController = require("../../controllers/trails/departureControlle
 
 router.post("/getAll", auth, departureController.getAll);
 router.post("/getByIds", auth, departureController.getByIds);
+router.post("/getForEditing", auth, departureController.getForEditing);
 router.post("/search", departureController.getFiltered);
 router.post("/create", auth, departureController.create);
 router.post("/update", auth, departureController.update);

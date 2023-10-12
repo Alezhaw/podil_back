@@ -29,6 +29,10 @@ class DepartureService {
     });
   }
 
+  async GetForCount(country) {
+    return await this.models[country].count({});
+  }
+
   async getAll(country) {
     return await this.models[country].findAll({
       where: { relevance_status: true },
