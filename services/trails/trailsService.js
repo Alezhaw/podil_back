@@ -20,7 +20,8 @@ class TrailsService {
           {
             model: this.cityModels[country],
             where: {
-              city_name: { [Op.iLike]: `%${search}%` },
+              [Op.or]: { city_name: { [Op.iLike]: `%${search}%` }, additional_city_name: { [Op.iLike]: `%${search}%` } },
+              //city_name: { [Op.iLike]: `%${search}%` },
             },
           },
         ]
@@ -45,6 +46,14 @@ class TrailsService {
     return await this.models[country].update({ relevance_status }, { where: { id } });
   }
 
+  async removeByDepartureId(country, relevance_status, departure_id) {
+    return await this.models[country].update({ relevance_status }, { where: { departure_id } });
+  }
+
+  async removeByDepartureDateId(country, relevance_status, departure_date_id) {
+    return await this.models[country].update({ relevance_status }, { where: { departure_date_id } });
+  }
+
   async GetFiltered(country, where, page, pageSize, sort) {
     return await this.models[country].findAll({
       where,
@@ -60,7 +69,9 @@ class TrailsService {
     return await this.models[country].findAll({
       include,
       where,
-      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("departure_id")), "departure_id"]],
+      //attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("departure_id")), "departure_id"]],
+      distinct: true,
+      col: "departure_id",
       offset: (page - 1) * pageSize,
       limit: pageSize,
     });

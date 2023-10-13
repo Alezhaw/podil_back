@@ -129,17 +129,23 @@ const PlCitiesWithReg = sequelize.define("plcities_with_region", {
 CitiesWithReg.hasOne(Trails, {
   foreignKey: "city_id",
 });
-Trails.belongsTo(CitiesWithReg);
+Trails.belongsTo(CitiesWithReg, {
+  foreignKey: "city_id",
+});
 
 KzCitiesWithReg.hasOne(KzTrails, {
   foreignKey: "city_id",
 });
-KzTrails.belongsTo(KzCitiesWithReg);
+KzTrails.belongsTo(KzCitiesWithReg, {
+  foreignKey: "city_id",
+});
 
 PlCitiesWithReg.hasOne(PlTrails, {
   foreignKey: "city_id",
 });
-PlTrails.belongsTo(PlCitiesWithReg);
+PlTrails.belongsTo(PlCitiesWithReg, {
+  foreignKey: "city_id",
+});
 
 module.exports = {
   Trails,

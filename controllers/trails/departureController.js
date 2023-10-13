@@ -1,10 +1,8 @@
 const ApiError = require("../../error/ApiError");
 const DepartureService = require("../../services/trails/departureService");
 const DepartureDateService = require("../../services/trails/departureDateService");
-const CitiesWithRegService = require("../../services/trails/citiesWithRegionsService");
 const TrailsService = require("../../services/trails/trailsService");
 const { Op } = require("sequelize");
-const sequelize = require("../../db");
 
 class DepartureController {
   async getAll(req, res, next) {
@@ -47,13 +45,14 @@ class DepartureController {
       return next(ApiError.badRequest("Укажите page и pageSize"));
     }
 
-    let departures = await DepartureService.GetFiltered(country, {}, page, pageSize, sort);
+    let departures = await DepartureService.GetFiltered(country, { relevance_status: true }, page, pageSize, sort);
     let departuresForCount = await DepartureService.GetForCount(country);
     let idsForDates = departures?.map((item) => item.dataValues.id);
     let whereForDate = {
       departure_id: {
         [Op.or]: idsForDates,
       },
+      relevance_status: true,
     };
     let departureDates = await DepartureDateService.getByWhere(country, whereForDate);
 
@@ -71,14 +70,16 @@ class DepartureController {
       return next(ApiError.badRequest("Укажите page и pageSize"));
     }
 
-    let departures = await DepartureService.GetFiltered(country, {}, page, pageSize, sort);
+    let departures = await DepartureService.GetFiltered(country, { relevance_status: true }, page, pageSize, sort);
 
     if (!departures) {
       return next(ApiError.internal("Выезды не найдены"));
     }
     let idsForDates = (departures || [])?.map((item) => item.dataValues.id);
 
-    let whereForDate = {};
+    let whereForDate = {
+      relevance_status: true,
+    };
 
     let dateFilter = [];
     if (dateTo) {
@@ -137,9 +138,9 @@ class DepartureController {
     const finalDepartureIds = await TrailsService.GetDistinctFiltered(country, whereForTrails, page, pageSize, search);
     let finalDepartureIdsForCount = await TrailsService.GetDistinctFilteredForCount(country, whereForTrails, search);
     const idsForDepartures = finalDepartureIds.map((el) => el.dataValues.departure_id);
-    let whereForDeparture = {};
+    let whereForDeparture = { relevance_status: true };
     if (!dateFilter[0] && !search) {
-      finalDepartureIdsForCount = await DepartureService.getByWhereWithSort(country, {}, sort);
+      finalDepartureIdsForCount = await DepartureService.getByWhereWithSort(country, { relevance_status: true }, sort);
       finalDepartureIdsForCount = finalDepartureIdsForCount?.length;
     } else {
       whereForDeparture.id = {
@@ -194,11 +195,9 @@ class DepartureController {
       const newDeparture = await DepartureService.create({ country, departure });
       if (newDeparture) {
         const departureForDates = newDeparture.dataValues;
-        let departureDates = departureForDates.dates.map((item) => ({ data: item, trails_id: [], departure_id: departureForDates.id }));
+        let departureDates = departureForDates.dates.map((item) => ({ data: item, trails_id: [], departure_id: departureForDates.id, relevance_status: true }));
         try {
-          console.log(1, departureDates);
           Promise.all(departureDates.map(async (departureDate) => DepartureDateService.create({ country, departureDate })));
-          console.log(2, departureDates);
         } catch (e) {
           return next(ApiError.badRequest("Ошибка создания дат"));
         }
@@ -220,6 +219,40 @@ class DepartureController {
       return next(ApiError.badRequest("Выезда с таким id не существует"));
     }
     try {
+      const whereForDate = {
+        departure_id: checkDeparture.dataValues.id,
+        relevance_status: true,
+      };
+      let departureDates = await DepartureDateService.getByWhere(country, whereForDate);
+      const dates = departure.dates;
+      departureDates = departureDates.map((el) => el.dataValues);
+      const departureDatesForCheck = departureDates.map((el) => el.data);
+      const deleteDates = departureDates.filter((el) => !dates.includes(el.data));
+      const createDates = dates.filter((el) => !departureDatesForCheck.includes(el));
+      try {
+        Promise.all(
+          deleteDates.map(async (item) => {
+            const updatedDepartures = await DepartureDateService.remove(country, false, item.id);
+            const updatedTrails = await TrailsService.removeByDepartureDateId(country, false, item.id);
+          })
+        );
+      } catch (e) {
+        return next(ApiError.badRequest("Ошибка удаления даты"));
+      }
+      try {
+        Promise.all(
+          createDates.map(async (item) => {
+            const departure_id = departure.id;
+            const checkDepartureDate = await DepartureDateService.getByDateAndDepartureId(country, item, departure_id);
+            if (checkDepartureDate) {
+              return next(ApiError.badRequest("Такая дата выезда уже существует"));
+            }
+            const newDepartureDate = await DepartureDateService.create({ country, departureDate: { departure_id, data: item, trails_id: [], relevance_status: true } });
+          })
+        );
+      } catch (e) {
+        return next(ApiError.badRequest("Ошибка создания даты"));
+      }
       const updatedDepartures = await DepartureService.update({ country, departure });
       return res.json("success");
     } catch (e) {
@@ -240,6 +273,8 @@ class DepartureController {
 
     try {
       const updatedDepartures = await DepartureService.remove(country, !!relevance_status, id);
+      const updatedDepartureDates = await DepartureDateService.removeByDepartureId(country, !!relevance_status, id);
+      const updatedTrails = await TrailsService.removeByDepartureId(country, !!relevance_status, id);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));

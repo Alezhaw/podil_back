@@ -30,7 +30,7 @@ class DepartureService {
   }
 
   async GetForCount(country) {
-    return await this.models[country].count({});
+    return await this.models[country].count({ where: { relevance_status: true } });
   }
 
   async getAll(country) {

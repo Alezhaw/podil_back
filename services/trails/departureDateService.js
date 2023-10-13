@@ -19,6 +19,10 @@ class DepartureDateService {
     return await this.models[country].update({ relevance_status }, { where: { id } });
   }
 
+  async removeByDepartureId(country, relevance_status, departure_id) {
+    return await this.models[country].update({ relevance_status }, { where: { departure_id } });
+  }
+
   async GetFiltered(country, where, page, pageSize, sort) {
     return await this.models[country].findAll({
       where,
@@ -44,7 +48,7 @@ class DepartureDateService {
   }
 
   async getByDateAndDepartureId(country, data, departure_id) {
-    return await this.models[country].findOne({ where: { data, departure_id } });
+    return await this.models[country].findOne({ where: { data, departure_id, relevance_status: true } });
   }
 }
 
