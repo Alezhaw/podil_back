@@ -72,9 +72,6 @@ class DepartureController {
 
     let departures = await DepartureService.GetFiltered(country, { relevance_status: true }, page, pageSize, sort);
 
-    if (!departures) {
-      return next(ApiError.internal("Выезды не найдены"));
-    }
     let idsForDates = (departures || [])?.map((item) => item.dataValues.id);
 
     let whereForDate = {
@@ -178,9 +175,6 @@ class DepartureController {
     }
 
     const trails = await TrailsService.getByWhereWithSearch(country, whereForTrails, search);
-    if (!trails[0]) {
-      return next(ApiError.badRequest("Трассы не найдены"));
-    }
     // distinct используется если есть только search, получаем departure dates с фильтром по датам, потом грузим все трассы по ид departure dates которые соответствуют cityId если есть search, без лимита
 
     return res.json({ trails, departure: departures, departureDate: departureDates, count });
