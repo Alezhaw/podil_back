@@ -7,7 +7,7 @@ const User = sequelize.define("user", {
   password: { type: DataTypes.STRING },
   role: { type: DataTypes.STRING, defaultValue: "USER" },
   nickname: { type: DataTypes.STRING, unique: true },
-  relevance_status: { type: DataTypes.BOOLEAN },
+  relevance_status: { type: DataTypes.BOOLEAN, defaultValue: true },
 });
 
 module.exports = {

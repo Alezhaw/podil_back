@@ -393,29 +393,52 @@ class UserController {
     return res.json({ ...userReceiver.dataValues, score: userReceiver.score + deal.sum });
   }
 
-  async deleteUsers(req, res, next) {
-    const { id, creatorEmail, creatorPassword } = req.body;
-    if (!id || !creatorEmail || !creatorPassword) {
-      return next(ApiError.badRequest("Введите все данные"));
-    }
+  // async deleteUsers(req, res, next) {
+  //   const { id, creatorEmail, creatorPassword } = req.body;
+  //   if (!id || !creatorEmail || !creatorPassword) {
+  //     return next(ApiError.badRequest("Введите все данные"));
+  //   }
+  //   const user = await User.findOne({ where: { id } });
+  //   if (!user) {
+  //     return next(ApiError.internal("Пользователь не найден"));
+  //   }
+  //   const creator = await User.findOne({ where: { email: creatorEmail } });
+  //   if (!creator) {
+  //     return next(ApiError.internal("Админ не найден"));
+  //   }
+  //   let comparePassword = bcrypt.compareSync(creatorPassword, creator.password);
+  //   if (!comparePassword) {
+  //     return next(ApiError.internal("Указан неверный пароль"));
+  //   }
+  //   if (creator.role !== "ADMIN") {
+  //     return next(ApiError.badRequest("Нет доступа"));
+  //   }
+  //   await User.destroy({
+  //     where: { id },
+  //   });
+  //   return res.json({ ...user.dataValues });
+  // }
+
+  async removeUsers(req, res, next) {
+    const { id } = req.body;
     const user = await User.findOne({ where: { id } });
     if (!user) {
       return next(ApiError.internal("Пользователь не найден"));
     }
-    const creator = await User.findOne({ where: { email: creatorEmail } });
+    const creator = await User.findOne({ where: { id } });
     if (!creator) {
       return next(ApiError.internal("Админ не найден"));
     }
-    let comparePassword = bcrypt.compareSync(creatorPassword, creator.password);
-    if (!comparePassword) {
-      return next(ApiError.internal("Указан неверный пароль"));
-    }
+
     if (creator.role !== "ADMIN") {
       return next(ApiError.badRequest("Нет доступа"));
     }
-    await User.destroy({
-      where: { id },
-    });
+    await User.update(
+      { relevance_status: false },
+      {
+        where: { id },
+      }
+    );
     return res.json({ ...user.dataValues });
   }
 
