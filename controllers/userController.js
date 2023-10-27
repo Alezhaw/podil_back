@@ -5,8 +5,8 @@ const { User, Deal, UserTransfer, UserTransferToUser } = require("../models/user
 const { Departure, PlDeparture, KzDeparture } = require("../models/trails/departureModels");
 const { DepartureDate, PlDepartureDate, KzDepartureDate } = require("../models/trails/departureDateModels");
 
-const generateJwt = (id, email, role, nickname, score, password, systemMessage, checkRu, minimumTransferAmount, sumTransferAmoumt, completed) => {
-  return jwt.sign({ id, email, role, nickname, score, password, systemMessage, checkRu, minimumTransferAmount, sumTransferAmoumt, completed }, process.env.SECRET_KEY, { expiresIn: "24h" });
+const generateJwt = (id, email, role, nickname, password, relevance_status) => {
+  return jwt.sign({ id, email, role, nickname, password, relevance_status }, process.env.SECRET_KEY, { expiresIn: "24h" });
 };
 
 class UserController {
@@ -26,7 +26,7 @@ class UserController {
     const hashPassword = await bcrypt.hash(password, 5);
     const user = await User.create({ email, role: "USER", password: hashPassword, nickname, checkRu });
     const systemMessage = "false";
-    const token = generateJwt(user.id, user.email, user.role, user.nickname, user.score, password, systemMessage, user.checkRu, user.minimumTransferAmount, user.sumTransferAmoumt, user.completed);
+    const token = generateJwt(user.id, user.email, user.role, user.nickname, password, user.relevance_status);
     return res.json({ token });
   }
 
@@ -40,46 +40,27 @@ class UserController {
     if (!comparePassword) {
       return next(ApiError.internal("Указан неверный пароль"));
     }
-    const token = generateJwt(
-      user.id,
-      user.email,
-      user.role,
-      user.nickname,
-      user.score,
-      password,
-      user.systemMessage,
-      user.checkRu,
-      user.minimumTransferAmount,
-      user.sumTransferAmoumt,
-      user.completed
-    );
+    const token = generateJwt(user.id, user.email, user.role, user.nickname, password, user.relevance_status);
     return res.json({ token });
   }
 
   async check(req, res, next) {
     const { email, password } = req.user;
+    console.log(1);
     const user = (await User.findOne({ where: { email } })) ?? (await User.findOne({ where: { nickname: email } }));
+    console.log(2);
     if (!user) {
       return next(ApiError.internal("Пользователь не найден"));
     }
+    console.log(3, password, user.password);
     let comparePassword = bcrypt.compareSync(password, user.password);
+    console.log(4);
     if (!comparePassword) {
       return next(ApiError.internal("Указан неверный пароль"));
     }
-
-    const token = generateJwt(
-      user.id,
-      user.email,
-      user.role,
-      user.nickname,
-      user.score,
-      password,
-      user.systemMessage,
-      user.checkRu,
-      user.minimumTransferAmount,
-      user.sumTransferAmoumt,
-      user.completed
-    );
+    console.log(5);
+    const token = generateJwt(user.id, user.email, user.role, user.nickname, password, user.relevance_status);
+    console.log(6);
     return res.json({ token });
   }
 
@@ -425,14 +406,14 @@ class UserController {
     if (!user) {
       return next(ApiError.internal("Пользователь не найден"));
     }
-    const creator = await User.findOne({ where: { id } });
-    if (!creator) {
-      return next(ApiError.internal("Админ не найден"));
-    }
+    // const creator = await User.findOne({ where: { id } });
+    // if (!creator) {
+    //   return next(ApiError.internal("Админ не найден"));
+    // }
 
-    if (creator.role !== "ADMIN") {
-      return next(ApiError.badRequest("Нет доступа"));
-    }
+    // if (creator.role !== "ADMIN") {
+    //   return next(ApiError.badRequest("Нет доступа"));
+    // }
     await User.update(
       { relevance_status: false },
       {
