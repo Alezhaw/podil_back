@@ -50,7 +50,7 @@ class CitiesWithRegController {
       where.city_name = city_name;
     }
 
-    const allCitiesWithRegions = await CitiesWithRegService.getByWhere(country, where);
+    const allCitiesWithRegions = await CitiesWithRegService.getByWhereForRegion(country, where);
 
     if (!allCitiesWithRegions[0]) {
       return next(ApiError.internal("Города не найдены"));
