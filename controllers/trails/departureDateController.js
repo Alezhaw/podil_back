@@ -1,5 +1,6 @@
 const ApiError = require("../../error/ApiError");
 const DepartureDateService = require("../../services/trails/departureDateService");
+const trailsService = require("../../services/trails/trailsService");
 const { Op } = require("sequelize");
 
 class DepartureDateController {
@@ -61,7 +62,7 @@ class DepartureDateController {
     if (!departureDate || !country || !departureDate.departure_id || !departureDate.data) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const checkDepartureDate = await DepartureDateService.getByIdAndDepartureId(country, departureDate.data, departureDate.departure_id);
+    const checkDepartureDate = await DepartureDateService.getByDateAndDepartureId(country, departureDate.data, departureDate.departure_id);
     if (checkDepartureDate) {
       return next(ApiError.badRequest("Такая дата выезда уже существует"));
     }
@@ -104,6 +105,7 @@ class DepartureDateController {
 
     try {
       const updatedDepartures = await DepartureDateService.remove(country, !!relevance_status, id);
+      const updatedTrails = await trailsService.removeByDepartureDateId(country, !!relevance_status, id);
       return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));

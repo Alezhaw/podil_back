@@ -8,7 +8,7 @@ class DepartureDateService {
   };
 
   async create({ country, departureDate }) {
-    return await this.models[country].create({ ...departureDate });
+    return await this.models[country].create({ ...departureDate, relevance_status: true });
   }
 
   async update({ country, departureDate }) {
@@ -17,6 +17,10 @@ class DepartureDateService {
 
   async remove(country, relevance_status, id) {
     return await this.models[country].update({ relevance_status }, { where: { id } });
+  }
+
+  async removeByDepartureId(country, relevance_status, departure_id) {
+    return await this.models[country].update({ relevance_status }, { where: { departure_id } });
   }
 
   async GetFiltered(country, where, page, pageSize, sort) {
@@ -44,7 +48,7 @@ class DepartureDateService {
   }
 
   async getByDateAndDepartureId(country, data, departure_id) {
-    return await this.models[country].findOne({ where: { data, departure_id } });
+    return await this.models[country].findOne({ where: { data, departure_id, relevance_status: true } });
   }
 }
 

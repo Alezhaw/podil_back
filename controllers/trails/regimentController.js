@@ -54,7 +54,7 @@ class RegimentController {
   async update(req, res, next) {
     const { regiment, country } = req.body;
 
-    if (!regiment || !country || !regiment.id) {
+    if (!regiment.name || !country || !regiment.id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
 

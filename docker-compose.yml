@@ -1,0 +1,24 @@
+version: "1.0"
+services:
+  web:
+    image: podil-api-web
+    container_name: podil_api
+    build: .
+    ports:
+      - "5000:5000"
+    restart: always
+    depends_on:
+      - db
+  db:
+    container_name: postgres
+    image: postgres:alpine3.17
+    ports:
+      - "5433:${DB_PORT}"
+    volumes:
+      - db:/data/db
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+volumes:
+  db:
+  web:

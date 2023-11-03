@@ -91,8 +91,67 @@ const PlTrails = sequelize.define("pltrail", {
   departure_date_id: { type: DataTypes.INTEGER },
 });
 
+const CitiesWithReg = sequelize.define("cities_with_region", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  region_id: { type: DataTypes.INTEGER },
+  city_name: { type: DataTypes.STRING },
+  additional_city_name: { type: DataTypes.STRING },
+  county: { type: DataTypes.STRING },
+  city_type: { type: DataTypes.STRING },
+  population: { type: DataTypes.INTEGER },
+  autozonning: { type: DataTypes.STRING },
+  relevance_status: { type: DataTypes.BOOLEAN },
+});
+const KzCitiesWithReg = sequelize.define("kzcities_with_region", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  region_id: { type: DataTypes.INTEGER },
+  city_name: { type: DataTypes.STRING },
+  additional_city_name: { type: DataTypes.STRING },
+  county: { type: DataTypes.STRING },
+  city_type: { type: DataTypes.STRING },
+  population: { type: DataTypes.INTEGER },
+  autozonning: { type: DataTypes.STRING },
+  relevance_status: { type: DataTypes.BOOLEAN },
+});
+
+const PlCitiesWithReg = sequelize.define("plcities_with_region", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  region_id: { type: DataTypes.INTEGER },
+  city_name: { type: DataTypes.STRING },
+  additional_city_name: { type: DataTypes.STRING },
+  county: { type: DataTypes.STRING },
+  city_type: { type: DataTypes.STRING },
+  population: { type: DataTypes.INTEGER },
+  autozonning: { type: DataTypes.STRING },
+  relevance_status: { type: DataTypes.BOOLEAN },
+});
+
+CitiesWithReg.hasOne(Trails, {
+  foreignKey: "city_id",
+});
+Trails.belongsTo(CitiesWithReg, {
+  foreignKey: "city_id",
+});
+
+KzCitiesWithReg.hasOne(KzTrails, {
+  foreignKey: "city_id",
+});
+KzTrails.belongsTo(KzCitiesWithReg, {
+  foreignKey: "city_id",
+});
+
+PlCitiesWithReg.hasOne(PlTrails, {
+  foreignKey: "city_id",
+});
+PlTrails.belongsTo(PlCitiesWithReg, {
+  foreignKey: "city_id",
+});
+
 module.exports = {
   Trails,
   KzTrails,
   PlTrails,
+  CitiesWithReg,
+  KzCitiesWithReg,
+  PlCitiesWithReg,
 };

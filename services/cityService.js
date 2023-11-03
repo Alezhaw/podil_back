@@ -423,8 +423,10 @@ class CityService {
   async GetDistinctFiltered(country, where, page, pageSize, sort) {
     return await this.models[country].findAll({
       where,
-      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("id_for_base")), "id_for_base"]],
-      order: [["id_for_base", sort ? "ASC" : "DESC"]],
+      //attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("id_for_base")), "id_for_base"]],
+      distinct: true,
+      col: "id_for_base",
+      order: [["date", sort ? "ASC" : "DESC"]],
       offset: (page - 1) * pageSize,
       limit: pageSize,
     });
@@ -433,12 +435,13 @@ class CityService {
   async GetDistinctFilteredForCount(country, where) {
     return await this.models[country].findAll({
       where,
-      attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("id_for_base")), "id_for_base"]],
+      distinct: true,
+      col: "id_for_base",
     });
   }
 
   async GetTimesByManyIdForBase(country, where, sort) {
-    return await this.models[country].findAll({ where, order: [["id_for_base", sort ? "ASC" : "DESC"]] });
+    return await this.models[country].findAll({ where, order: [["date", sort ? "ASC" : "DESC"]] });
   }
 
   async GetTimeByIdForBase(id_for_base, country) {

@@ -9,7 +9,7 @@ class DepartureService {
   };
 
   async create({ country, departure }) {
-    return await this.models[country].create({ ...departure });
+    return await this.models[country].create({ ...departure, relevance_status: true });
   }
 
   async update({ country, departure }) {
@@ -27,6 +27,10 @@ class DepartureService {
       offset: (page - 1) * pageSize,
       limit: pageSize,
     });
+  }
+
+  async GetForCount(country) {
+    return await this.models[country].count({ where: { relevance_status: true } });
   }
 
   async getAll(country) {

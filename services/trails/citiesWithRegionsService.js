@@ -1,4 +1,4 @@
-const { CitiesWithReg, KzCitiesWithReg, PlCitiesWithReg } = require("../../models/trails/citiesWithRegModels");
+const { CitiesWithReg, KzCitiesWithReg, PlCitiesWithReg } = require("../../models/trails/trailsModels");
 
 class CitiesWithRegService {
   models = {
