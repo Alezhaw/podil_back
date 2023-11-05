@@ -91,6 +91,7 @@ class LogsController {
 
     const logsWitgProperties = await Logs.findAll({
       where: whereForLogsWithProperties,
+      order: [["createdAt", "DESC"]],
     });
     if (!logsWitgProperties) {
       return next(ApiError.internal("Логи не найдены"));

@@ -62,7 +62,19 @@ class FormController {
     if (!forms) {
       return next(ApiError.internal("Города не найдены"));
     }
-    return res.json(forms);
+
+    let ids = [];
+
+    forms.map((el) => ids.push({ id: el.dataValues.city_id }));
+
+    const whereForCities = {
+      relevance_status: true,
+      [Op.or]: ids,
+    };
+
+    const cities = await CitiesWithRegService.getByWhere(country, whereForCities);
+
+    return res.json({ forms, cities });
   }
 
   async create(req, res, next) {

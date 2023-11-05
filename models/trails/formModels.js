@@ -26,6 +26,7 @@ const Form = sequelize.define("form", {
   trade_group: { type: DataTypes.STRING },
   company: { type: DataTypes.STRING },
   relevance_status: { type: DataTypes.BOOLEAN },
+  city_id: { type: DataTypes.INTEGER },
 });
 
 const KzForm = sequelize.define("kzform", {
@@ -53,6 +54,7 @@ const KzForm = sequelize.define("kzform", {
   trade_group: { type: DataTypes.STRING },
   company: { type: DataTypes.STRING },
   relevance_status: { type: DataTypes.BOOLEAN },
+  city_id: { type: DataTypes.INTEGER },
 });
 
 const PlForm = sequelize.define("plform", {
@@ -80,6 +82,7 @@ const PlForm = sequelize.define("plform", {
   trade_group: { type: DataTypes.STRING },
   company: { type: DataTypes.STRING },
   relevance_status: { type: DataTypes.BOOLEAN },
+  city_id: { type: DataTypes.INTEGER },
 });
 
 module.exports = {

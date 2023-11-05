@@ -1,5 +1,6 @@
 const ApiError = require("../error/ApiError");
 const ObjectHelper = require("../utils/objectHelper");
+const CityHelper = require("../utils/cityHelper");
 const { Cities, KzCities, PlCities } = require("../models/citiesModels");
 const TrailsService = require("./trails/trailsService");
 const { Sequelize, Op } = require("sequelize");
@@ -74,13 +75,16 @@ class CityService {
   async Search() {}
   async UpdateOrCreate(data, user, country) {
     let errors = [];
+    data = CityHelper.changeCitiesTime(data, true);
     await Promise.all(
       data.map(async (item) => {
         if (!item.id_for_base) {
           const lastIdForBase = await this.models[country].max("id_for_base");
           item.id_for_base = lastIdForBase + 4;
         }
-
+        if (item.id === "create") {
+          delete item.id;
+        }
         const time = item.id ? await this.GetTimeById(item.id, country) : await this.GetTimeByIdForBaseAndTime(item.id_for_base, item.time, country);
         if (item?.id !== "create" && !!time) {
           try {
@@ -116,6 +120,7 @@ class CityService {
 
   async UpdateOrCreateByTrails({ country, data, user, status }) {
     let errors = [];
+    data = CityHelper.changeCitiesTime(data, true);
     await Promise.all(
       data.map(async (item) => {
         const time = await this.GetTimeByTrailIdAndTime(item.trailId, item.time, country);
@@ -157,7 +162,6 @@ class CityService {
   }
 
   async CreateTime(item, user, country, status) {
-    delete item.id;
     const time = await this.models[country].create(item);
     const result = ObjectHelper.sendDifferencesToDatabase(time, item, country, "create", user, "city");
 
@@ -170,7 +174,7 @@ class CityService {
     }
 
     global.io.to("1").emit("updateCities", {
-      data: { cities: [time.dataValues], country },
+      data: { cities: CityHelper.changeCitiesTime([time.dataValues]), country },
     });
 
     if (status) {
@@ -204,7 +208,7 @@ class CityService {
         }
         await this.Update(item, { id: time.dataValues.id }, country);
         global.io.to("1").emit("updateCities", {
-          data: { cities: [item], country },
+          data: { cities: CityHelper.changeCitiesTime([item]), country },
         });
         if (status) {
           await TrailsService.update({ country, trail: { id: item.trailId, ...status } });
@@ -242,7 +246,7 @@ class CityService {
     const updated = await this.Update(this.checkValue(check_base, check_speaker, check_scenario), { id_for_base: city.id_for_base }, country);
     const updatedCity = await this.GetTimes(city.dataValues.id_for_base, country);
     global.io.to("1").emit("updateCities", {
-      data: { cities: updatedCity, country },
+      data: { cities: CityHelper.changeCitiesTime(updatedCity), country },
     });
 
     return updatedCity.map((city) => city.id);
@@ -264,7 +268,7 @@ class CityService {
     const updatedCity = await this.GetTimes(city.id_for_base, country);
 
     global.io.to("1").emit("updateCities", {
-      data: { cities: updatedCity, country },
+      data: { cities: CityHelper.changeCitiesTime(updatedCity), country },
     });
 
     return updatedCity.map((city) => city.id);
@@ -389,7 +393,7 @@ class CityService {
 
     const count = Math.ceil(cityForCount?.length / pageSize);
 
-    const result = { cities: citiesWithProperties, count };
+    const result = { cities: CityHelper.changeCitiesTime(citiesWithProperties), count };
     return result;
   }
 
