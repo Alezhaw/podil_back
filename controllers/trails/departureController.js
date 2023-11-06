@@ -143,7 +143,16 @@ class DepartureController {
       whereForDeparture.id = {
         [Op.or]: idsForDepartures,
       };
-      departures = await DepartureService.getByWhereWithSort(country, whereForDeparture, sort);
+      if (dateFilter[0]) {
+        whereForDeparture = { relevance_status: true, id: { [Op.or]: departureDates.map((el) => el.dataValues.departure_id) } };
+        departures = await DepartureService.GetFiltered(country, whereForDeparture, page, pageSize, sort);
+        const forCount = await DepartureService.getByWhere(country, whereForDeparture);
+        finalDepartureIdsForCount = forCount?.length;
+      } else {
+        departures = await DepartureService.getByWhereWithSort(country, whereForDeparture, sort);
+      }
+      //вставить сюда проверку на дату
+
       if (!departures[0] || !finalDepartureIdsForCount) {
         return next(ApiError.badRequest("Выезды не найдены"));
       }
