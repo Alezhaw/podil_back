@@ -1,4 +1,5 @@
 const { CitiesWithReg, KzCitiesWithReg, PlCitiesWithReg } = require("../../models/trails/trailsModels");
+const { Sequelize, Op } = require("sequelize");
 
 class CitiesWithRegService {
   models = {
@@ -26,11 +27,20 @@ class CitiesWithRegService {
   }
 
   async getAll(country) {
-    return await this.models[country].findAll({ where: { relevance_status: true }, order: [["id", "ASC"]] });
+    return await this.models[country].findAll({ where: { relevance_status: true }, order: [["city_name", "ASC"]] });
   }
 
   async getByWhere(country, where) {
     return await this.models[country].findAll({ where, order: [["city_name", "ASC"]] });
+  }
+
+  async getByWhereForRegion(country, where) {
+    return await this.models[country].findAll({
+      where,
+      distinct: true,
+      col: "city_name",
+      order: [["city_name", "ASC"]],
+    });
   }
 
   async getByWhereWithLimit(country, where, limit) {

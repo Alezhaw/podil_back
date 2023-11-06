@@ -1,5 +1,6 @@
 const ApiError = require("../error/ApiError");
 const CityService = require("../services/cityService");
+const CityHelper = require("../utils/cityHelper");
 
 class CitiesController {
   async create(req, res, next) {
@@ -42,7 +43,7 @@ class CitiesController {
   }
 
   async fixDate(req, res) {
-    await CityService.fixDate();
+    // await CityService.fixDate();
     return res.json(123);
   }
 
@@ -74,9 +75,12 @@ class CitiesController {
       return next(ApiError.badRequest("Укажите country"));
     }
 
-    const city = id ? await CityService.GetTimeById(id, country) : await CityService.GetTimes(id_for_base, country);
+    let city = id ? await CityService.GetTimeById(id, country) : await CityService.GetTimes(id_for_base, country);
     if (!city) {
       return next(ApiError.internal("Город не найден"));
+    }
+    if (!!city[0]) {
+      city = CityHelper.changeCitiesTime(city);
     }
     return res.json(city);
   }

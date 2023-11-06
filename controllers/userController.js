@@ -119,14 +119,7 @@ class UserController {
     if (!comparePassword) {
       return next(ApiError.internal("Указан неверный пароль"));
     }
-    if (
-      creator.role === "USER" ||
-      creator.role === "CHATER" ||
-      (role === "MODERATOR" && creator.role !== "ADMIN") ||
-      (user.role === "MODERATOR" && creator.role !== "MODERATOR") ||
-      role === "ADMIN" ||
-      user.role === "ADMIN"
-    ) {
+    if (creator.role !== "ADMIN" || user.role === "ADMIN") {
       return next(ApiError.badRequest("Нет доступа"));
     }
     const updatedUser = await User.update({ role }, { where: { id } });
