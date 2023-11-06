@@ -417,7 +417,7 @@ class UserController {
   }
 
   async getAllUsers(req, res, next) {
-    const users = await User.findAll({ where: { relevance_status: false } });
+    const users = await User.findAll({ where: { relevance_status: true } });
     return res.json({ users });
   }
 }
