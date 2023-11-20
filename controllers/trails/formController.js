@@ -1,6 +1,7 @@
 const ApiError = require("../../error/ApiError");
 const FormService = require("../../services/trails/formService");
 const CitiesWithRegService = require("../../services/trails/citiesWithRegionsService");
+const RegionService = require("../../services/trails/regionService");
 const { Op } = require("sequelize");
 
 class FormController {
@@ -46,15 +47,22 @@ class FormController {
     if (search) {
       actions.push({ local: { [Op.iLike]: `%${search}%` } });
     }
+    if (city_id) {
+      const citiesForForms = await CitiesWithRegService.getByWhere(country, { id: city_id });
+      citiesForForms.map((el) => {
+        actions.push({ town: el.dataValues.city_name, region_id: el.dataValues.region_id });
+      });
+    }
+
     let where = {};
     if (!!actions[0]) {
       where = {
         [Op.or]: actions,
       };
     }
-    if (city_id) {
-      where.city_id = city_id;
-    }
+
+    console.log(1, actions, where);
+
     where.relevance_status = true;
 
     const forms = await FormService.getByWhereWithLimit(country, where, 50);
@@ -78,10 +86,12 @@ class FormController {
   }
 
   async create(req, res, next) {
-    const { country, form } = req.body;
+    let { form } = req.body;
+    const country = form?.country;
+    form = form?.form;
 
-    if (!country || !form || !form.city_id) {
-      return next(ApiError.badRequest("Укажите все данные"));
+    if (!country || !form || !form.city_id || !form.region_id || !form.local || !form.address) {
+      return next(ApiError.badRequest("Укажите все данные: city, region, institution, address"));
     }
     if (!!form.id) {
       const checkFormId = await FormService.getById(country, form.id);
@@ -93,6 +103,11 @@ class FormController {
     const checkCityId = await CitiesWithRegService.getById(country, form.city_id);
     if (!checkCityId) {
       return next(ApiError.badRequest("Такого города нет"));
+    }
+
+    const checkRegionId = await RegionService.getById(country, form.region_id);
+    if (!checkRegionId) {
+      return next(ApiError.badRequest("Такого региона нет"));
     }
 
     let where = {
@@ -107,6 +122,7 @@ class FormController {
       const newForm = await FormService.create({ country, form });
       return res.json(newForm);
     } catch (e) {
+      console.log("create form error", e);
       return next(ApiError.badRequest("Непредвиденная ошибка"));
     }
   }

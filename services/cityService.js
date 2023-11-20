@@ -368,6 +368,7 @@ class CityService {
       };
     }
     const cities = await this.GetDistinctFiltered(country, where, page, pageSize, sort);
+    console.log(1, cities);
     const cityForCount = await this.GetDistinctFilteredForCount(country, where);
     if (!cities || !cityForCount) {
       throw ApiError.internal("Города не найдены");
@@ -428,8 +429,11 @@ class CityService {
     return await this.models[country].findAll({
       where,
       //attributes: [[Sequelize.fn("DISTINCT", Sequelize.col("id_for_base")), "id_for_base"]],
-      distinct: true,
-      col: "id_for_base",
+      attributes: ["id_for_base", "date", Sequelize.fn("count", Sequelize.col("id_for_base"))],
+      group: ["id_for_base", "date"],
+      // distinct: true,
+      // col: "id_for_base",
+      // group: ["id_for_base"],
       order: [["date", sort ? "ASC" : "DESC"]],
       offset: (page - 1) * pageSize,
       limit: pageSize,
@@ -439,8 +443,10 @@ class CityService {
   async GetDistinctFilteredForCount(country, where) {
     return await this.models[country].findAll({
       where,
-      distinct: true,
-      col: "id_for_base",
+      attributes: ["id_for_base", "date", Sequelize.fn("count", Sequelize.col("id_for_base"))],
+      group: ["id_for_base", "date"],
+      //  distinct: true,
+      //col: "id_for_base",
     });
   }
 

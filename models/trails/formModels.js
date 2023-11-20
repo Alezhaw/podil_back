@@ -27,6 +27,9 @@ const Form = sequelize.define("form", {
   company: { type: DataTypes.STRING },
   relevance_status: { type: DataTypes.BOOLEAN },
   city_id: { type: DataTypes.INTEGER },
+  region_id: { type: DataTypes.INTEGER },
+  start_coord: { type: DataTypes.DOUBLE },
+  end_coord: { type: DataTypes.DOUBLE },
 });
 
 const KzForm = sequelize.define("kzform", {
@@ -55,6 +58,9 @@ const KzForm = sequelize.define("kzform", {
   company: { type: DataTypes.STRING },
   relevance_status: { type: DataTypes.BOOLEAN },
   city_id: { type: DataTypes.INTEGER },
+  region_id: { type: DataTypes.INTEGER },
+  start_coord: { type: DataTypes.DOUBLE },
+  end_coord: { type: DataTypes.DOUBLE },
 });
 
 const PlForm = sequelize.define("plform", {
@@ -83,6 +89,9 @@ const PlForm = sequelize.define("plform", {
   company: { type: DataTypes.STRING },
   relevance_status: { type: DataTypes.BOOLEAN },
   city_id: { type: DataTypes.INTEGER },
+  region_id: { type: DataTypes.INTEGER },
+  start_coord: { type: DataTypes.DOUBLE },
+  end_coord: { type: DataTypes.DOUBLE },
 });
 
 module.exports = {

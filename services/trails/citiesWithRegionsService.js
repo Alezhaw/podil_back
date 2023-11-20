@@ -22,8 +22,8 @@ class CitiesWithRegService {
     });
   }
 
-  async remove(country, relevance_status, id) {
-    return await this.models[country].update({ relevance_status }, { where: { id } });
+  async remove(country, relevance_status, region_id) {
+    return await this.models[country].update({ relevance_status }, { where: { region_id } });
   }
 
   async getAll(country) {

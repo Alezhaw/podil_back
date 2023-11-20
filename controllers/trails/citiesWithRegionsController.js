@@ -135,6 +135,25 @@ class CitiesWithRegController {
     }
   }
 
+  async removeByRegion(req, res, next) {
+    const { country, region_id, relevance_status } = req.body;
+    if (!country || !region_id) {
+      return next(ApiError.badRequest("Укажите все данные"));
+    }
+    const item = await CitiesWithRegService.getById(country, region_id);
+
+    if (!item) {
+      return next(ApiError.badRequest("Элемент не найден"));
+    }
+
+    try {
+      const updatedCitiesWithReg = await CitiesWithRegService.remove(country, !!relevance_status, region_id);
+      return res.json("success");
+    } catch (e) {
+      return next(ApiError.badRequest("Непредвиденная ошибка"));
+    }
+  }
+
   async delete(req, res, next) {
     const { country, id } = req.body;
 
@@ -149,25 +168,6 @@ class CitiesWithRegController {
     try {
       await CitiesWithRegService.delete(country, id);
       return res.json({ ...checkCityId.dataValues });
-    } catch (e) {
-      return next(ApiError.badRequest("Непредвиденная ошибка"));
-    }
-  }
-
-  async remove(req, res) {
-    const { id, country, relevance_status } = req.body;
-    if (!country || !id) {
-      return next(ApiError.badRequest("Укажите все данные"));
-    }
-    const item = await CitiesWithRegService.getById(country, id);
-
-    if (!item) {
-      return next(ApiError.badRequest("Элемент не найден"));
-    }
-
-    try {
-      const updatedCallTemplate = await CitiesWithRegService.remove(country, !!relevance_status, id);
-      return res.json("success");
     } catch (e) {
       return next(ApiError.badRequest("Непредвиденная ошибка"));
     }
