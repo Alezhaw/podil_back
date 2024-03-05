@@ -26,12 +26,12 @@ class PresentationTimeController {
       [Op.or]: actions,
     };
 
-    const cities = await PresentationTimeService.getByWhere(country, where);
+    const times = await PresentationTimeService.getByWhere(country, where);
 
-    if (!cities) {
-      return next(ApiError.internal("Города не найдены"));
+    if (!times) {
+      return next(ApiError.internal("Времена не найдены"));
     }
-    return res.json({ cities });
+    return res.json({ times });
   }
 
   async create(req, res, next) {
@@ -39,9 +39,9 @@ class PresentationTimeController {
     if (!presentationTime.presentation_hour || !country || !presentationTime.rental_hours) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const checkPresentationTime = await PresentationTimeService.getByName(country, presentationTime.presentation_hour);
+    const checkPresentationTime = await PresentationTimeService.getByWhere(country, { presentation_hour: presentationTime.presentation_hour, alternative: presentationTime.alternative });
 
-    if (checkPresentationTime) {
+    if (checkPresentationTime[0]) {
       return next(ApiError.badRequest("PresentationTime с таким именем уже существует"));
     }
 
@@ -62,8 +62,9 @@ class PresentationTimeController {
     if (!presentationTime || !country || !presentationTime.id) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
-    const checkPresentationTimeName = await PresentationTimeService.getByName(country, presentationTime.presentation_hour);
-    if (checkPresentationTimeName) {
+    const checkPresentationTimeName = await PresentationTimeService.getByWhere(country, { presentation_hour: presentationTime.presentation_hour, alternative: presentationTime.alternative });
+    console.log(1, checkPresentationTimeName, "where", { presentation_hour: presentationTime.presentation_hour, alternative: presentationTime.alternative });
+    if (checkPresentationTimeName[0]) {
       return next(ApiError.badRequest("PresentationTime с таким именем уже существует"));
     }
     const checkPresentationTimeId = await PresentationTimeService.getById(country, presentationTime.id);

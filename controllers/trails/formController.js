@@ -50,7 +50,7 @@ class FormController {
     if (city_id) {
       const citiesForForms = await CitiesWithRegService.getByWhere(country, { id: city_id });
       citiesForForms.map((el) => {
-        actions.push({ town: el.dataValues.city_name, region_id: el.dataValues.region_id });
+        actions.push({ city_id, region_id: el.dataValues.region_id });
       });
     }
 
@@ -111,7 +111,9 @@ class FormController {
     }
 
     let where = {
+      city_id: form.city_id,
       local: form.local,
+      relevance_status: true,
     };
 
     const checkForm = await FormService.getByWhere(country, where);
@@ -128,10 +130,9 @@ class FormController {
   }
 
   async update(req, res, next) {
-    const { country, form } = req.body;
-
-    if (!country || !form.id || !form.city_id) {
-      return next(ApiError.badRequest("Укажите все данные"));
+    let { country, form } = req.body;
+    if (!country || !form.id || !form.city_id || !form.region_id || !form.local || !form.address) {
+      return next(ApiError.badRequest("Укажите все данные: city, region, local, address"));
     }
 
     const checkFormId = await FormService.getById(country, form.id);
@@ -144,6 +145,12 @@ class FormController {
     if (!checkCityId) {
       return next(ApiError.badRequest("Такого города нет"));
     }
+
+    const checkRegionId = await RegionService.getById(country, form.region_id);
+    if (!checkRegionId) {
+      return next(ApiError.badRequest("Такого региона нет"));
+    }
+
     try {
       const updatedForm = await FormService.update({ country, form });
       return res.json("success");
@@ -152,26 +159,7 @@ class FormController {
     }
   }
 
-  //   async delete(req, res, next) {
-  //     const { country, id } = req.body;
-
-  //     if (!country || !id) {
-  //       return next(ApiError.badRequest("Укажите все данные"));
-  //     }
-
-  //     const checkCityId = await CitiesWithRegService.getById(country, id);
-  //     if (!checkCityId) {
-  //       return next(ApiError.badRequest("Города с таким id не существует"));
-  //     }
-  //     try {
-  //       await CitiesWithRegService.delete(country, id);
-  //       return res.json({ ...checkCityId.dataValues });
-  //     } catch (e) {
-  //       return next(ApiError.badRequest("Непредвиденная ошибка"));
-  //     }
-  //   }
-
-  async remove(req, res) {
+  async remove(req, res, next) {
     const { id, country, relevance_status } = req.body;
     if (!country || !id) {
       return next(ApiError.badRequest("Укажите все данные"));

@@ -8,12 +8,12 @@ class CitiesWithRegService {
     PL: PlCitiesWithReg,
   };
 
-  async create({ country, region_id, city_name, additional_city_name, county, city_type, population, autozonning }) {
-    return await this.models[country].create({ region_id, city_name, additional_city_name, county, city_type, population, autozonning });
+  async create({ country, city }) {
+    return await this.models[country].create({ ...city });
   }
 
-  async update({ country, id, region_id, city_name, additional_city_name, county, city_type, population, autozonning }) {
-    return await this.models[country].update({ region_id, city_name, additional_city_name, county, city_type, population, autozonning }, { where: { id } });
+  async update({ country, city }) {
+    return await this.models[country].update({ ...city }, { where: { id: city.id } });
   }
 
   async delete(country, id) {
@@ -22,7 +22,11 @@ class CitiesWithRegService {
     });
   }
 
-  async remove(country, relevance_status, region_id) {
+  async remove(country, relevance_status, id) {
+    return await this.models[country].update({ relevance_status }, { where: { id } });
+  }
+
+  async removeByRegion(country, relevance_status, region_id) {
     return await this.models[country].update({ relevance_status }, { where: { region_id } });
   }
 
@@ -44,7 +48,7 @@ class CitiesWithRegService {
   }
 
   async getByWhereWithLimit(country, where, limit) {
-    return await this.models[country].findAll({ where, limit });
+    return await this.models[country].findAll({ where, limit, order: [["city_name", "ASC"]] });
   }
 
   async getById(country, id) {

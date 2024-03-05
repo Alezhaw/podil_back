@@ -33,6 +33,10 @@ class DepartureService {
     return await this.models[country].count({ where: { relevance_status: true } });
   }
 
+  async GetForCountByWhere(country, where) {
+    return await this.models[country].count({ where });
+  }
+
   async getAll(country) {
     return await this.models[country].findAll({
       where: { relevance_status: true },

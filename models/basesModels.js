@@ -16,6 +16,8 @@ const Bases = sequelize.define("base", {
   sogl_3: { type: DataTypes.INTEGER },
   sogl_4: { type: DataTypes.INTEGER },
   comment: { type: DataTypes.STRING },
+  gazooServerId: { type: DataTypes.STRING },
+  gazooCampaignId: { type: DataTypes.INTEGER },
 });
 
 const KzBases = sequelize.define("kzbase", {
@@ -33,6 +35,8 @@ const KzBases = sequelize.define("kzbase", {
   sogl_3: { type: DataTypes.INTEGER },
   sogl_4: { type: DataTypes.INTEGER },
   comment: { type: DataTypes.STRING },
+  gazooServerId: { type: DataTypes.STRING },
+  gazooCampaignId: { type: DataTypes.INTEGER },
 });
 
 const PlBases = sequelize.define("plbase", {
@@ -50,6 +54,8 @@ const PlBases = sequelize.define("plbase", {
   sogl_3: { type: DataTypes.INTEGER },
   sogl_4: { type: DataTypes.INTEGER },
   comment: { type: DataTypes.STRING },
+  gazooServerId: { type: DataTypes.STRING },
+  gazooCampaignId: { type: DataTypes.INTEGER },
 });
 
 module.exports = {

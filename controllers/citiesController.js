@@ -1,6 +1,8 @@
 const ApiError = require("../error/ApiError");
 const CityService = require("../services/cityService");
+const ListService = require("../services/lists/listService");
 const CityHelper = require("../utils/cityHelper");
+const { Op } = require("sequelize");
 
 class CitiesController {
   async create(req, res, next) {
@@ -65,6 +67,19 @@ class CitiesController {
     return res.json({ ...result });
   }
 
+  async getByTrail(req, res, next) {
+    const { trailId, calling_scheme, country } = req.body;
+    if (!trailId || !country) {
+      return next(ApiError.badRequest("Укажите все данные"));
+    }
+
+    const checkCity = await CityService.GetTimeByTrailIdAndScheme(trailId, calling_scheme, country);
+    if (!checkCity) {
+      return next(ApiError.badRequest("City not found"));
+    }
+    return res.json(checkCity);
+  }
+
   async getOneCity(req, res, next) {
     const { id, id_for_base, country } = req.body;
 
@@ -80,9 +95,35 @@ class CitiesController {
       return next(ApiError.internal("Город не найден"));
     }
     if (!!city[0]) {
-      city = CityHelper.changeCitiesTime(city);
+      let options = [];
+
+      city.map((el) => {
+        el = el.dataValues;
+        options.push({
+          id_for_base: el.id_for_base,
+        });
+      });
+
+      let whereWithProperties = {
+        [Op.or]: options,
+      };
+
+      let citiesWithLists = CityHelper.changeCitiesTime(city);
+      let lists = await ListService.getDistinctFiltered(country, whereWithProperties);
+      lists = lists?.filter((el) => el?.dataValues?.time);
+      lists = await Promise.all(
+        lists?.map(async (el) => {
+          el = el.dataValues;
+          return { ...el, coming: await ListService.getForCount(country, { id_for_base: el.id_for_base, time: el.time, who_called: el.who_called }) };
+        })
+      );
+      citiesWithLists = citiesWithLists?.map((city) => ({
+        ...city,
+        coming: lists?.filter((list) => list.id_for_base === city.id_for_base && list.time === city.time)?.reduce((acc, el) => `${el.coming} (${el.who_called})${acc ? ` / ${acc}` : ""}`, ""),
+      }));
+      return res.json(citiesWithLists);
     }
-    return res.json(city);
+    return res.json(CityHelper.changeCitiesTime(city));
   }
 
   async changeCheck(req, res, next) {
@@ -107,10 +148,10 @@ class CitiesController {
   }
 
   async changeStatus(req, res, next) {
-    const { id, id_for_base, status, country } = req.body;
+    const { id, id_for_base, status, country, trailId } = req.body;
     let user = req.user;
-    if (!id && !id_for_base) {
-      return next(ApiError.badRequest("Укажите id или id_for_base"));
+    if (!id && !id_for_base && !trailId) {
+      return next(ApiError.badRequest("Укажите id или id_for_base или trailId"));
     }
     if (typeof status !== "number") {
       return next(ApiError.badRequest("Укажите данные для замены"));
@@ -119,7 +160,7 @@ class CitiesController {
       return next(ApiError.badRequest("Укажите country"));
     }
     try {
-      let result = await CityService.ChangeStatus(id, id_for_base, status, user, country);
+      let result = await CityService.ChangeStatus(id, id_for_base, status, user, country, trailId);
       return res.status(200).json(result);
     } catch (error) {
       return next(error);
@@ -129,22 +170,15 @@ class CitiesController {
   async deleteCity(req, res, next) {
     const { id_for_base, country } = req.body;
     let user = req.user;
-    console.log(123);
     if (!id_for_base) {
-      console.log(124);
       return next(ApiError.badRequest("Укажите id_for_base"));
     }
-    console.log(125);
     if (!country) {
-      console.log(126);
       return next(ApiError.badRequest("Укажите country"));
     }
-    console.log(127);
     try {
-      console.log(128);
       let result = await CityService.DeleteCity(id_for_base, user, country);
-      console.log(129);
-      console.log(130, result);
+      await ListService.removeByIdForBase(country, false, id_for_base);
       return res.status(200).json(result);
     } catch (error) {
       return next(error);

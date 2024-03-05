@@ -37,7 +37,7 @@ class DepartureController {
   }
 
   async getForEditing(req, res, next) {
-    const { country, sort, pageSize, page } = req.body;
+    const { country, sort, pageSize, page, dateFrom, dateTo } = req.body;
     if (!country) {
       return next(ApiError.badRequest("Укажите country"));
     }
@@ -49,12 +49,37 @@ class DepartureController {
     let departuresForCount = await DepartureService.GetForCount(country);
     let idsForDates = departures?.map((item) => item.dataValues.id);
     let whereForDate = {
-      departure_id: {
-        [Op.or]: idsForDates,
-      },
       relevance_status: true,
     };
+
+    let dateFilter = [];
+    if (dateTo) {
+      dateFilter.push({ [Op.lte]: dateTo });
+    }
+    if (dateFrom) {
+      dateFilter.push({ [Op.gte]: dateFrom });
+    }
+    if (dateFilter[0]) {
+      whereForDate.data = {
+        [Op.and]: dateFilter,
+      };
+    } else {
+      whereForDate.departure_id = {
+        [Op.or]: idsForDates,
+      };
+    }
     let departureDates = await DepartureDateService.getByWhere(country, whereForDate);
+    let idsForDeparture = departureDates?.map((item) => item.dataValues.departure_id);
+    const whereForDeparture = {
+      relevance_status: true,
+      id: { [Op.or]: idsForDeparture },
+    };
+    if (dateFilter[0]) {
+      departures = await DepartureService.GetFiltered(country, whereForDeparture, page, pageSize, sort);
+      departuresForCount = await DepartureService.GetForCountByWhere(country, whereForDeparture);
+    } else {
+      departures = await DepartureService.getByWhereWithSort(country, whereForDeparture, sort);
+    }
 
     const count = Math.ceil(departuresForCount / pageSize);
 
@@ -191,7 +216,7 @@ class DepartureController {
 
   async create(req, res, next) {
     const { departure, country } = req.body;
-    if (!departure || !country || !departure.dates || !departure.range) {
+    if (!departure || !country || !departure.dates || !departure.range || !departure.route_number) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
     try {
@@ -214,7 +239,7 @@ class DepartureController {
   async update(req, res, next) {
     const { departure, country } = req.body;
 
-    if (!departure || !country || !departure.id || !departure.dates || !departure.range) {
+    if (!departure || !country || !departure.id || !departure.dates || !departure.range || !departure.route_number) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
     const checkDeparture = await DepartureService.getById(country, departure.id);

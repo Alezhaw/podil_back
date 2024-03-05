@@ -8,6 +8,11 @@ const fileUpload = require("express-fileupload");
 const router = require("./routes/index");
 const errorHandler = require("./middleware/ErrorHandlingMiddleware");
 const path = require("path");
+const cron = require("node-cron");
+const QueueHelper = require("./utils/queueHelper");
+const BaseService = require("./services/baseService");
+const serversQueueController = require("./controllers/serversQueueController");
+const basesController = require("./controllers/basesController");
 
 const PORT = process.env.PORT || 5000;
 
@@ -60,6 +65,31 @@ const start = async () => {
   try {
     await sequelize.authenticate();
     await sequelize.sync();
+    // await QueueHelper.createCampaign();
+
+    let isExecuting = false;
+    const executeTask = async () => {
+      if (isExecuting) {
+        console.log("Задача уже выполняется, пропускаем текущий запуск.");
+        return;
+      }
+      try {
+        isExecuting = true;
+        await QueueHelper.createCampaign();
+      } catch (error) {
+        console.error("Create campaign error:", error);
+      } finally {
+        isExecuting = false;
+      }
+    };
+    cron.schedule("*/10 * * * *", () => {
+      executeTask();
+    });
+
+    cron.schedule("0 2 * * *", () => {
+      serversQueueController.deleteAll();
+      BaseService.updateByTime({ country: "PL" });
+    });
     server.listen(PORT, () => console.log(`Server started on port ${PORT}`));
   } catch (e) {
     console.log(e);

@@ -9,6 +9,7 @@ router.post("/getByIds", auth, citiesWithRegionsController.getByIds);
 router.post("/getByRegion", auth, citiesWithRegionsController.getByRegion);
 router.post("/create", auth, citiesWithRegionsController.create);
 router.post("/update", auth, citiesWithRegionsController.update);
+router.post("/remove", auth, citiesWithRegionsController.remove);
 router.post("/delete", auth, citiesWithRegionsController.delete);
 router.post("/removeByRegion", auth, citiesWithRegionsController.removeByRegion);
 

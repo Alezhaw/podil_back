@@ -3,6 +3,7 @@ const ObjectHelper = require("../utils/objectHelper");
 const CityHelper = require("../utils/cityHelper");
 const { Cities, KzCities, PlCities } = require("../models/citiesModels");
 const TrailsService = require("./trails/trailsService");
+const ListService = require("./lists/listService");
 const { Sequelize, Op } = require("sequelize");
 
 class CityService {
@@ -123,7 +124,7 @@ class CityService {
     data = CityHelper.changeCitiesTime(data, true);
     await Promise.all(
       data.map(async (item) => {
-        const time = await this.GetTimeByTrailIdAndTime(item.trailId, item.time, country);
+        const time = await this.GetTimeByTrailIdAndTimeAndScheme(item.trailId, item.time, item.calling_scheme, country);
         if (!time) {
           const lastIdForBase = await this.models[country].max("id_for_base");
           item.id_for_base = lastIdForBase + 4;
@@ -193,7 +194,7 @@ class CityService {
     const time = item.id
       ? await this.GetTimeById(item.id, country)
       : item.trailId
-      ? await this.GetTimeByTrailIdAndTime(item.trailId, item.time, country)
+      ? await this.GetTimeByTrailIdAndTimeAndScheme(item.trailId, item.time, item?.calling_scheme, country)
       : await this.GetTimeByIdForBaseAndTime(item.id_for_base, item.time, country);
 
     if (time) {
@@ -208,7 +209,7 @@ class CityService {
         }
         await this.Update(item, { id: time.dataValues.id }, country);
         global.io.to("1").emit("updateCities", {
-          data: { cities: CityHelper.changeCitiesTime([item]), country },
+          data: { cities: CityHelper.changeCitiesTime([{ ...item, id_for_base: time.dataValues.id_for_base, id: time.dataValues.id }]), country },
         });
         if (status) {
           await TrailsService.update({ country, trail: { id: item.trailId, ...status } });
@@ -252,8 +253,17 @@ class CityService {
     return updatedCity.map((city) => city.id);
   }
 
-  async ChangeStatus(id, id_for_base, status, user, country) {
-    const city = id ? await this.GetTimeById(id, country) : await this.GetTimeByIdForBase(id_for_base, country);
+  async ChangeStatus(id, id_for_base, status, user, country, trailId) {
+    let city = null;
+    if (id) {
+      city = await this.GetTimeById(id, country);
+    }
+    if (id_for_base) {
+      city = await this.GetTimeByIdForBase(id_for_base, country);
+    }
+    if (trailId) {
+      city = await this.GetTimeByTrailIdAndScheme(trailId, null, country);
+    }
     if (!city) {
       throw ApiError.internal("Город не найден");
     }
@@ -367,8 +377,8 @@ class CityService {
         [Op.iLike]: `%${search}%`,
       };
     }
+    where.departure_date_id = { [Op.ne]: null };
     const cities = await this.GetDistinctFiltered(country, where, page, pageSize, sort);
-    console.log(1, cities);
     const cityForCount = await this.GetDistinctFilteredForCount(country, where);
     if (!cities || !cityForCount) {
       throw ApiError.internal("Города не найдены");
@@ -387,14 +397,40 @@ class CityService {
       [Op.or]: options,
     };
 
-    let citiesWithProperties = await this.GetTimesByManyIdForBase(country, whereWithProperties, sort);
+    let citiesWithProperties = await this.GetTimesByManyIdForBase(country, { ...whereWithProperties, departure_date_id: { [Op.ne]: null } }, sort);
     if (!citiesWithProperties) {
       return next(ApiError.internal("Города не найдены"));
     }
 
+    let optionsForTrails = [];
+    citiesWithProperties.map((el) => {
+      el = el.dataValues;
+      optionsForTrails.push(el.trailId);
+    });
+    const unique = optionsForTrails.filter((value, index, array) => array.indexOf(value) === index);
+    const whereForTrails = {
+      [Op.or]: unique?.map((el) => ({ id: el })),
+    };
+
+    const trails = await TrailsService.getByWhere(country, whereForTrails);
+
     const count = Math.ceil(cityForCount?.length / pageSize);
 
-    const result = { cities: CityHelper.changeCitiesTime(citiesWithProperties), count };
+    let citiesWithLists = CityHelper.changeCitiesTime(citiesWithProperties);
+    let lists = await ListService.getDistinctFiltered(country, whereWithProperties);
+    lists = lists?.filter((el) => el?.dataValues?.time);
+    lists = await Promise.all(
+      lists?.map(async (el) => {
+        el = el.dataValues;
+        return { ...el, coming: await ListService.getForCount(country, { id_for_base: el.id_for_base, time: el.time, who_called: el.who_called }) };
+      })
+    );
+    citiesWithLists = citiesWithLists?.map((city) => ({
+      ...city,
+      coming: lists?.filter((list) => list.id_for_base === city.id_for_base && list.time === city.time)?.reduce((acc, el) => `${el.coming} (${el.who_called})${acc ? ` / ${acc}` : ""}`, ""),
+    }));
+
+    const result = { cities: citiesWithLists, count, trails };
     return result;
   }
 
@@ -451,7 +487,15 @@ class CityService {
   }
 
   async GetTimesByManyIdForBase(country, where, sort) {
-    return await this.models[country].findAll({ where, order: [["date", sort ? "ASC" : "DESC"]] });
+    //  return await this.models[country].findAll({ where, order: [[Sequelize.literal("date", "city_lokal"), sort ? "ASC" : "DESC"]] });
+    return await this.models[country].findAll({
+      where,
+      order: [
+        ["date", sort ? "ASC" : "DESC"],
+        ["city_lokal", "ASC"],
+        ["calling_scheme", "ASC"],
+      ],
+    });
   }
 
   async GetTimeByIdForBase(id_for_base, country) {
@@ -459,6 +503,14 @@ class CityService {
   }
   async GetTimeByTrailIdAndTime(trailId, time, country) {
     return await this.models[country].findOne({ where: { trailId, time } });
+  }
+
+  async GetTimeByTrailIdAndTimeAndScheme(trailId, time, calling_scheme, country) {
+    return await this.models[country].findOne({ where: { trailId, time, calling_scheme } });
+  }
+
+  async GetTimeByTrailIdAndScheme(trailId, calling_scheme, country) {
+    return await this.models[country].findOne({ where: { trailId, calling_scheme } });
   }
 
   async GetTimeByIdForBaseAndTime(id_for_base, time, country) {

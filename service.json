@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "cool-album-403113",
+  "private_key_id": "b2c8e8b91551e3492864f70b3e020a032bef8094",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCLwQZFUAfzA+WP\nXUBpZxKhEWOkRZRY80iZZors2UgJvJJw0/pBEKZYYxeDprp2mC0Bhihr9sI1Eckx\nYYWGQlYtmBJo+a1Dgw++kJv3kwom9PIuooMllftsReMceH7I1lG+nziyNGJI0hkJ\n47euhgOtjGzJX87+pzUlqIpR14zGzw1JURLFHeSdrfKzse0f7IDVoaBV6TY2xyVW\n5B18ueZpvZqyycZlR2g8Smdnh23eKL7DPDhkTP2kUBSFBView3RSowJ+ny3/EM4G\nz0JMYwUUWeTlGKIKG4k6P9EPQKGcNX8zjgNOyaSW2CPg4XKzzGqw/DrIXV/wGvkb\nKLPwZgBNAgMBAAECggEACkqtdcrCPxr1G5TsMqboyAxCCH2oQlGuMb/LsMwCglcM\n+Lqflg2OFnm7qFINrsCfpdpVnTfHjwVvic+q99toQcTObEUgxZVAAlJfbgC50Wsd\n76G/ozOzl4JhCn50JcGktPNAR11UtJSmS+RlaTiMyknKVB0WXwn8v7h08Th8sUI/\n1fer9vglTlBYe80IuAXr7yyZyRQQDOTVXXPWRGM8dl3kzcm3WSj8FSVrN5ukgoTH\nw26lXqsMH+RUebvoRxFJQMt5NEYEF/Rx/Wh4EZGfHRh2DbUWfTyuqFpAEG972pB+\n48MJAt7oqqS7SUykja3OPhufnHn/SxxcnsRYqo1M+QKBgQC+dON8q9ThgcCyywbS\nFs3ScPRHN/XhmQpcvxnRdl/TUqxquVmGX5ZDfiYGzMUyUuX3Zi6qiDZts2iz0YDA\ndRZ8K+q33i4tXtGHQScYsMFwSKs7LbwtaEAQK/1u4d84R4H8UDZtxelsKdgP624p\nNR+AkoMkZL6PMQIvTZt8lu7RlQKBgQC72USTAGOITYcE/x41WvVIgV8mt2ZBUvB5\nRzGMGjdkachPZ/de3DUujH5YkSpS39zavVFoLq5NsXdseTP+mpnzGDa7wUAQV3F4\nuFhfmpz/H2Fsj8vxLIDXPtNGi45nPxFLT8Q6jqYHrR8qP6KVPJ4X1Wm7qqcdmbTU\nTHWaLKi12QKBgQCRwsm7x5J0SCafb4y3yyYYscPyoZx33PW2R7dNvMfX5sT4JQSk\nN5G789bMi3k8a39+2WBLuVXWnWE7hdKA+NuNitrnf45dwNyhJDb0yYoyEhuiff0v\nz0KAXfpnG00IOIn9/bG6T6a21kt625cCyJpkfz0I5GWHF13xr/aY4rbCBQKBgQCT\ntj9UEMQzlDMN3MaWUhX6k7CMsz53M47g7vipIJxaG0xmFGzSbPpsxhE797p+PIZg\nguoWsE5jzZ8I7y3RkSRpoaq4bTfBIeGaeesUEnJNsxFa2qAV31bY6xAbsvWhflhN\nDkZRfYZVFu8gu7VPAMGYIDrqVUDf59Pn9M+tElz/0QKBgQCYII3SlwMAl068cfDs\new2PPrA5f+Lxc+zWqUCS0yy0d6Pv7VvtUM+WPDP5MAAseIqp0zH/387YwlQdJU7B\nUk7ftFUzeiUpDmuaZIn0N4edY2Xu/KRee2SKrclmIcdxsPd8co+VFEgQyUTC7lzx\nYLKuCc9NUIQ06fRTVlIsFO9mww==\n-----END PRIVATE KEY-----\n",
+  "client_email": "sheetsaccess@cool-album-403113.iam.gserviceaccount.com",
+  "client_id": "109256505357933491460",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/sheetsaccess%40cool-album-403113.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

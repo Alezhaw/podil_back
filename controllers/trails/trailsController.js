@@ -47,6 +47,28 @@ class TrailsController {
     return res.json({ trails });
   }
 
+  async getByCityIds(req, res, next) {
+    const { country, ids } = req.body;
+    if (!country || !ids[0]) {
+      return next(ApiError.badRequest("Укажите все данные"));
+    }
+
+    let actions = [];
+
+    ids.map((city_id) => actions.push({ city_id }));
+
+    let where = {
+      [Op.or]: actions,
+    };
+
+    const trails = await TrailsService.getByWhere(country, where);
+
+    if (!trails) {
+      return next(ApiError.internal("Города не найдены"));
+    }
+    return res.json({ trails });
+  }
+
   async create(req, res, next) {
     const { country, trail } = req.body;
     if (
@@ -54,7 +76,6 @@ class TrailsController {
       !trail ||
       !trail.planning_person_id ||
       !trail.date_scheduled ||
-      !trail.company_id ||
       !trail.route_number ||
       !trail.departure_dates ||
       !trail.presentation_date ||
@@ -75,14 +96,10 @@ class TrailsController {
       return next(ApiError.badRequest("Презентация уже есть"));
     }
 
-    const checkPlanningPerson = await PlanningPersonService.getById(country, trail.planning_person_id);
-    if (!checkPlanningPerson) {
-      throw ApiError.internal("Planning person не найден");
-    }
-    const checkCompany = await RegimentService.getById(country, trail.company_id);
-    if (!checkCompany) {
-      throw ApiError.internal("Company не найдена");
-    }
+    //   const checkPlanningPerson = await PlanningPersonService.getById(country, trail.planning_person_id);
+    // if (!checkPlanningPerson) {
+    //  throw ApiError.internal("Planning person не найден");
+    // }
     const checkPresentationTime = await PresentationTimeService.getById(country, trail.presentation_time_id);
     if (!checkPresentationTime) {
       throw ApiError.internal("Presentation time не найден");
@@ -131,7 +148,6 @@ class TrailsController {
       !trail ||
       !trail.planning_person_id ||
       !trail.date_scheduled ||
-      !trail.company_id ||
       !trail.route_number ||
       !trail.departure_dates ||
       !trail.presentation_date ||
@@ -152,14 +168,10 @@ class TrailsController {
     if (!checkTrail) {
       return next(ApiError.badRequest("Презентации с таким id не существует"));
     }
-    const checkPlanningPerson = await PlanningPersonService.getById(country, trail.planning_person_id);
-    if (!checkPlanningPerson) {
-      throw ApiError.internal("Planning person не найден");
-    }
-    const checkCompany = await RegimentService.getById(country, trail.company_id);
-    if (!checkCompany) {
-      throw ApiError.internal("Company не найдена");
-    }
+    //const checkPlanningPerson = await PlanningPersonService.getById(country, trail.planning_person_id);
+    //if (!checkPlanningPerson) {
+    //  throw ApiError.internal("Planning person не найден");
+    // }
     const checkPresentationTime = await PresentationTimeService.getById(country, trail.presentation_time_id);
     if (!checkPresentationTime) {
       throw ApiError.internal("Presentation time не найден");
@@ -354,6 +366,37 @@ class TrailsController {
     }
 
     return res.json(allDictionary);
+  }
+
+  async getAllDictionaryForQueue(country) {
+    if (!country) {
+      return console.log("getAllDictionaryForQueue error: укажите country");
+    }
+    let dictionary = [
+      { service: CallTemplateService, array: "callTamplates" },
+      { service: ContactStatusService, array: "contractStatuses" },
+      { service: PlanningPersonService, array: "planningPeople" },
+      { service: PresentationTimeService, array: "presentationTimes" },
+      { service: ProjectConcentService, array: "projectConcent" },
+      { service: ProjectSalesService, array: "projectSales" },
+      { service: RegimentService, array: "regiments" },
+      { service: RegionService, array: "regions" },
+      { service: ReservationStatusService, array: "reservationStatuses" },
+    ];
+    const allDictionary = {};
+
+    try {
+      await Promise.all(
+        dictionary?.map(async (el) => {
+          const data = await el.service.getAll(country);
+          allDictionary[el.array] = data;
+        })
+      );
+    } catch (e) {
+      console.log(e);
+    }
+
+    return allDictionary;
   }
 
   async remove(req, res) {

@@ -6,6 +6,7 @@ const PresentationTime = sequelize.define("presentation_times", {
   presentation_hour: { type: DataTypes.ARRAY(DataTypes.STRING) },
   rental_hours: { type: DataTypes.STRING },
   relevance_status: { type: DataTypes.BOOLEAN },
+  alternative: { type: DataTypes.BOOLEAN, allowNull: false },
 });
 
 const KzPresentationTime = sequelize.define("kzpresentation_times", {
@@ -13,6 +14,7 @@ const KzPresentationTime = sequelize.define("kzpresentation_times", {
   presentation_hour: { type: DataTypes.ARRAY(DataTypes.STRING) },
   rental_hours: { type: DataTypes.STRING },
   relevance_status: { type: DataTypes.BOOLEAN },
+  alternative: { type: DataTypes.BOOLEAN, allowNull: false },
 });
 
 const PlPresentationTime = sequelize.define("plpresentation_times", {
@@ -20,6 +22,7 @@ const PlPresentationTime = sequelize.define("plpresentation_times", {
   presentation_hour: { type: DataTypes.ARRAY(DataTypes.STRING) },
   rental_hours: { type: DataTypes.STRING },
   relevance_status: { type: DataTypes.BOOLEAN },
+  alternative: { type: DataTypes.BOOLEAN, allowNull: false },
 });
 
 module.exports = {

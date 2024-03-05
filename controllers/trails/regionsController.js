@@ -36,7 +36,7 @@ class RegionsController {
 
   async create(req, res, next) {
     const { region, country } = req.body;
-    if (!region.region || !country) {
+    if (!region.region || !country || !Number.isInteger(region.timezone)) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
     const checkRegion = await RegionService.getByName(country, region.region);
@@ -54,12 +54,12 @@ class RegionsController {
   async update(req, res, next) {
     const { region, country } = req.body;
 
-    if (!region || !country || !region.id) {
+    if (!region || !country || !region.id || !Number.isInteger(region.timezone)) {
       return next(ApiError.badRequest("Укажите все данные"));
     }
 
-    const checkRegionName = await RegionService.getByName(country, region.region);
-    if (checkRegionName) {
+    const checkRegionName = await RegionService.getByWhere(country, { region: region.region, timezone: region.timezone });
+    if (checkRegionName[0]) {
       return next(ApiError.badRequest("Регион с таким именем уже существует"));
     }
     const checkRegionId = await RegionService.getById(country, region.id);
